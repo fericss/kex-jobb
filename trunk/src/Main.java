@@ -136,7 +136,7 @@ public class Main extends JFrame{
 				return one>two ? 0 : one==two ? 0 : 1;
 			}
 			
-		});
+		}); 
 //		String temp[] = (String[])returnList.toArray();
 //		Arrays.sort(temp);
 //		ArrayList.
