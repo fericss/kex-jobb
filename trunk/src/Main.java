@@ -72,6 +72,7 @@ public class Main extends JFrame{
 		points.put("Y", 4);
 		points.put("Z", 10);
 		
+		
 		game = new String[15][15];
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
