@@ -136,6 +136,7 @@ public class Main extends JFrame{
 		System.out.print("Rack: ");
 		System.out.println(rack);
 	}
+	
 	private void parseTiles(String gameInfo) {
 		int pos = 0;
 		while(gameInfo.charAt(pos)!='['){
