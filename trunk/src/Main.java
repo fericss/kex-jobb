@@ -35,12 +35,42 @@ public class Main extends JFrame{
 	BufferedReader rd  = null;
 	StringBuilder sb = null;
 	String rack;
+	
 	//    String line = null;
 
 	String[][] game;
+	private HashMap<String, Integer> points;
 
 
 	public Main() throws Exception{
+		
+		points.put("A", 1);
+		points.put("B", 4);
+		points.put("C", 4);
+		points.put("D", 2);
+		points.put("E", 1);
+		points.put("F", 4);
+		points.put("G", 3);
+		points.put("H", 4);
+		points.put("I", 1);
+		points.put("J", 10);
+		points.put("K", 5);
+		points.put("L", 1);
+		points.put("M", 3);
+		points.put("N", 1);
+		points.put("O", 1);
+		points.put("P", 4);
+		points.put("Q", 10);
+		points.put("R", 1);
+		points.put("S", 1);
+		points.put("T", 1);
+		points.put("U", 2);
+		points.put("V", 4);
+		points.put("W", 4);
+		points.put("X", 8);
+		points.put("Y", 4);
+		points.put("Z", 10);
+		
 		game = new String[15][15];
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
@@ -81,43 +111,19 @@ public class Main extends JFrame{
 		}
 
 	}
+	private int calcPoints(String s){
+		int word_points = 0;
+		for(char c : s.toCharArray()){
+//			System.out.println(""+((char)(c-32)));
+			word_points+=points.get(""+((char)(c-32)));
+		}
+		return word_points;
+	}
 	private List<String> sortByPoints(List<String> bla) {
 		// this needs fixing, it really sucks and does not work
-		HashMap<String,Integer> points = new HashMap<String,Integer>();
-		points.put("A", 1);
-		points.put("B", 4);
-		points.put("C", 4);
-		points.put("D", 2);
-		points.put("E", 1);
-		points.put("F", 4);
-		points.put("G", 3);
-		points.put("H", 4);
-		points.put("I", 1);
-		points.put("J", 10);
-		points.put("K", 5);
-		points.put("L", 1);
-		points.put("M", 3);
-		points.put("N", 1);
-		points.put("O", 1);
-		points.put("P", 4);
-		points.put("Q", 10);
-		points.put("R", 1);
-		points.put("S", 1);
-		points.put("T", 1);
-		points.put("U", 2);
-		points.put("V", 4);
-		points.put("W", 4);
-		points.put("X", 8);
-		points.put("Y", 4);
-		points.put("Z", 10);
 		List<String> returnList = new ArrayList<String>();
 		for(String s : bla){
-			int word_points = 0;
-			for(char c : s.toCharArray()){
-//				System.out.println(""+((char)(c-32)));
-				word_points+=points.get(""+((char)(c-32)));
-			}
-			returnList.add(""+word_points+" "+s);
+			returnList.add(""+calcPoints(s)+" "+s);
 		}
 		Collections.sort(returnList);
 //		String temp[] = (String[])returnList.toArray();
