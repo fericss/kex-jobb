@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class Main extends JFrame{
 
 
 	public Main() throws Exception{
-		
+		points = new HashMap<String, Integer>();
 		points.put("A", 1);
 		points.put("B", 4);
 		points.put("C", 4);
@@ -125,7 +126,17 @@ public class Main extends JFrame{
 		for(String s : bla){
 			returnList.add(""+calcPoints(s)+" "+s);
 		}
-		Collections.sort(returnList);
+		Collections.sort(returnList, new Comparator<String>(){
+
+			@Override
+			public int compare(String arg0, String arg1) {
+				int one =Integer.parseInt(arg0.split(" ")[0]);
+				int two =Integer.parseInt(arg1.split(" ")[0]);
+				
+				return one>two ? 0 : one==two ? 0 : 1;
+			}
+			
+		});
 //		String temp[] = (String[])returnList.toArray();
 //		Arrays.sort(temp);
 //		ArrayList.
