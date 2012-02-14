@@ -29,7 +29,9 @@ public class WordFinder {
 		return matches;
 	}
 
-
+	public void gah(){
+		System.out.println("gah");
+	}
 	private String[] LoadWords() {
 		m_words = new String[16][];
 		FileInputStream fstream;
