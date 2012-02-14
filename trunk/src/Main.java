@@ -17,6 +17,9 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -41,12 +44,12 @@ public class Main extends JFrame{
 		game = new String[15][15];
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
-		String _gameInfo = getGame(gamesIDList.get(1));
+		String _gameInfo = getGame(gamesIDList.get(0));
 		parseTiles(_gameInfo);
 		printTiles();
 		WordFinder find = new WordFinder();
-
-
+		
+		
 
 		List<String> bla;
 		/// TEST
@@ -72,10 +75,56 @@ public class Main extends JFrame{
 		//        /// END TEST
 		System.out.print("Words built with rack: ");
 		bla = find.Matches(rack);
-		for(String s : bla){
+		List<String> test = sortByPoints(bla);
+		for(String s : test){
 			System.out.print(s+", ");
 		}
 
+	}
+	private List<String> sortByPoints(List<String> bla) {
+		// this needs fixing, it really sucks and does not work
+		HashMap<String,Integer> points = new HashMap<String,Integer>();
+		points.put("A", 1);
+		points.put("B", 4);
+		points.put("C", 4);
+		points.put("D", 2);
+		points.put("E", 1);
+		points.put("F", 4);
+		points.put("G", 3);
+		points.put("H", 4);
+		points.put("I", 1);
+		points.put("J", 10);
+		points.put("K", 5);
+		points.put("L", 1);
+		points.put("M", 3);
+		points.put("N", 1);
+		points.put("O", 1);
+		points.put("P", 4);
+		points.put("Q", 10);
+		points.put("R", 1);
+		points.put("S", 1);
+		points.put("T", 1);
+		points.put("U", 2);
+		points.put("V", 4);
+		points.put("W", 4);
+		points.put("X", 8);
+		points.put("Y", 4);
+		points.put("Z", 10);
+		List<String> returnList = new ArrayList<String>();
+		for(String s : bla){
+			int word_points = 0;
+			for(char c : s.toCharArray()){
+//				System.out.println(""+((char)(c-32)));
+				word_points+=points.get(""+((char)(c-32)));
+			}
+			returnList.add(""+word_points+" "+s);
+		}
+		Collections.sort(returnList);
+//		String temp[] = (String[])returnList.toArray();
+//		Arrays.sort(temp);
+//		ArrayList.
+//		returnList.
+		return returnList;
 	}
 	private void printTiles() {
 		for(String[] s : game){
@@ -120,7 +169,7 @@ public class Main extends JFrame{
 				pos++;
 			}
 			String l3 = String.valueOf(gameInfo.charAt(pos-2));
-						System.out.println(""+l1+" "+l2+" "+l3);
+//						System.out.println(""+l1+" "+l2+" "+l3);
 			game[l2][l1] = ""+l3;
 			if(gameInfo.charAt(pos+7)==']'&& gameInfo.charAt(pos+8)==']'){
 				done = true;
