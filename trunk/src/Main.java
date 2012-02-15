@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +19,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -36,7 +38,7 @@ public class Main extends JFrame{
 	BufferedReader rd  = null;
 	StringBuilder sb = null;
 	String rack;
-	
+
 	//    String line = null;
 
 	String[][] game;
@@ -71,38 +73,64 @@ public class Main extends JFrame{
 		points.put("X", 8);
 		points.put("Y", 4);
 		points.put("Z", 10);
-		
-		
+
+
 		game = new String[15][15];
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
 		String _gameInfo = getGame(gamesIDList.get(0));
 		parseTiles(_gameInfo);
-		printTiles();
+		
 		WordFinder find = new WordFinder();
-		
-		
-
+		ArrayList<Point> buildLocations = new ArrayList<Point>();
 		List<String> bla;
-		/// TEST
-		//		        List<String> build = new ArrayList<String>();
-		//		        for(String[] s : game){
-		//		            String _tmp ="";
-		//		            for(String st : s){
-		//		                _tmp += st==null? "" : st;
-		//		            }
-		//		            System.out.println(_tmp);
-		//		            bla = find.Matches(rack+_tmp);
-		//		            for(String st : bla){
-		////		                System.out.print(st+", ");
-		//		                if(!st.equals("") && st.contains(_tmp)){
-		//		                    build.add(st);
-		//		                }
-		//		            }
-		//		        }
-		//		        for(String s : build){
-		//		            System.out.println(s);
-		//		        }
+		/// TEST  
+		for(int i = 0; i<15; i++){
+			for(int i2 = 0; i2<15; i2++){
+				if(game[i][i2]!=null && !game[i][i2].equals("_")){
+					if(i2 < 14 && game[i][i2+1]==null){
+						game[i][i2+1]="_";
+						buildLocations.add(new Point(i,i2+1));
+//						System.out.println("what");
+					}
+					if(i<14 && game[i+1][i2]==null){
+						game[i+1][i2]="_";
+						buildLocations.add(new Point(i+1,i2));
+					}	
+					if(i > 0 &&game[i-1][i2]==null){
+						game[i-1][i2]="_";
+						buildLocations.add(new Point(i-1,i2));
+					}
+					if(i2 > 0 && game[i][i2-1]==null){
+						game[i][i2-1]="_";
+						buildLocations.add(new Point(i,i2-1));
+					}
+				}
+
+
+			}
+		}
+		printTiles();
+//		new FredricTestStuff(game,buildLocations); 
+		//				        List<String> build = new ArrayList<String>();
+		//				        for(String[] s : game){
+		//				            String _tmp ="";
+		//				            for(String st : s){
+		//				                _tmp += st==null? "" : st;
+		//				                if()
+		//				            }
+		//				            System.out.println(_tmp);
+		//				            bla = find.Matches(rack+_tmp);
+		//				            for(String st : bla){
+		//		//		                System.out.print(st+", ");
+		//				                if(!st.equals("") && st.contains(_tmp)){
+		//				                    build.add(st);
+		//				                }
+		//				            }
+		//				        }
+		//				        for(String s : build){
+		//				            System.out.println(s);
+		//				        }
 
 		//        /// END TEST
 		System.out.print("Words built with rack: ");
@@ -116,7 +144,7 @@ public class Main extends JFrame{
 	private int calcPoints(String s){
 		int word_points = 0;
 		for(char c : s.toCharArray()){
-//			System.out.println(""+((char)(c-32)));
+			//			System.out.println(""+((char)(c-32)));
 			word_points+=points.get(""+((char)(c-32)));
 		}
 		return word_points;
@@ -133,15 +161,15 @@ public class Main extends JFrame{
 			public int compare(String arg0, String arg1) {
 				int one =Integer.parseInt(arg0.split(" ")[0]);
 				int two =Integer.parseInt(arg1.split(" ")[0]);
-				
+
 				return one>two ? 0 : one==two ? 0 : 1;
 			}
-			
+
 		}); 
-//		String temp[] = (String[])returnList.toArray();
-//		Arrays.sort(temp);
-//		ArrayList.
-//		returnList.
+		//		String temp[] = (String[])returnList.toArray();
+		//		Arrays.sort(temp);
+		//		ArrayList.
+		//		returnList.
 		return returnList;
 	}
 	private void printTiles() {
@@ -154,7 +182,7 @@ public class Main extends JFrame{
 		System.out.print("Rack: ");
 		System.out.println(rack);
 	}
-	
+
 	private void parseTiles(String gameInfo) {
 		int pos = 0;
 		while(gameInfo.charAt(pos)!='['){
@@ -188,7 +216,7 @@ public class Main extends JFrame{
 				pos++;
 			}
 			String l3 = String.valueOf(gameInfo.charAt(pos-2));
-//						System.out.println(""+l1+" "+l2+" "+l3);
+			//						System.out.println(""+l1+" "+l2+" "+l3);
 			game[l2][l1] = ""+l3;
 			if(gameInfo.charAt(pos+7)==']'&& gameInfo.charAt(pos+8)==']'){
 				done = true;
@@ -217,10 +245,10 @@ public class Main extends JFrame{
 			pos++;
 			//            System.out.println(pos);
 			if(gameInfo.charAt(pos)=='"' && gameInfo.charAt(pos-1)=='k'
-				&& gameInfo.charAt(pos-2)=='c'
+					&& gameInfo.charAt(pos-2)=='c'
 					&& gameInfo.charAt(pos-3)=='a'
-						&& gameInfo.charAt(pos-4)=='r'
-							&& gameInfo.charAt(pos-5)=='"'){
+					&& gameInfo.charAt(pos-4)=='r'
+					&& gameInfo.charAt(pos-5)=='"'){
 				done = true;
 				break;
 			}
@@ -263,28 +291,28 @@ public class Main extends JFrame{
 			pos++;
 			if(line.charAt(pos)=='}'&&line.charAt(pos-1)=='}'&&line.charAt(pos-2)==']'&&line.charAt(pos-3)=='}'){
 				done = true;
-//				System.out.println("lol"+pos);
+				//				System.out.println("lol"+pos);
 				break;
-				
+
 			}
 			if(line.charAt(pos)=='"'&&line.charAt(pos-1)=='d'&&line.charAt(pos-2)=='i'&&line.charAt(pos-3)=='"'
-				&&line.charAt(pos-10)=='e'&&line.charAt(pos-11)=='m'&&line.charAt(pos-12)=='a'&&line.charAt(pos-13)=='g'){
-			
-//			while(!line.substring(pos,pos+4).equals("\"id\"")){
-//				pos++;
-//			}
-				
-			pos = pos+3;
-			//        while(line.charAt(pos)<'0' &&  line.charAt(pos)>'9'){
-			//            pos++;
-			//        }
-			int startPos = pos;
-			while(line.charAt(pos)!=','){
-				pos++;
-			}
-			//        System.out.println(line.substring(startPos,pos));
-			gameID.add(line.substring(startPos,pos));
-			System.out.println("lol "+line.substring(startPos,pos) );
+					&&line.charAt(pos-10)=='e'&&line.charAt(pos-11)=='m'&&line.charAt(pos-12)=='a'&&line.charAt(pos-13)=='g'){
+
+				//			while(!line.substring(pos,pos+4).equals("\"id\"")){
+				//				pos++;
+				//			}
+
+				pos = pos+3;
+				//        while(line.charAt(pos)<'0' &&  line.charAt(pos)>'9'){
+				//            pos++;
+				//        }
+				int startPos = pos;
+				while(line.charAt(pos)!=','){
+					pos++;
+				}
+				//        System.out.println(line.substring(startPos,pos));
+				gameID.add(line.substring(startPos,pos));
+//				System.out.println("lol "+line.substring(startPos,pos) );
 			}
 		}
 
@@ -343,7 +371,7 @@ public class Main extends JFrame{
 		String pwd = SHA1(password+salt);
 
 		String str = "{\"password\": \""+pwd+"\""+","+
-		"\"email\": \""+user+"\"}";
+				"\"email\": \""+user+"\"}";
 		System.out.println(str);
 		utdata.println(str);
 		//        System.out.println(connection);
