@@ -3,20 +3,33 @@ import java.util.ArrayList;
 
 public class Scrabby {
 	
+	/**
+	 * might be changed to take a filtered wordlist for each row and each column.
+	 * @param board
+	 * @param bonus
+	 * @param charvalues
+	 * @param rack
+	 * @param wordlist
+	 * @param emptyChar
+	 * @return
+	 */
 	public ArrayList<Move> brute(char[][] board, int[][] bonus,int[] charvalues,char[] rack,String[] wordlist,char emptyChar){
 		ArrayList<Move> res=new ArrayList<Move>();
+		//for each word in wordlist
 		for(int i=0;i<wordlist.length;i++){
 			String word=wordlist[i];
+			//for each position on board
 			for(int y=0;y<board.length;y++){
 				for(int x=0;x<board[y].length;x++){
+					//calculate points for placing word on board at position and in direction
 					int points=points(board,bonus,charvalues,rack,word,x,y,true, emptyChar);
 					if(points>0){
-						//was a word so add to result
+						//it was a word so add to result
 						res.add(new Move(wordlist,points,i,x,y,true));
 					}
 					points=points(board,bonus,charvalues,rack,word,x,y,false,emptyChar);
 					if(points>0){
-						//was a word so add to result
+						//it was a word so add to result
 						res.add(new Move(wordlist,points,i,x,y,false));
 					}
 				}
@@ -42,9 +55,7 @@ public class Scrabby {
 		}
 		public String toString(){
 			return "{"+this.points+","+this.wordlist[word]+","+this.x+","+this.y+","+this.horizontal+"}";
-			
 		}
-		
 	}
 	
 	/**
@@ -64,7 +75,8 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
-	public int points(char[][] board, int[][] bonus,int[] charvalues,char[] rack, String word, int x,int y,boolean horizontal,final char emptyChar){
+	public int points(char[][] board, int[][] bonus,int[] charvalues,char[] rack, 
+			String word, int x,int y,boolean horizontal,final char emptyChar){
 		
 		//Check chars before and after word
 		if(horizontal){
@@ -79,34 +91,40 @@ public class Scrabby {
 			if(x+word.length()<board[y].length-1 && board[y][x+word.length()]!=emptyChar){return -1;}
 		}
 		
+		//the number of points
 		int points=0;
 		
-		//check word in indicated direction, and calculate points
-		//quick check, take chars from rack, test if correct char at position, calculate points
-		int emptyChars=0;
-		int filledChars=0;
-		char[] neededChars=new char[7]; //has to be in the rack, empty chars to know length
-		boolean[] taken=new boolean[rack.length];
-		int index=0;
+		//check word in given direction (horizontal or not horizontal), and calculate points
+		//check correct char at position and that the char is in the rack
+		int usedChars=0;
+		int setChars=0;
+		char[] neededChars=new char[7]; //used chars, TODO: might be returned?
+		boolean[] taken=new boolean[rack.length]; //wich of the char in the rack are taken
 		int x2=x;
 		int y2=y;
-		for(int i=0;i<word.length();i++){
-			char tmp=board[y][x];
-			if(tmp!=emptyChar){
-				if(tmp==word.charAt(i)){
-					points+=charvalues[board[y][x]]*bonus[y][x];
-				} else {
+		for(int wi=0;wi<word.length();wi++){
+			char boardCh=board[y2][x2];//retrieve board char
+			char wordCh=word.charAt(wi);//retrieve word char
+			if(boardCh!=emptyChar){
+				//it's a nonempty position =>
+				if(boardCh!=wordCh){
 					return -1;
+				} else {
+					//
+					points+=charvalues[board[y2][x2]]*bonus[y2][x2];
+					setChars++;
 				}
-				filledChars++;
+				
 			} else {
 				boolean foundChar=false;
-				for(int j=0;j<taken.length;j++){
-					if(!taken[j]){
-						if(rack[j]==tmp){
+				for(int ri=0;ri<taken.length;ri++){
+					if(!taken[ri]){
+						if(rack[ri]==wordCh){
 							//take char from rack
 							foundChar=true;
-							taken[j]=true;
+							taken[ri]=true;
+							neededChars[usedChars]=wordCh;
+							usedChars++;
 							break;
 						}
 					}
@@ -114,16 +132,15 @@ public class Scrabby {
 				if(!foundChar){
 					return -1;
 				} 
-				emptyChars++;
 			}
 			if(horizontal){
-				x++;//go to next letter in word
+				x2++;//go to next letter in word
 			} else {
-				y++;//go to next letter in word
+				y2++;//go to next letter in word
 			}
 		}
 		//it has to add atleast one char and it must contain atleast one char from the board
-		if(filledChars==0 || emptyChars==0){
+		if(setChars==0 || usedChars==0){
 			return -1;
 		}
 		
@@ -149,6 +166,7 @@ public class Scrabby {
 					return -1;
 				}
 			}
+			//increment position in direction
 			if(horizontal){
 				//go to next letter in word
 				x++;
@@ -160,6 +178,10 @@ public class Scrabby {
 		return points;
 	}
 	
+	public int pointsAtPoint(char[][] board, int[][] bonus,int[] charvalues,int x, int y, char ch){
+		return board[x][y]==ch?charvalues[indexOfChar(board[x][y])]*bonus[x][y]:-1;
+	}
+	
 	/**
 	 * checks for a word in the indicated direction
 	 * returns -1 if the resulting word has length -1
@@ -167,14 +189,16 @@ public class Scrabby {
 	 * @param board
 	 * @param x
 	 * @param y
-	 * @param horisontal
+	 * @param horizontal
 	 * @param emptyChar
 	 * @return
 	 */
-	public int crosspoints(char[][] board,int[][] bonus,int[] charvalues,int x, int y, boolean horisontal,final char emptyChar){
+	public int crosspoints(char[][] board,int[][] bonus,int[] charvalues,
+			int x, int y, boolean horizontal,final char emptyChar){
+		
 		StringBuilder sb=new StringBuilder();
 		int points=0;
-		if(horisontal){
+		if(horizontal){
 			while(x>0 && board[y][x-1]!=emptyChar){
 				x--;
 			} 
@@ -250,14 +274,15 @@ public class Scrabby {
 			return freq;
 		}
 		
-		/**
-		 * place holder, use fredric's method instead
-		 * @param ch
-		 * @return
-		 */
-		public int indexOfChar(char ch){
-			return -1;
-		}
+		
+	}
+	/**
+	 * place holder, use fredric's method instead
+	 * @param ch
+	 * @return
+	 */
+	public static int indexOfChar(char ch){
+		return -1;
 	}
     
 }
