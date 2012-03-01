@@ -2,7 +2,8 @@ import java.util.ArrayList;
 
 
 public class Scrabby {
-	int[] charvalues;
+	public int[] charvalues;
+
 	/**
 	 * might be changed to take a filtered wordlist for each row and each column.
 	 * @param board
@@ -112,7 +113,6 @@ public class Scrabby {
 				} else {
 					setChars++;
 				}
-				
 			} else {
 				boolean foundChar=false;
 				for(int ri=0;ri<taken.length;ri++){
@@ -160,7 +160,7 @@ public class Scrabby {
 			}
 			//if letter above or below check if word in that direction
 			if(should){
-				int tmp=crosspoints(board,bonus,charvalues,y,x,!vertical,emptyChar);
+				int tmp=crosspoints(board,bonus,charvalues,x,y,!vertical,emptyChar);
 				if(tmp>0){
 					points=points+tmp;
 				} else {
@@ -183,7 +183,12 @@ public class Scrabby {
 		return value(ch)*bonus[x][y];
 	}
 	
-	public int value(char ch){
+	/**
+	 * 
+	 * @param ch
+	 * @return
+	 */
+	public int value(char ch){//TODO: implement
 		return -1;
 	}
 	
@@ -210,7 +215,7 @@ public class Scrabby {
 			} 
 			while(y<board[x].length && board[x][y]!=emptyChar){
 				sb.append(board[x][y]);
-				points+=pointsAtPoint(bonus,y,x,board[x][y]);
+				points+=pointsAtPoint(bonus,x,y,board[x][y]);
 				y++;
 			}
 		} else {
@@ -219,7 +224,7 @@ public class Scrabby {
 			} 
 			while(x<board.length && board[x][y]!=emptyChar){
 				sb.append(board[x][y]);
-				points+=pointsAtPoint(bonus,y,x,board[x][y]);
+				points+=pointsAtPoint(bonus,x,y,board[x][y]);
 				x--;
 			}
 		}
