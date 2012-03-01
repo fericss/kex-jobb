@@ -19,8 +19,8 @@ public class Scrabby {
 		for(int i=0;i<wordlist.length;i++){
 			String word=wordlist[i];
 			//for each position on board
-			for(int y=0;y<board.length;y++){
-				for(int x=0;x<board[y].length;x++){
+			for(int x=0;x<board.length;x++){
+				for(int y=0;y<board[x].length;y++){
 					//calculate points for placing word on board at position and in direction
 					int points=points(board,bonus,charvalues,rack,word,x,y,true, emptyChar);
 					if(points>0){
@@ -69,26 +69,26 @@ public class Scrabby {
 	 * @param charvalues
 	 * @param rack
 	 * @param word
-	 * @param x
 	 * @param y
-	 * @param horizontal
+	 * @param x
+	 * @param vertical
 	 * @param emptyChar
 	 * @return
 	 */
 	public int points(char[][] board, int[][] bonus,int[] charvalues,char[] rack, 
-			String word, int x,int y,boolean horizontal,final char emptyChar){
+			String word, int x,int y,boolean vertical,final char emptyChar){
 		
 		//Check chars before and after word
-		if(horizontal){
+		if(vertical){
 			//if char before word quit
-			if(x>0 && board[y][x-1]!=emptyChar){return -1;}
+			if(y>0 && board[x][y-1]!=emptyChar){return -1;}
 			//if char after word quit
-			if(x+word.length()<board[y].length-1 && board[y][x+word.length()]!=emptyChar){return -1;}
+			if(y+word.length()<board[x].length-1 && board[x][y+word.length()]!=emptyChar){return -1;}
 		} else {
 			//if char after word quit
-			if(y+word.length()<board.length-1 && board[y+word.length()][x]!=emptyChar){return -1;}
+			if(x>0 && board[x-1][y]!=emptyChar){return -1;}
 			//if char after word quit
-			if(x+word.length()<board[y].length-1 && board[y][x+word.length()]!=emptyChar){return -1;}
+			if(y+word.length()<board[x].length-1 && board[x][y+word.length()]!=emptyChar){return -1;}
 		}
 		
 		//the number of points
@@ -100,10 +100,10 @@ public class Scrabby {
 		int setChars=0;
 		char[] neededChars=new char[7]; //used chars, TODO: might be returned?
 		boolean[] taken=new boolean[rack.length]; //wich of the char in the rack are taken
-		int x2=x;
 		int y2=y;
+		int x2=x;
 		for(int wi=0;wi<word.length();wi++){
-			char boardCh=board[y2][x2];//retrieve board char
+			char boardCh=board[x2][y2];//retrieve board char
 			char wordCh=word.charAt(wi);//retrieve word char
 			if(boardCh!=emptyChar){
 				//it's a nonempty position =>
@@ -134,10 +134,10 @@ public class Scrabby {
 			//a char was "placed" calculate the points for it
 			points+=pointsAtPoint(bonus,x2,y2,wordCh);
 			
-			if(horizontal){
-				x2++;//go to next letter in word
-			} else {
+			if(vertical){
 				y2++;//go to next letter in word
+			} else {
+				x2++;//go to next letter in word
 			}
 		}
 		//it has to add atleast one char and it must contain atleast one char from the board
@@ -149,18 +149,18 @@ public class Scrabby {
 		for(int i=0;i<word.length();i++){
 			boolean should=false;
 			//check if letter above or below
-			if(horizontal){
-				if(board[y+1][x]!=emptyChar || board[y-1][x]!=emptyChar){
+			if(vertical){
+				if(board[x+1][y]!=emptyChar || board[x-1][y]!=emptyChar){
 					should=true;
 				}
 			} else {
-				if(board[y][x+1]!=emptyChar || board[y][x-1]!=emptyChar){
+				if(board[x][y+1]!=emptyChar || board[x][y-1]!=emptyChar){
 					should=true;
 				}
 			}
 			//if letter above or below check if word in that direction
 			if(should){
-				int tmp=crosspoints(board,bonus,charvalues,x,y,!horizontal,emptyChar);
+				int tmp=crosspoints(board,bonus,charvalues,y,x,!vertical,emptyChar);
 				if(tmp>0){
 					points=points+tmp;
 				} else {
@@ -168,12 +168,12 @@ public class Scrabby {
 				}
 			}
 			//increment position in direction
-			if(horizontal){
-				//go to next letter in word
-				x++;
-			} else {
+			if(vertical){
 				//go to next letter in word
 				y++;
+			} else {
+				//go to next letter in word
+				x++;
 			}
 		}
 		return points;
@@ -193,34 +193,34 @@ public class Scrabby {
 	 * returns -1 if the resulting word has length -1
 	 * TODO: must add a contains check
 	 * @param board
-	 * @param x
 	 * @param y
-	 * @param horizontal
+	 * @param x
+	 * @param vertical
 	 * @param emptyChar
 	 * @return
 	 */
 	public int crosspoints(char[][] board,int[][] bonus,int[] charvalues,
-			int x, int y, boolean horizontal,final char emptyChar){
+			int x, int y, boolean vertical,final char emptyChar){
 		
 		StringBuilder sb=new StringBuilder();
 		int points=0;
-		if(horizontal){
-			while(x>0 && board[y][x-1]!=emptyChar){
-				x--;
+		if(vertical){
+			while(y>0 && board[x][y-1]!=emptyChar){
+				y--;
 			} 
-			while(x<board[y].length && board[y][x]!=emptyChar){
-				sb.append(board[y][x]);
-				points+=pointsAtPoint(bonus,x,y,board[y][x]);
-				x++;
+			while(y<board[x].length && board[x][y]!=emptyChar){
+				sb.append(board[x][y]);
+				points+=pointsAtPoint(bonus,y,x,board[x][y]);
+				y++;
 			}
 		} else {
-			while(y>0 && board[y-1][x]!=emptyChar){
-				y--;
+			while(x>0 && board[x-1][y]!=emptyChar){
+				x--;
 			} 
-			while(y<board.length && board[y][x]!=emptyChar){
-				sb.append(board[y][x]);
-				points+=pointsAtPoint(bonus,x,y,board[y][x]);
-				y--;
+			while(x<board.length && board[x][y]!=emptyChar){
+				sb.append(board[x][y]);
+				points+=pointsAtPoint(bonus,y,x,board[x][y]);
+				x--;
 			}
 		}
 		if(sb.length()==1){
