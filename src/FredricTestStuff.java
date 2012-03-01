@@ -78,11 +78,32 @@ public class FredricTestStuff {
 	}
 
 	private boolean canBePlacedCol(String word, int x, int boardPos, int wordPos) {
-		int startPos = boardPos-wordPos;
-		for(int i = 0; i<word.length();i++){
+//		System.out.println("testing "+word);
+		String wordTest="";
+		for(int i = (boardPos-wordPos); i<((boardPos-wordPos)+word.length());i++){
+			int y = x;
+			while(y>0 && game[y][i]!=null && !game[y][i].equals("_")){
+				y--;
+			}
+			int y2 = x;
+			while(y2<15 && game[y2][i]!=null && !game[y2][i].equals("_")){
+				y2++;
+			}
+			y++;
+			
+//			System.out.println(y+" w "+y2+" i "+(i-(boardPos-wordPos)));
+			for(int r = y; r<y2; r++){
+				
+				wordTest += r==x ? word.charAt((i-(boardPos-wordPos))) : game[r][i];
+			}
+//			System.out.println("\n"+wordTest);
 			
 		}
-		return false;
+		if(wordTest.length()<2){
+			return true;
+		}
+//		System.out.println("\ntest "+wordTest);
+		return find.isWord(wordTest.toLowerCase());
 	}
 	private Collection<String> getWordThatCanBeBuiltOnCol(int x) {
 		List<String> words = new ArrayList<String>();
