@@ -28,7 +28,7 @@ public class WordFinder {
 		}
 		return matches;
 	}
-	
+
 	private String[] LoadWords() {
 		m_words = new String[16][];
 		FileInputStream fstream;
@@ -39,19 +39,19 @@ public class WordFinder {
 
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			
-			
+
+
 			int numWords = 0;
 			String line=null;
 			while ((line =br.readLine()) != null){
-					numWords++;
+				numWords++;
 			}
 			words = new String[numWords];
-//			System.out.println(""+numWords);
+			//			System.out.println(""+numWords);
 			br.close();
 			in.close();
 			fstream.close();
-			
+
 			fstream = new FileInputStream("words.txt");
 			in = new DataInputStream(fstream);
 			br = new BufferedReader(new InputStreamReader(in));
@@ -63,7 +63,7 @@ public class WordFinder {
 			br.close();
 			in.close();
 			fstream.close();
-			
+
 			/// Create some arrays with words of certain lengths, for example m_words[5] has all words of length 5
 			for (int i = 2; i <= 15; i++) {
 				fstream = new FileInputStream("words.txt");
@@ -109,13 +109,13 @@ public class WordFinder {
 		char[] letters = targetWord.toCharArray();
 		for(char letter : letters)
 		{
-			
-//			char letter = targetWord.charAt(i);
+
+			//			char letter = targetWord.charAt(i);
 			int pos = sourceLetters.indexOf(letter);
-//			System.out.println(""+letter+" "+pos);
+			//			System.out.println(""+letter+" "+pos);
 			if (pos >= 0)
 			{
-//				System.out.println("bla");
+				//				System.out.println("bla");
 				builtWord += letter;
 				sourceLetters = Remove(pos, sourceLetters);
 				continue;
@@ -140,13 +140,15 @@ public class WordFinder {
 			wat[i-1] = wat[i];
 			wat[i] = 0;
 		}
+		if(pos+1==wat.length){
+			wat[pos]=0;
+		}
 		return (""+String.valueOf(wat));
 	}
 	public static void main(String[] args){
 		WordFinder wordList = new WordFinder();
-		System.out.println(wordList.isWord("crayon"));
-		System.out.println(wordList.isWord("cat"));
-		System.out.println(wordList.isWord("qrztru"));
+		System.out.println(wordList.Matches("fid"));
+
 	}
 	public boolean isWord(String s) {
 		if (s.length() < 2 || s.length() > 15)

@@ -37,7 +37,7 @@ public class Main extends JFrame{
 	OutputStreamWriter wr = null;
 	BufferedReader rd  = null;
 	StringBuilder sb = null;
-	String rack;
+	private String rack;
 
 	//    String line = null;
 
@@ -111,7 +111,7 @@ public class Main extends JFrame{
 			}
 		}
 		printTiles();
-//		new FredricTestStuff(game,buildLocations); 
+		new FredricTestStuff(game,buildLocations,rack,this); 
 		//				        List<String> build = new ArrayList<String>();
 		//				        for(String[] s : game){
 		//				            String _tmp ="";
@@ -133,12 +133,14 @@ public class Main extends JFrame{
 		//				        }
 
 		//        /// END TEST
-		System.out.print("Words built with rack: ");
-		bla = find.Matches(rack);
-		List<String> test = sortByPoints(bla);
-		for(String s : test){
-			System.out.print(s+", ");
-		}
+//		System.out.print("Words built with rack: ");
+//		bla = find.Matches(getRack());
+//		List<String> test = sortByPoints(bla);
+//		List<String> test = bla;
+//
+//		for(String s : test){
+//			System.out.print(s+", ");
+//		}
 
 	}
 	private int calcPoints(String s){
@@ -149,7 +151,7 @@ public class Main extends JFrame{
 		}
 		return word_points;
 	}
-	private List<String> sortByPoints(List<String> bla) {
+	List<String> sortByPoints(List<String> bla) {
 		// this needs fixing, it really sucks and does not work
 		List<String> returnList = new ArrayList<String>();
 		for(String s : bla){
@@ -180,7 +182,7 @@ public class Main extends JFrame{
 			System.out.println();
 		}
 		System.out.print("Rack: ");
-		System.out.println(rack);
+		System.out.println(getRack());
 	}
 
 	private void parseTiles(String gameInfo) {
@@ -239,7 +241,7 @@ public class Main extends JFrame{
 		//                }
 		//                pos+=10;
 		done = false;
-		rack = "";
+		setRack("");
 
 		while(!done){
 			pos++;
@@ -258,7 +260,7 @@ public class Main extends JFrame{
 			pos++;
 			if(gameInfo.charAt(pos)>='A' && gameInfo.charAt(pos)<='Z' && gameInfo.charAt(pos-1)=='"' && gameInfo.charAt(pos+1)=='"'){
 				//                System.out.println(""+gameInfo.charAt(pos));
-				rack = rack+gameInfo.charAt(pos);
+				setRack(getRack()+gameInfo.charAt(pos));
 			}
 			if(gameInfo.charAt(pos)==']'&& gameInfo.charAt(pos+1)=='}'){
 				done = true;
@@ -417,6 +419,12 @@ public class Main extends JFrame{
 		md.update(text.getBytes("iso-8859-1"), 0, text.length());
 		sha1hash = md.digest();
 		return convToHex(sha1hash);
+	}
+	public void setRack(String rack) {
+		this.rack = rack;
+	}
+	public String getRack() {
+		return rack;
 	}
 
 }
