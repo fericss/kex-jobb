@@ -85,31 +85,31 @@ public class Main extends JFrame{
 		ArrayList<Point> buildLocations = new ArrayList<Point>();
 		List<String> bla;
 		/// TEST  
-		for(int i = 0; i<15; i++){
-			for(int i2 = 0; i2<15; i2++){
-				if(game[i][i2]!=null && !game[i][i2].equals("_")){
-					if(i2 < 14 && game[i][i2+1]==null){
-						game[i][i2+1]="_";
-						buildLocations.add(new Point(i,i2+1));
-//						System.out.println("what");
-					}
-					if(i<14 && game[i+1][i2]==null){
-						game[i+1][i2]="_";
-						buildLocations.add(new Point(i+1,i2));
-					}	
-					if(i > 0 &&game[i-1][i2]==null){
-						game[i-1][i2]="_";
-						buildLocations.add(new Point(i-1,i2));
-					}
-					if(i2 > 0 && game[i][i2-1]==null){
-						game[i][i2-1]="_";
-						buildLocations.add(new Point(i,i2-1));
-					}
-				}
-
-
-			}
-		}
+//		for(int i = 0; i<15; i++){
+//			for(int i2 = 0; i2<15; i2++){
+//				if(game[i][i2]!=null && !game[i][i2].equals("_")){
+//					if(i2 < 14 && game[i][i2+1]==null){
+//						game[i][i2+1]="_";
+//						buildLocations.add(new Point(i,i2+1));
+////						System.out.println("what");
+//					}
+//					if(i<14 && game[i+1][i2]==null){
+//						game[i+1][i2]="_";
+//						buildLocations.add(new Point(i+1,i2));
+//					}	
+//					if(i > 0 &&game[i-1][i2]==null){
+//						game[i-1][i2]="_";
+//						buildLocations.add(new Point(i-1,i2));
+//					}
+//					if(i2 > 0 && game[i][i2-1]==null){
+//						game[i][i2-1]="_";
+//						buildLocations.add(new Point(i,i2-1));
+//					}
+//				}
+//
+//
+//			}
+//		}
 		printTiles();
 		new FredricTestStuff(game,buildLocations,rack,this); 
 		//				        List<String> build = new ArrayList<String>();

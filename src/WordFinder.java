@@ -140,14 +140,14 @@ public class WordFinder {
 			wat[i-1] = wat[i];
 			wat[i] = 0;
 		}
-		if(pos+1==wat.length){
+		if(pos==wat.length-1){
 			wat[pos]=0;
 		}
 		return (""+String.valueOf(wat));
 	}
 	public static void main(String[] args){
 		WordFinder wordList = new WordFinder();
-		System.out.println(wordList.Matches("fid"));
+		System.out.println(wordList.Matches("fhosedextrnaa"));
 
 	}
 	public boolean isWord(String s) {
