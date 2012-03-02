@@ -11,12 +11,19 @@ public class Scrabby {
 	
 	
 	public void test(String[][] game,String rack,HashMap<String, Integer> _letterPoints,String[] _wordlist){
+		
+		//code for use in main
+		//Scrabby sc=new Scrabby();
+		//sc.test(game,rack,points, wordlist);
+		
 		wordlist=_wordlist;
 		letterPoints=_letterPoints;
 		char[][] board=gameToBoard(game);
 		int[][] bonus=plainBonus(15,15);
 		char[] rack2=rack.toCharArray();
 		ArrayList<Move> res=brute(board, bonus,rack2,' ');
+		
+		//print the generated moves/words
 		for(int i=0;i<res.size();i++){
 			res.get(i).toString();
 		}
@@ -116,17 +123,30 @@ public class Scrabby {
 	public int points(char[][] board, int[][] bonus,char[] rack, 
 			String word, int x,int y,boolean vertical,final char emptyChar){
 		
+		final int xsize=15;
+		final int ysize=15;
+		//check length of word
+		if(vertical){
+			if(y+word.length()>ysize){
+				return -1;
+			}
+		} else {
+			if(x+word.length()>xsize){
+				return -1;
+			}
+		}
+		
 		//Check chars before and after word
 		if(vertical){
 			//if char before word quit
 			if(y>0 && board[x][y-1]!=emptyChar){return -1;}
 			//if char after word quit
-			if(y+word.length()<board[x].length-1 && board[x][y+word.length()]!=emptyChar){return -1;}
+			if(y+word.length()<ysize-1 && board[x][y+word.length()]!=emptyChar){return -1;}
 		} else {
 			//if char after word quit
 			if(x>0 && board[x-1][y]!=emptyChar){return -1;}
 			//if char after word quit
-			if(y+word.length()<board[x].length-1 && board[x][y+word.length()]!=emptyChar){return -1;}
+			if(x+word.length()<xsize-1 && board[x+word.length()][y]!=emptyChar){return -1;}
 		}
 		
 		//the number of points
@@ -177,7 +197,7 @@ public class Scrabby {
 				x2++;//go to next letter in word
 			}
 		}
-		//it has to add atleast one char and it must contain atleast one char from the board
+		//it has to have added atleast one char and it must contain atleast one char from the board
 		if(setChars==0 || usedChars==0){
 			return -1;
 		}
@@ -254,13 +274,16 @@ public class Scrabby {
 	public int crosspoints(char[][] board,int[][] bonus,
 			int x, int y, boolean vertical,final char emptyChar){
 		
+		final int xsize=15;
+		final int ysize=15;
+		
 		StringBuilder sb=new StringBuilder();
 		int points=0;
 		if(vertical){
 			while(y>0 && board[x][y-1]!=emptyChar){
 				y--;
 			} 
-			while(y<board[x].length && board[x][y]!=emptyChar){
+			while(y<ysize && board[x][y]!=emptyChar){
 				sb.append(board[x][y]);
 				points+=pointsAtPoint(bonus,x,y,board[x][y]);
 				y++;
@@ -269,7 +292,7 @@ public class Scrabby {
 			while(x>0 && board[x-1][y]!=emptyChar){
 				x--;
 			} 
-			while(x<board.length && board[x][y]!=emptyChar){
+			while(x<xsize && board[x][y]!=emptyChar){
 				sb.append(board[x][y]);
 				points+=pointsAtPoint(bonus,x,y,board[x][y]);
 				x--;
