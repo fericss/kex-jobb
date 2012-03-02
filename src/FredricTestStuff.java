@@ -12,13 +12,13 @@ public class FredricTestStuff {
 	ArrayList<Point> buildLocations;
 	WordFinder find;
 	String rack;
-	HashMap<Point, String> buildAbleWords;
+	ArrayList<Move> buildAbleWords;
 	Main main;
 	//	private String[][] m_words;
 	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main){
 		//		wordList = _wordList;
 		//		m_words = _m_words;
-		buildAbleWords = new HashMap<Point, String>();
+		buildAbleWords = new ArrayList<Move>();
 		game = _game;
 		main = _main;
 		rack = _rack;
@@ -34,13 +34,13 @@ public class FredricTestStuff {
 			getWordThatCanBeBuiltOnCol(row);
 			getWordThatCanBeBuiltOnRow(row);
 		}
-		System.out.println(""+buildAbleWords.keySet().size());
+		System.out.println(""+buildAbleWords.size());
 		//		for(String s : buildAbleWords.values())
 		//		{
 		//			System.out.println(s);
 		//		}
-		for(Point p : buildAbleWords.keySet()){
-			System.out.println(p.x+":"+p.y+" "+buildAbleWords.get(p));
+		for(Move p : buildAbleWords){
+			System.out.println(p.x+":"+p.y+" "+p.word);
 		}
 	}
 	private Collection<String> getWordThatCanBeBuiltOnRow(int x) {
@@ -210,6 +210,10 @@ public class FredricTestStuff {
 		for(String word : test){
 			for(String s2 : words){
 				if(word.contains(s2.toLowerCase())){
+					if(word.equals("rated")){
+						System.out.println("WHEEEEEEE:" + rack+s2);
+					}
+					
 					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
 						tryToMatchHorizontal(word,x);
 					//					System.out.print(word+", ");
@@ -226,48 +230,70 @@ public class FredricTestStuff {
 		}
 		return null;
 	}
-	private void tryToMatchHorizontal(String word, int col) {
+	private void tryToMatchHorizontal(String word, int x) {
 		//		char ar[] = word.toCharArray();
-		for(int i = 0;i<(15-word.length());i++){ // 13 because minimum word has lengt of 2 ?? no idea what the fuck
-
+		for(int i = 0;i<(15-word.length());i++){ 
 			boolean possible = false;
+			if(i+word.length()!=15){
+				if(game[i+word.length()][x]!=null)
+					continue;
+			}
+			if(i-1>1 && game[i-1][x]!=null){
+				continue;
+			}
+
 			for(int c = 0; c<word.length();c++){
-				if(game[i+c][col]==null){
-					//					continue;
-				}
-				else if(word.charAt(c)!=game[i+c][col].toLowerCase().charAt(0)){
+				if(game[i+c][x]==null){
 					continue;
 				}
 				else{
-					possible = true;
+					if(game[i+c][x].toLowerCase().equals(""+word.charAt(c))){
+						possible=true;
+						continue;
+					}
+					else{
+						possible = false;
+						break;
+					}
 				}
-//				String tempWord = ""+word.charAt(c);
-//				int y = col-1;
-//				if(y>0 && game[i+c][y]!=null){
-//					tempWord = game[i+c][y]+tempWord;
-//					y--;
-//				}
-//				y = col+1;
-//				while(y<15 && game[i+c][y]!=null){
-//					tempWord = tempWord+game[i+c][y];
-//					y++;
-//				}
-//				if(tempWord.length()>1){
-//					if( !find.isWord(tempWord.toLowerCase())){
-//						possible = false;
-//						break;
-//						//					buildAbleWords.put(new Point(col,i), word+" V");
-//						//					return false;
-//					}
-//					else {
-//						possible = true;
-//					}
-//				}
 			}
 			if(possible){
-				buildAbleWords.put(new Point(col,i), word+" V");
-			}
+				boolean cont = false;
+				for(int c = 0; c<word.length();c++){
+					
 
+					String tempWord = ""+word.charAt(c);
+					int y = x-1;
+					while(y>0 && game[i+c][y]!=null){
+						tempWord = game[i+c][y]+tempWord;
+						y--;
+					}
+					y = x+1;
+					while(y<15 && game[i+c][y]!=null){
+						tempWord = tempWord+game[i+c][y];
+						y++;
+					}
+					
+					if(word.equals("tree")){
+						System.out.println("treekjh "+tempWord);
+					}
+					
+					if(tempWord.length()>1){
+						if(find.isWord(tempWord.toLowerCase())){
+						}	
+						else{
+							cont = true;
+							break;
+						}
+					}
+				}
+				if(cont){
+					continue;
+				}
+				
+				
+				buildAbleWords.add(new Move(1, word, x,i, true));
+			}
 		}
 	}
 	private void tryToMatchVertical(String word, int col) {

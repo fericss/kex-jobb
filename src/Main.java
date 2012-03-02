@@ -111,6 +111,7 @@ public class Main extends JFrame{
 //			}
 //		}
 		printTiles();
+		
 		new FredricTestStuff(game,buildLocations,rack,this); 
 		//				        List<String> build = new ArrayList<String>();
 		//				        for(String[] s : game){
