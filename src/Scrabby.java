@@ -3,24 +3,23 @@ import java.util.HashMap;
 
 
 public class Scrabby {
-	public int[] charvalues;
-	
 	//global
 	GameInfo gi;
 	WordFinder wf;
+	char board[][];
 	
 	public Scrabby(GameInfo _gi,WordFinder _wf){
 		wf=_wf;
-		gi=_gi;
+		setGameInfo(_gi);
 	}
 	
-	public void test(String[][] game,String rack){
+	public void test(GameInfo _gi,String rack){
 		//code for use in main
 		//Scrabby sc=new Scrabby(points, wf);
 		//sc.test(game,rack,points, wordlist);
 		
 //		wordlist=_wordlist;
-		char[][] board=gameToBoard(game);
+		char[][] board=gameToBoard(gi.getGame());
 		int[][] bonus=plainBonus(15,15);
 		char[] rack2=rack.toCharArray();
 		ArrayList<Move> res=brute(board, bonus,rack2,' ');
@@ -29,6 +28,15 @@ public class Scrabby {
 		for(int i=0;i<res.size();i++){
 			res.get(i).toString();
 		}
+	}
+	
+	public GameInfo getGameInfo(){
+		return gi;
+	}
+	
+	public void setGameInfo(GameInfo _gi){
+		gi=_gi;
+		board=gameToBoard(gi.getGame());
 	}
 	
 	/**
@@ -241,17 +249,94 @@ public class Scrabby {
 //	}
 	
 	public int simplePoints(String word,int x,int y,boolean vertical){//TODO: implement help methods
-		int points=0;
+		return simplePoints2(word,x,y,vertical,true);
+	}
+	
+	public int simplePoints2(String word,int x,int y,boolean vertical,boolean recurse){//TODO: implement help methods
+		//some variables
+		char emptyChar=' ';
+		int xsize=15;
+		int ysize=15;
+		
+		
+		//points accumulated from recursions
+		int otherPoints=0;
+		
+		//the current points
+		int currentPoints=0;
+		int wordFactor=1;
+		
+		//chose the direction
 		if(vertical){
+			//for each char
 			for(int i=0;i<word.length();i++){
-				points+=pointsAtPoint(gi.getBonus(),x,y+i,word.charAt(i));
+				if(recurse){
+					//check if there is a word in other direction
+					if( (x-1>0 && board[x-1][y]!=emptyChar) || 
+							(x+1<xsize && board[x+1][y]!=emptyChar)){//is there a word in !vertical direction?
+						//find start of word
+						int x2=x;
+						while(x2>0 && board[x2-1][y]!=emptyChar){
+							x2--;
+						}
+						//get points for word in other direction
+						otherPoints+=simplePoints2(word,x2,y,!vertical,false);
+					}
+				}
+				
+				//points for current word
+				if(board[x][y+i]==emptyChar){//added a character
+					//updates points for current word, currentPoints+=valueOfChar*letterBonus
+					currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(gi.getBonus()[x][y+i],false);
+					//updates factor for current word, wordFactor*=wordBonus
+					wordFactor*=bonusFactor(gi.getBonus()[x][y+i],true);
+				} else {
+					currentPoints+=wf.valueOf(word.charAt(i));
+				}
 			}
 		} else {
+			//a mirror of the direction above
+			
+			//for each char
 			for(int i=0;i<word.length();i++){
-				points+=pointsAtPoint(gi.getBonus(),x+i,y,word.charAt(i));
+				if(recurse){
+					//check if there is a word in other direction
+					if( (y-1>0 && board[x][y-1]!=emptyChar) || 
+							(y+1<ysize && board[x][y+1]!=emptyChar)){//is there a word in !vertical direction?
+						//find start of word
+						int y2=y;
+						while(y2>0 && board[x][y2-1]!=emptyChar){
+							y2--;
+						}
+						//get points for word in other direction
+						otherPoints+=simplePoints2(word,x,y2,!vertical,false);
+					}
+				}
+				
+				//points for current word
+				if(board[x+i][y]==emptyChar){//added a character
+					//updates points for current word, currentPoints+=valueOfChar*letterBonus
+					currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(gi.getBonus()[x+i][y],false);
+					//updates factor for current word, wordFactor*=wordBonus
+					wordFactor*=bonusFactor(gi.getBonus()[x+i][y],true);
+				} else {
+					currentPoints+=wf.valueOf(word.charAt(i));
+				}
 			}
 		}
-		return points;
+		//calculate and return total points
+		int totalPoints=currentPoints*wordFactor+otherPoints;
+		return totalPoints;
+	}
+	
+	
+	
+	public int bonusFactor(int bonusCode,boolean isWord){
+		if(bonusCode<=2){//it's a letter bonus
+			return isWord?1:bonusCode+1;
+		} else { //it's a word bonus
+			return isWord?bonusCode-1:1;
+		}
 	}
 	
 	public int pointsAtPoint(int[][] bonus,int x, int y, char ch){
@@ -276,6 +361,7 @@ public class Scrabby {
 //	public int value(char ch){//TODO: implement
 //		return 1;
 //	}
+	
 	
 	
 	
