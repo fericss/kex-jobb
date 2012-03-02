@@ -15,7 +15,7 @@ public class WordFinder {
 	private String[][] m_words;
 	private HashMap<String, Integer> points;
 	
-	private final static int[] fastPoints={1,4,4,2,1,4,3,4,1,10,5,1,3,1,1,4,10,1,1,1,2,4,4,8,4,10};//TEST
+	public final static int[] fastPoints={1,4,4,2,1,4,3,4,1,10,5,1,3,1,1,4,10,1,1,1,2,4,4,8,4,10};//TEST
 	
 	public WordFinder(){
 		wordList = LoadWords();
