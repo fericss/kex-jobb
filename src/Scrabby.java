@@ -220,21 +220,35 @@ public class Scrabby {
 		return points;
 	}
 	
-	/**
-	 * Returns the points of a move
-	 * @param move
-	 * @param bonus
-	 * @return
-	 */
-	public int simplePoints(Move move,int[][] bonus){//TODO: implement help methods
+//	/**
+//	 * Returns the points of a move
+//	 * @param move
+//	 * @param bonus
+//	 * @return
+//	 */
+//	public int simplePoints(Move move,int[][] bonus){//TODO: implement help methods
+//		int points=0;
+//		if(move.vertical){
+//			for(int i=0;i<move.word.length();i++){
+//				points+=pointsAtPoint(bonus,move.x,move.y+i,move.word.charAt(i));
+//			}
+//		} else {
+//			for(int i=0;i<move.word.length();i++){
+//				points+=pointsAtPoint(bonus,move.x+i,move.y,move.word.charAt(i));
+//			}
+//		}
+//		return points;
+//	}
+	
+	public int simplePoints(int[][] bonus,String word,int x,int y,boolean vertical){//TODO: implement help methods
 		int points=0;
-		if(move.vertical){
-			for(int i=0;i<move.word.length();i++){
-				points+=pointsAtPoint(bonus,move.x,move.y+i,move.word.charAt(i));
+		if(vertical){
+			for(int i=0;i<word.length();i++){
+				points+=pointsAtPoint(bonus,x,y+i,word.charAt(i));
 			}
 		} else {
-			for(int i=0;i<move.word.length();i++){
-				points+=pointsAtPoint(bonus,move.x+i,move.y,move.word.charAt(i));
+			for(int i=0;i<word.length();i++){
+				points+=pointsAtPoint(bonus,x+i,y,word.charAt(i));
 			}
 		}
 		return points;
