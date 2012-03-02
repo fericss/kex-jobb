@@ -79,40 +79,41 @@ public class Main extends JFrame{
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
 		String _gameInfo = getGame(gamesIDList.get(0));
+		int[][] bonus = getGameBoard(_gameInfo);
 		parseTiles(_gameInfo);
-		
+
 		WordFinder find = new WordFinder();
 		ArrayList<Point> buildLocations = new ArrayList<Point>();
 		List<String> bla;
 		/// TEST  
-//		for(int i = 0; i<15; i++){
-//			for(int i2 = 0; i2<15; i2++){
-//				if(game[i][i2]!=null && !game[i][i2].equals("_")){
-//					if(i2 < 14 && game[i][i2+1]==null){
-//						game[i][i2+1]="_";
-//						buildLocations.add(new Point(i,i2+1));
-////						System.out.println("what");
-//					}
-//					if(i<14 && game[i+1][i2]==null){
-//						game[i+1][i2]="_";
-//						buildLocations.add(new Point(i+1,i2));
-//					}	
-//					if(i > 0 &&game[i-1][i2]==null){
-//						game[i-1][i2]="_";
-//						buildLocations.add(new Point(i-1,i2));
-//					}
-//					if(i2 > 0 && game[i][i2-1]==null){
-//						game[i][i2-1]="_";
-//						buildLocations.add(new Point(i,i2-1));
-//					}
-//				}
-//
-//
-//			}
-//		}
+		//		for(int i = 0; i<15; i++){
+		//			for(int i2 = 0; i2<15; i2++){
+		//				if(game[i][i2]!=null && !game[i][i2].equals("_")){
+		//					if(i2 < 14 && game[i][i2+1]==null){
+		//						game[i][i2+1]="_";
+		//						buildLocations.add(new Point(i,i2+1));
+		////						System.out.println("what");
+		//					}
+		//					if(i<14 && game[i+1][i2]==null){
+		//						game[i+1][i2]="_";
+		//						buildLocations.add(new Point(i+1,i2));
+		//					}	
+		//					if(i > 0 &&game[i-1][i2]==null){
+		//						game[i-1][i2]="_";
+		//						buildLocations.add(new Point(i-1,i2));
+		//					}
+		//					if(i2 > 0 && game[i][i2-1]==null){
+		//						game[i][i2-1]="_";
+		//						buildLocations.add(new Point(i,i2-1));
+		//					}
+		//				}
+		//
+		//
+		//			}
+		//		}
 		printTiles();
-		
-		new FredricTestStuff(game,buildLocations,rack,this); 
+
+		new FredricTestStuff(game,buildLocations,rack,this, bonus); 
 		//				        List<String> build = new ArrayList<String>();
 		//				        for(String[] s : game){
 		//				            String _tmp ="";
@@ -134,15 +135,101 @@ public class Main extends JFrame{
 		//				        }
 
 		//        /// END TEST
-//		System.out.print("Words built with rack: ");
-//		bla = find.Matches(getRack());
-//		List<String> test = sortByPoints(bla);
-//		List<String> test = bla;
-//
-//		for(String s : test){
-//			System.out.print(s+", ");
-//		}
+		//		System.out.print("Words built with rack: ");
+		//		bla = find.Matches(getRack());
+		//		List<String> test = sortByPoints(bla);
+		//		List<String> test = bla;
+		//
+		//		for(String s : test){
+		//			System.out.print(s+", ");
+		//		}
 
+	}
+	private int[][] getGameBoard(String gameInfo) throws Exception {
+
+
+		boolean done = false;
+		int pos = 0;
+		while(!done){
+			pos++;
+			if(gameInfo.charAt(pos)=='"'
+				&&gameInfo.charAt(pos-1)=='d'
+					&&gameInfo.charAt(pos-2)=='r'
+						&&gameInfo.charAt(pos-3)=='a'
+							&&gameInfo.charAt(pos-4)=='o'
+								&&gameInfo.charAt(pos-5)=='b'
+									&&gameInfo.charAt(pos-6)=='"'){
+
+
+				done = true;
+				//				System.out.println("lol"+pos);
+				break;
+
+			}
+
+		}
+		done = false;
+		int endpos = pos;
+		while(!done){
+			endpos++;
+			if(gameInfo.charAt(endpos)==','){
+				done=true;
+				break;
+			}
+		}
+		//		System.out.println(gameInfo);
+		//		System.out.println(""+pos+" "+endpos);
+		String boardID = gameInfo.substring(pos+3,endpos);
+		//		
+		//		System.out.println(boardID);
+		ArrayList<String> gameID = new ArrayList<String>();
+		serverAddress = new URL("http://game03.wordfeud.com/wf/board/"+boardID+"/");
+		//        PrintStream utdata = new PrintStream(connection.getOutputStream());
+		connection = (HttpURLConnection)serverAddress.openConnection();
+		connection.setRequestMethod("GET");
+		connection.setDoOutput(true);
+		connection.setReadTimeout(10000);
+		connection.addRequestProperty("Cookie", cookie);
+		connection.connect();
+		rd  = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		String line= rd.readLine();
+		//        while ((line = rd.readLine()) != null)
+		//        {
+		System.out.println(line);
+
+
+		done = false;
+		pos = 0;
+		while(!done){
+			pos++;
+			if(line.charAt(pos)=='"'
+				&&line.charAt(pos-1)=='d'
+					&&line.charAt(pos-2)=='r'
+						&&line.charAt(pos-3)=='a'
+							&&line.charAt(pos-4)=='o'
+								&&line.charAt(pos-5)=='b'
+									&&line.charAt(pos-6)=='"'){
+
+
+				done = true;
+				//				System.out.println("lol"+pos);
+				break;
+
+			}
+
+		}
+		pos += 5;
+		int[][] retThis = new int [15][15];
+		for(int i = 0; i<15;i++){
+			for(int i2 = 0; i2<15;i2++){
+//				System.out.print(line.charAt(pos));
+				retThis[i2][i] = Integer.parseInt(""+line.charAt(pos));
+				pos += 3;
+			}
+			pos += 2;
+		}
+
+		return retThis;
 	}
 	private int calcPoints(String s){
 		int word_points = 0;
@@ -248,10 +335,10 @@ public class Main extends JFrame{
 			pos++;
 			//            System.out.println(pos);
 			if(gameInfo.charAt(pos)=='"' && gameInfo.charAt(pos-1)=='k'
-					&& gameInfo.charAt(pos-2)=='c'
+				&& gameInfo.charAt(pos-2)=='c'
 					&& gameInfo.charAt(pos-3)=='a'
-					&& gameInfo.charAt(pos-4)=='r'
-					&& gameInfo.charAt(pos-5)=='"'){
+						&& gameInfo.charAt(pos-4)=='r'
+							&& gameInfo.charAt(pos-5)=='"'){
 				done = true;
 				break;
 			}
@@ -299,7 +386,7 @@ public class Main extends JFrame{
 
 			}
 			if(line.charAt(pos)=='"'&&line.charAt(pos-1)=='d'&&line.charAt(pos-2)=='i'&&line.charAt(pos-3)=='"'
-					&&line.charAt(pos-10)=='e'&&line.charAt(pos-11)=='m'&&line.charAt(pos-12)=='a'&&line.charAt(pos-13)=='g'){
+				&&line.charAt(pos-10)=='e'&&line.charAt(pos-11)=='m'&&line.charAt(pos-12)=='a'&&line.charAt(pos-13)=='g'){
 
 				//			while(!line.substring(pos,pos+4).equals("\"id\"")){
 				//				pos++;
@@ -315,7 +402,7 @@ public class Main extends JFrame{
 				}
 				//        System.out.println(line.substring(startPos,pos));
 				gameID.add(line.substring(startPos,pos));
-//				System.out.println("lol "+line.substring(startPos,pos) );
+				//				System.out.println("lol "+line.substring(startPos,pos) );
 			}
 		}
 
@@ -374,7 +461,7 @@ public class Main extends JFrame{
 		String pwd = SHA1(password+salt);
 
 		String str = "{\"password\": \""+pwd+"\""+","+
-				"\"email\": \""+user+"\"}";
+		"\"email\": \""+user+"\"}";
 		System.out.println(str);
 		utdata.println(str);
 		//        System.out.println(connection);
