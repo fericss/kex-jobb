@@ -51,12 +51,12 @@ public class Scrabby {
 					int points=points(board,bonus,rack,word,x,y,true, emptyChar);
 					if(points>0){
 						//it was a word so add to result
-						res.add(new Move(wordlist,points,i,x,y,true));
+						res.add(new Move(points,word,x,y,true));
 					}
 					points=points(board,bonus,rack,word,x,y,false,emptyChar);
 					if(points>0){
 						//it was a word so add to result
-						res.add(new Move(wordlist,points,i,x,y,false));
+						res.add(new Move(points,word,x,y,false));
 					}
 				}
 			}
@@ -83,25 +83,6 @@ public class Scrabby {
 		return board;
 	}
 	
-	class Move{//TODO: make comparable
-		int x;
-		int y;
-		String[] wordlist;
-		int word;
-		int points;
-		boolean horizontal;
-		public Move(String[] _wordlist,int _points,int _word,int _x, int _y,boolean _horizontal){
-			wordlist=_wordlist;
-			points=_points;
-			word=_word;
-			x=_x;
-			y=_y;
-			horizontal=_horizontal;
-		}
-		public String toString(){
-			return "{"+this.points+","+this.wordlist[word]+","+this.x+","+this.y+","+this.horizontal+"}";
-		}
-	}
 	
 	/**
 	 * calculates the number of points for the word
