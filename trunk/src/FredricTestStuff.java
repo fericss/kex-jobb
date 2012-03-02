@@ -1,6 +1,7 @@
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,10 +43,13 @@ public class FredricTestStuff {
 		//		{
 		//			System.out.println(s);
 		//		}
+		Collections.sort(buildAbleWords);
 		for(Move p : buildAbleWords){
 			System.out.println(p);
 //			System.out.println(p.x+":"+p.y+" "+p.word);
 		}
+		
+		
 	}
 	private Collection<String> getWordThatCanBeBuiltOnRow(int x) {
 		List<String> words = new ArrayList<String>();

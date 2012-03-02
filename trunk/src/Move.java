@@ -1,4 +1,4 @@
-public class Move implements Comparable{//TODO: make comparable
+public class Move implements Comparable<Move>{//TODO: make comparable
 	int x;
 	int y;
 //	String[] wordlist;
@@ -19,8 +19,8 @@ public class Move implements Comparable{//TODO: make comparable
 	}
 	
 	@Override
-	public int compareTo(Object arg0) {
-		int points=((Move)arg0).points;
+	public int compareTo(Move arg0) {
+		int points=arg0.points;
 		if(this.points==points){
 			return 0;
 		}

@@ -105,10 +105,8 @@ public class WordFinder {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -145,7 +143,6 @@ public class WordFinder {
 		return builtWord.equals(targetWord);
 	}
 	private String Remove(int pos, String sourceLetters) {
-		// TODO Auto-generated method stub
 		char[] wat = sourceLetters.toCharArray();
 		for(int i = pos+1;i<wat.length;i++){
 			wat[i-1] = wat[i];
