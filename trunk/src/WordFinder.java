@@ -6,14 +6,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 
 public class WordFinder {
 	private String[] wordList;
 	private String[][] m_words;
+	private HashMap<String, Integer> points;
 	public WordFinder(){
 		wordList = LoadWords();
+	}
+	
+	public int valueOf(char ch){ //TODO: implement
+		return 1;
 	}
 	
 	public String[] getWordlist(){
