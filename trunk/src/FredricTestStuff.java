@@ -25,7 +25,7 @@ public class FredricTestStuff {
 		main = _main;
 		rack = _rack;
 		find = new WordFinder();
-		scrab = new Scrabby(main.points,find);
+		scrab = new Scrabby(new GameInfo(game, bonus,rack),find);
 		buildLocations = _buildLocations;
 		//		ArrayList<String> wordThatCanBeBuildLol= new ArrayList<String>();
 		//		for(Point p: buildLocations){
