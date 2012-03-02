@@ -256,10 +256,21 @@ public class Scrabby {
 		return simplePoints2(word,x,y,vertical,true);
 	}
 	
-	public int simplePoints2(String word,int x,int y,boolean vertical,boolean recurse){//TODO: implement help methods
-		
+	/**
+	 * Not fully tested.
+	 * gives points to a word.
+	 * 
+	 * Has a HAX so that it works with flipped x and y value.
+	 * @param word
+	 * @param x
+	 * @param y
+	 * @param vertical
+	 * @param recurse
+	 * @return
+	 */
+	public int simplePoints2(String word,int x,int y,boolean vertical,boolean recurse){
 		//TODO: remove HAX
-		//DEBUG HAX
+		//HAX, swaps x and y, and inverts vertical
 		int tmp=x;
 		x=y;
 		y=tmp;
