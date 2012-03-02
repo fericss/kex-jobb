@@ -7,16 +7,17 @@ public class Scrabby {
 	
 	//global
 	HashMap<String, Integer> letterPoints;
-	String[] wordlist;
+	WordFinder wf;
 	
 	
-	public void test(String[][] game,String rack,HashMap<String, Integer> _letterPoints,String[] _wordlist){
+	public void test(String[][] game,String rack,HashMap<String, Integer> _letterPoints,WordFinder _wf){
 		
 		//code for use in main
 		//Scrabby sc=new Scrabby();
 		//sc.test(game,rack,points, wordlist);
 		
-		wordlist=_wordlist;
+//		wordlist=_wordlist;
+		wf=_wf;
 		letterPoints=_letterPoints;
 		char[][] board=gameToBoard(game);
 		int[][] bonus=plainBonus(15,15);
@@ -41,6 +42,7 @@ public class Scrabby {
 	 */
 	public ArrayList<Move> brute(char[][] board, int[][] bonus,char[] rack,char emptyChar){
 		ArrayList<Move> res=new ArrayList<Move>();
+		String[] wordlist=wf.getWordlist();
 		//for each word in wordlist
 		for(int i=0;i<wordlist.length;i++){
 			String word=wordlist[i];
@@ -282,11 +284,10 @@ public class Scrabby {
 		if(sb.length()==1){
 			return -1;
 		}
-		// TODO: implement contains method
-		//check contains
-//		if(!wordlist.contains(sb.toString())){
-//			return -1;
-//		}
+		
+		if(!wf.isWord(sb.toString())){
+			return -1;
+		}
 		return points;
 	}
 	
