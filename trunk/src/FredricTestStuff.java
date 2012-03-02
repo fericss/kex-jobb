@@ -182,16 +182,17 @@ public class FredricTestStuff {
 	}
 	private Collection<String> getWordThatCanBeBuiltOnCol(int x) {
 		List<String> words = new ArrayList<String>();
+		//		words.add("");
 		String letters = "";
 		String line="";
 		String row = null;
 		for(int i = 0; i<15; i++){
 
-			if(row!=null && (game[i][x]==null || game[i][x].equals("_"))){
+			if(row!=null && (game[i][x]==null )){
 				words.add(row);
 				row = null;
 			}
-			if(game[i][x]!=null && !game[i][x].equals("_")){
+			if(game[i][x]!=null){
 				if(row==null){
 					row = "";
 				}
@@ -209,24 +210,33 @@ public class FredricTestStuff {
 		//		List<String> wordsThatCanBeBuilt = new ArrayList<String>();
 		//		System.out.println("\n");
 		List<String> test = find.Matches(rack+letters);
-		for(String word : test){
-			for(String s2 : words){
-				if(word.contains(s2.toLowerCase())){
-					//					if(word.equals("rated")){
-					//						System.out.println("WHEEEEEEE:" + rack+s2);
-					//					}
 
-					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
-						tryToMatchHorizontal(word,x);
-					//					System.out.print(word+", ");
-					//					int board_pos = line.indexOf(s2.toUpperCase());
-					//					int word_pos = word.indexOf(s2.toLowerCase());
-					//					if(((word.length()-word_pos)+board_pos<=15) && ((board_pos-word_pos)>=0)){
-					//						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
-					//						if(canBePlaced_RowCheck(word,x,(board_pos-word_pos)))
-					//						System.out.print(word+", ");
-					//						tryToMatch(word,)
-					//					}
+		if(words.size()<1){
+			for(String word : test){
+				tryToMatchHorizontal(word,x);
+			}
+		}
+		else{
+
+			for(String word : test){
+				for(String s2 : words){
+					if(word.contains(s2.toLowerCase())){
+						//					if(word.equals("rated")){
+						//						System.out.println("WHEEEEEEE:" + rack+s2);
+						//					}
+
+						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+							tryToMatchHorizontal(word,x);
+						//					System.out.print(word+", ");
+						//					int board_pos = line.indexOf(s2.toUpperCase());
+						//					int word_pos = word.indexOf(s2.toLowerCase());
+						//					if(((word.length()-word_pos)+board_pos<=15) && ((board_pos-word_pos)>=0)){
+						//						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+						//						if(canBePlaced_RowCheck(word,x,(board_pos-word_pos)))
+						//						System.out.print(word+", ");
+						//						tryToMatch(word,)
+						//					}
+					}
 				}
 			}
 		}
@@ -250,6 +260,16 @@ public class FredricTestStuff {
 			for(int c = 0; c<word.length();c++){
 				int type = bonus[x][i+c];
 				int tempMult = 1;
+				
+				if(x<14)
+				if(game[i+c][x+1]!=null){
+					possible=true;
+				}
+				if(x>0)
+				if(game[i+c][x-1]!=null){
+					possible=true;
+				}	
+				
 				if(game[i+c][x]==null){
 					tempMult = type == 1 ? 2 : type==2 ? 3 : 1;
 					mult = mult * (type == 3 ? 2 : type==4 ? 3 : 1);
@@ -279,8 +299,8 @@ public class FredricTestStuff {
 				if(!check){
 					continue;
 				}
-				
-				
+
+
 				boolean cont = false;
 				for(int c = 0; c<word.length();c++){
 					//					if(bonus[x][i+c]!=0){
@@ -337,7 +357,7 @@ public class FredricTestStuff {
 				}
 				gameLetters += rack;
 				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
-//					System.out.println(x+":"+i+" "+word+" "+points);
+					//					System.out.println(x+":"+i+" "+word+" "+points);
 					buildAbleWords.add(new Move(points, word, x,i, true));
 				}
 			}
@@ -361,12 +381,23 @@ public class FredricTestStuff {
 			for(int c = 0; c<word.length();c++){
 				int type = bonus[i+c][x];
 				int tempMult = 1;
+				
+				if(x<14)
+				if(game[x+1][i+c]!=null){
+					possible=true;
+				}
+				if(x>0)
+				if(game[x-1][i+c]!=null){
+					possible=true;
+				}	
+				
+				
 				if(game[x][i+c]==null){
 					tempMult = type == 1 ? 2 : type==2 ? 3 : 1;
 					mult = mult * (type == 3 ? 2 : type==4 ? 3 : 1);
 				}
 				points += tempMult*WordFinder.fastPoints[word.charAt(c)-'a'];
-						
+
 				if(game[x][i+c]==null){
 					continue;
 				}
@@ -383,7 +414,7 @@ public class FredricTestStuff {
 			}
 			points = points*mult;
 			if(possible){
-				
+
 				boolean check = false;
 				for(int c = 0; c<word.length();c++){
 					check = game[x][i+c] == null ? true : check;
@@ -391,7 +422,7 @@ public class FredricTestStuff {
 				if(!check){
 					continue;
 				}
-				
+
 				boolean cont = false;
 				for(int c = 0; c<word.length();c++){
 					String tempWord = ""+word.charAt(c);
