@@ -251,12 +251,12 @@ public class Scrabby {
 	}
 	
 	/**
-	 * 
+	 * placeholder
 	 * @param ch
 	 * @return
 	 */
 	public int value(char ch){//TODO: implement
-		return -1;
+		return 1;
 	}
 	
 	
