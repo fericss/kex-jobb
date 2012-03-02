@@ -6,12 +6,12 @@ public class Scrabby {
 	public int[] charvalues;
 	
 	//global
-	HashMap<String, Integer> letterPoints;
+	GameInfo gi;
 	WordFinder wf;
 	
-	public Scrabby(HashMap<String, Integer> _letterPoints,WordFinder _wf){
+	public Scrabby(GameInfo _gi,WordFinder _wf){
 		wf=_wf;
-		letterPoints=_letterPoints;
+		gi=_gi;
 	}
 	
 	public void test(String[][] game,String rack){
@@ -240,15 +240,15 @@ public class Scrabby {
 //		return points;
 //	}
 	
-	public int simplePoints(int[][] bonus,String word,int x,int y,boolean vertical){//TODO: implement help methods
+	public int simplePoints(String word,int x,int y,boolean vertical){//TODO: implement help methods
 		int points=0;
 		if(vertical){
 			for(int i=0;i<word.length();i++){
-				points+=pointsAtPoint(bonus,x,y+i,word.charAt(i));
+				points+=pointsAtPoint(gi.getBonus(),x,y+i,word.charAt(i));
 			}
 		} else {
 			for(int i=0;i<word.length();i++){
-				points+=pointsAtPoint(bonus,x+i,y,word.charAt(i));
+				points+=pointsAtPoint(gi.getBonus(),x+i,y,word.charAt(i));
 			}
 		}
 		return points;
@@ -380,12 +380,6 @@ public class Scrabby {
 	 */
 	public static int indexOfChar(char ch){
 		return -1;
-	}
-
-
-	public int[][] getGameInfo() {
-		// TODO Auto-generated method stub
-		return null;
 	}
     
 }
