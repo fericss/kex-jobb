@@ -299,7 +299,7 @@ public class Scrabby {
 				}
 				
 				//points for current word
-				try{
+//				try{
 				if(board[x][y+i]==emptyChar){//added a character
 					//updates points for current word, currentPoints+=valueOfChar*letterBonus
 					currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(gi.getBonus()[x][y+i],false);
@@ -309,22 +309,22 @@ public class Scrabby {
 					//no letter bonus because it already was on board
 					currentPoints+=wf.valueOf(word.charAt(i));
 				}
-				} catch(Exception e){
-					
-					//beror troligen på att spelplanen är i andra riktningen
-					//DEBUG
-					System.out.println("min "+word+" "+x+" "+y+" "+i+" "+(y+i)+" "+recurse);
-					//RE-THROW
-					if(board[x][y+i]==emptyChar){//added a character
-						//updates points for current word, currentPoints+=valueOfChar*letterBonus
-						currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(gi.getBonus()[x][y+i],false);
-						//updates factor for current word, wordFactor*=wordBonus
-						wordFactor*=bonusFactor(gi.getBonus()[x][y+i],true);
-					} else {
-						//no letter bonus because it already was on board
-						currentPoints+=wf.valueOf(word.charAt(i));
-					}
-				}
+//				} catch(Exception e){
+//					
+//					//beror troligen på att spelplanen är i andra riktningen
+//					//DEBUG
+//					System.out.println("min "+word+" "+x+" "+y+" "+i+" "+(y+i)+" "+recurse);
+//					//RE-THROW
+//					if(board[x][y+i]==emptyChar){//added a character
+//						//updates points for current word, currentPoints+=valueOfChar*letterBonus
+//						currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(gi.getBonus()[x][y+i],false);
+//						//updates factor for current word, wordFactor*=wordBonus
+//						wordFactor*=bonusFactor(gi.getBonus()[x][y+i],true);
+//					} else {
+//						//no letter bonus because it already was on board
+//						currentPoints+=wf.valueOf(word.charAt(i));
+//					}
+//				}
 			}
 		} else {
 			//a mirror of the direction above

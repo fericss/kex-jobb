@@ -14,12 +14,56 @@ public class WordFinder {
 	private String[] wordList;
 	private String[][] m_words;
 	private HashMap<String, Integer> points;
+	
+	private final static int[] fastPoints={1,4,4,2,1,4,3,4,1,10,5,1,3,1,1,4,10,1,1,1,2,4,4,8,4,10};//TEST
+	
 	public WordFinder(){
 		wordList = LoadWords();
+		points = new HashMap<String, Integer>();
+		points.put("A", 1);
+		points.put("B", 4);
+		points.put("C", 4);
+		points.put("D", 2);
+		points.put("E", 1);
+		points.put("F", 4);
+		points.put("G", 3);
+		points.put("H", 4);
+		points.put("I", 1);
+		points.put("J", 10);
+		points.put("K", 5);
+		points.put("L", 1);
+		points.put("M", 3);
+		points.put("N", 1);
+		points.put("O", 1);
+		points.put("P", 4);
+		points.put("Q", 10);
+		points.put("R", 1);
+		points.put("S", 1);
+		points.put("T", 1);
+		points.put("U", 2);
+		points.put("V", 4);
+		points.put("W", 4);
+		points.put("X", 8);
+		points.put("Y", 4);
+		points.put("Z", 10);
 	}
 	
-	public int valueOf(char ch){ //TODO: implement
-		return 1;
+	/**
+	 * det kan vara säkrare att använda valueOf2
+	 * @param ch
+	 * @return
+	 */
+	public int valueOf(char ch){//TEST
+		return fastPoints[ch-'a'];
+	}
+	
+	/**
+	 * 
+	 * @param ch
+	 * @return
+	 */
+	public int valueOf2(char ch){
+		return points.get(String.valueOf(ch).toUpperCase());
 	}
 	
 	public String[] getWordlist(){
