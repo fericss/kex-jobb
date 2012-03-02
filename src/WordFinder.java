@@ -58,7 +58,7 @@ public class WordFinder {
 	}
 	
 	/**
-	 * 
+	 * h
 	 * @param ch
 	 * @return
 	 */
