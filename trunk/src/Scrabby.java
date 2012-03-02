@@ -1,9 +1,27 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Scrabby {
 	public int[] charvalues;
-
+	
+	//global
+	HashMap<String, Integer> letterPoints;
+	String[] wordlist;
+	
+	
+	public void test(String[][] game,String rack,HashMap<String, Integer> _letterPoints,String[] _wordlist){
+		wordlist=_wordlist;
+		letterPoints=_letterPoints;
+		char[][] board=gameToBoard(game);
+		int[][] bonus=plainBonus(15,15);
+		char[] rack2=rack.toCharArray();
+		ArrayList<Move> res=brute(board, bonus,rack2,' ');
+		for(int i=0;i<res.size();i++){
+			res.get(i).toString();
+		}
+	}
+	
 	/**
 	 * might be changed to take a filtered wordlist for each row and each column.
 	 * @param board
@@ -14,7 +32,7 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
-	public ArrayList<Move> brute(char[][] board, int[][] bonus,int[] charvalues,char[] rack,String[] wordlist,char emptyChar){
+	public ArrayList<Move> brute(char[][] board, int[][] bonus,char[] rack,char emptyChar){
 		ArrayList<Move> res=new ArrayList<Move>();
 		//for each word in wordlist
 		for(int i=0;i<wordlist.length;i++){
@@ -23,12 +41,12 @@ public class Scrabby {
 			for(int x=0;x<board.length;x++){
 				for(int y=0;y<board[x].length;y++){
 					//calculate points for placing word on board at position and in direction
-					int points=points(board,bonus,charvalues,rack,word,x,y,true, emptyChar);
+					int points=points(board,bonus,rack,word,x,y,true, emptyChar);
 					if(points>0){
 						//it was a word so add to result
 						res.add(new Move(wordlist,points,i,x,y,true));
 					}
-					points=points(board,bonus,charvalues,rack,word,x,y,false,emptyChar);
+					points=points(board,bonus,rack,word,x,y,false,emptyChar);
 					if(points>0){
 						//it was a word so add to result
 						res.add(new Move(wordlist,points,i,x,y,false));
@@ -37,6 +55,25 @@ public class Scrabby {
 			}
 		}
 		return res;
+	}
+	
+	public char[][] gameToBoard(String[][] game){
+		return gameToBoard(game,null,' ');
+	}
+	
+	private char[][] gameToBoard(String[][] game,String emptyLetter, char emptyChar){
+		char[][] board=new char[game.length][game[0].length];
+		for(int x=0;x<game.length;x++){
+			for(int y=0;y<game[0].length;y++){
+				String letter=game[x][y];
+				if(letter==null || letter.equals(emptyLetter)){
+					board[x][y]=emptyChar;
+				} else {
+					board[x][y]=letter.charAt(0);
+				}
+			}
+		}
+		return board;
 	}
 	
 	class Move{//TODO: make comparable
@@ -76,7 +113,7 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
-	public int points(char[][] board, int[][] bonus,int[] charvalues,char[] rack, 
+	public int points(char[][] board, int[][] bonus,char[] rack, 
 			String word, int x,int y,boolean vertical,final char emptyChar){
 		
 		//Check chars before and after word
@@ -160,7 +197,7 @@ public class Scrabby {
 			}
 			//if letter above or below check if word in that direction
 			if(should){
-				int tmp=crosspoints(board,bonus,charvalues,x,y,!vertical,emptyChar);
+				int tmp=crosspoints(board,bonus,x,y,!vertical,emptyChar);
 				if(tmp>0){
 					points=points+tmp;
 				} else {
@@ -181,6 +218,16 @@ public class Scrabby {
 	
 	public int pointsAtPoint(int[][] bonus,int x, int y, char ch){
 		return value(ch)*bonus[x][y];
+	}
+	
+	public int[][] plainBonus(int xl, int yl){
+		int[][] arr=new int[xl][yl];
+		for(int x=0;x<xl;x++){
+			for(int y=0;y<yl;y++){
+				arr[x][y]=1;
+			}
+		}
+		return arr;
 	}
 	
 	/**
@@ -204,7 +251,7 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
-	public int crosspoints(char[][] board,int[][] bonus,int[] charvalues,
+	public int crosspoints(char[][] board,int[][] bonus,
 			int x, int y, boolean vertical,final char emptyChar){
 		
 		StringBuilder sb=new StringBuilder();
