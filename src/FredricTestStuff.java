@@ -16,13 +16,15 @@ public class FredricTestStuff {
 	ArrayList<Move> buildAbleWords;
 	Scrabby scrab;
 	Main main;
+	int[][] bonus;
 	//	private String[][] m_words;
-	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] bonus){
+	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus){
 		//		wordList = _wordList;
 		//		m_words = _m_words;
-		
+
 		buildAbleWords = new ArrayList<Move>();
 		game = _game;
+		bonus = _bonus;
 		main = _main;
 		rack = _rack;
 		find = new WordFinder();
@@ -46,10 +48,10 @@ public class FredricTestStuff {
 		Collections.sort(buildAbleWords);
 		for(Move p : buildAbleWords){
 			System.out.println(p);
-//			System.out.println(p.x+":"+p.y+" "+p.word);
+			//			System.out.println(p.x+":"+p.y+" "+p.word);
 		}
-		
-		
+
+
 	}
 	private Collection<String> getWordThatCanBeBuiltOnRow(int x) {
 		List<String> words = new ArrayList<String>();
@@ -77,7 +79,7 @@ public class FredricTestStuff {
 		//		for(String s : words){
 		//			System.out.print("\n"+s+", ");
 		//		}
-//		List<String> wordsThatCanBeBuilt = new ArrayList<String>();
+		//		List<String> wordsThatCanBeBuilt = new ArrayList<String>();
 		//		System.out.println("\n");
 		List<String> test = find.Matches(rack+letters);
 		for(String word : test){
@@ -231,8 +233,12 @@ public class FredricTestStuff {
 		return null;
 	}
 	private void tryToMatchHorizontal(String word, int x) {
+		int points = 0;
+		int mult = 0;
 		for(int i = 0;i<(15-word.length());i++){ 
 			boolean possible = false;
+			points = 0;
+			mult = 1;
 			if(i+word.length()!=15){
 				if(game[i+word.length()][x]!=null)
 					continue;
@@ -242,6 +248,14 @@ public class FredricTestStuff {
 			}
 
 			for(int c = 0; c<word.length();c++){
+				int type = bonus[x][i+c];
+				int tempMult = 1;
+				if(game[i+c][x]==null){
+					tempMult = type == 1 ? 2 : type==2 ? 3 : 1;
+					mult = mult * (type == 3 ? 2 : type==4 ? 3 : 1);
+				}
+				points += tempMult*WordFinder.fastPoints[word.charAt(c)-'a'];
+
 				if(game[i+c][x]==null){
 					continue;
 				}
@@ -256,9 +270,22 @@ public class FredricTestStuff {
 					}
 				}
 			}
+			points = points*mult;
 			if(possible){
+				boolean check = false;
+				for(int c = 0; c<word.length();c++){
+					check = game[i+c][x] == null ? true : check;
+				}
+				if(!check){
+					continue;
+				}
+				
+				
 				boolean cont = false;
 				for(int c = 0; c<word.length();c++){
+					//					if(bonus[x][i+c]!=0){
+					//						System.out.println(word+" "+bonus[x][i+c]+" "+word.charAt(c));
+					//					}
 					String tempWord = ""+word.charAt(c);
 					int y = x-1;
 					while(y>0 && game[i+c][y]!=null){
@@ -272,12 +299,31 @@ public class FredricTestStuff {
 					}
 					if(tempWord.length()>1){
 						if(find.isWord(tempWord.toLowerCase())){
+							if(game[i+c][x]==null){
+								int type = bonus[x][i+c];
+								if(type==0){
+									points += calcPoints(tempWord.toLowerCase());
+								} 
+								else if(type==1){
+									points += calcPoints(tempWord.toLowerCase()) + WordFinder.fastPoints[word.charAt(c)-'a'];
+								}
+								else if(type==2){
+									points += calcPoints(tempWord.toLowerCase()) + WordFinder.fastPoints[word.charAt(c)-'a']*2;
+								}
+								else if(type==3){
+									points += calcPoints(tempWord.toLowerCase())*2;
+								}
+								else if(type==4){
+									points += calcPoints(tempWord.toLowerCase())*3;
+								}
+							}
 						}	
 						else{
 							cont = true;
 							break;
 						}
 					}
+
 				}
 				if(cont){
 					continue;
@@ -291,14 +337,19 @@ public class FredricTestStuff {
 				}
 				gameLetters += rack;
 				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
-					buildAbleWords.add(new Move(scrab, word, x,i, true));
+//					System.out.println(x+":"+i+" "+word+" "+points);
+					buildAbleWords.add(new Move(points, word, x,i, true));
 				}
 			}
 		}
 	}
 	private void tryToMatchVertical(String word, int x) {
+		int points = 0;
+		int mult = 0;
 		for(int i = 0;i<(15-word.length());i++){ 
 			boolean possible = false;
+			points = 0;
+			mult = 1;
 			if(i+word.length()!=15){
 				if(game[x][i+word.length()]!=null)
 					continue;
@@ -308,6 +359,14 @@ public class FredricTestStuff {
 			}
 
 			for(int c = 0; c<word.length();c++){
+				int type = bonus[i+c][x];
+				int tempMult = 1;
+				if(game[x][i+c]==null){
+					tempMult = type == 1 ? 2 : type==2 ? 3 : 1;
+					mult = mult * (type == 3 ? 2 : type==4 ? 3 : 1);
+				}
+				points += tempMult*WordFinder.fastPoints[word.charAt(c)-'a'];
+						
 				if(game[x][i+c]==null){
 					continue;
 				}
@@ -322,7 +381,17 @@ public class FredricTestStuff {
 					}
 				}
 			}
+			points = points*mult;
 			if(possible){
+				
+				boolean check = false;
+				for(int c = 0; c<word.length();c++){
+					check = game[x][i+c] == null ? true : check;
+				}
+				if(!check){
+					continue;
+				}
+				
 				boolean cont = false;
 				for(int c = 0; c<word.length();c++){
 					String tempWord = ""+word.charAt(c);
@@ -338,6 +407,24 @@ public class FredricTestStuff {
 					}
 					if(tempWord.length()>1){
 						if(find.isWord(tempWord.toLowerCase())){
+							if(game[x][i+c]==null){
+								int type = bonus[i+c][x];
+								if(type==0){
+									points += calcPoints(tempWord.toLowerCase());
+								} 
+								else if(type==1){
+									points += calcPoints(tempWord.toLowerCase()) + WordFinder.fastPoints[word.charAt(c)-'a'];
+								}
+								else if(type==2){
+									points += calcPoints(tempWord.toLowerCase()) + WordFinder.fastPoints[word.charAt(c)-'a']*2;
+								}
+								else if(type==3){
+									points += calcPoints(tempWord.toLowerCase())*2;
+								}
+								else if(type==4){
+									points += calcPoints(tempWord.toLowerCase())*3;
+								}
+							}
 						}	
 						else{
 							cont = true;
@@ -356,7 +443,7 @@ public class FredricTestStuff {
 				}
 				gameLetters += rack;
 				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
-					buildAbleWords.add(new Move(scrab, word, i,x, false));
+					buildAbleWords.add(new Move(points, word, i,x, false));
 				}
 			}
 		}
@@ -375,5 +462,12 @@ public class FredricTestStuff {
 			System.out.print(s+", ");
 		}
 		return null;
+	}
+	private int calcPoints(String s){
+		int word_points = 0;
+		for(char c : s.toCharArray()){
+			word_points += WordFinder.fastPoints[c-'a'];
+		}
+		return word_points;
 	}
 }

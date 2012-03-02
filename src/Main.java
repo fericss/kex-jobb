@@ -234,7 +234,6 @@ public class Main extends JFrame{
 	private int calcPoints(String s){
 		int word_points = 0;
 		for(char c : s.toCharArray()){
-			//			System.out.println(""+((char)(c-32)));
 			word_points+=points.get(""+((char)(c-32)));
 		}
 		return word_points;
