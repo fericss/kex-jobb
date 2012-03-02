@@ -9,16 +9,17 @@ public class Scrabby {
 	HashMap<String, Integer> letterPoints;
 	WordFinder wf;
 	
+	public Scrabby(HashMap<String, Integer> _letterPoints,WordFinder _wf){
+		wf=_wf;
+		letterPoints=_letterPoints;
+	}
 	
-	public void test(String[][] game,String rack,HashMap<String, Integer> _letterPoints,WordFinder _wf){
-		
+	public void test(String[][] game,String rack){
 		//code for use in main
-		//Scrabby sc=new Scrabby();
+		//Scrabby sc=new Scrabby(points, wf);
 		//sc.test(game,rack,points, wordlist);
 		
 //		wordlist=_wordlist;
-		wf=_wf;
-		letterPoints=_letterPoints;
 		char[][] board=gameToBoard(game);
 		int[][] bonus=plainBonus(15,15);
 		char[] rack2=rack.toCharArray();
@@ -219,6 +220,26 @@ public class Scrabby {
 		return points;
 	}
 	
+	/**
+	 * Returns the points of a move
+	 * @param move
+	 * @param bonus
+	 * @return
+	 */
+	public int simplePoints(Move move,int[][] bonus){//TODO: implement help methods
+		int points=0;
+		if(move.vertical){
+			for(int i=0;i<move.word.length();i++){
+				points+=pointsAtPoint(bonus,move.x,move.y+i,move.word.charAt(i));
+			}
+		} else {
+			for(int i=0;i<move.word.length();i++){
+				points+=pointsAtPoint(bonus,move.x+i,move.y,move.word.charAt(i));
+			}
+		}
+		return points;
+	}
+	
 	public int pointsAtPoint(int[][] bonus,int x, int y, char ch){
 		return value(ch)*bonus[x][y];
 	}
@@ -241,6 +262,7 @@ public class Scrabby {
 	public int value(char ch){//TODO: implement
 		return 1;
 	}
+	
 	
 	
 	/**
