@@ -258,7 +258,7 @@ public class Scrabby {
 	
 	public int simplePoints2(String word,int x,int y,boolean vertical,boolean recurse){//TODO: implement help methods
 		
-		//TODO: change all other code so it works without hax
+		//TODO: remove HAX
 		//DEBUG HAX
 		int tmp=x;
 		x=y;
