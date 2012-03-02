@@ -20,7 +20,14 @@ public class Move implements Comparable{//TODO: make comparable
 	
 	@Override
 	public int compareTo(Object arg0) {
-		// TODO Auto-generated method stub
-		return this.points-((Move)arg0).points;
+		int points=((Move)arg0).points;
+		if(this.points==points){
+			return 0;
+		}
+		if(this.points>points){
+			return 1;
+		} else {
+			return -1;
+		}
 	}
 }

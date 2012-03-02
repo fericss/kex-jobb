@@ -7,10 +7,12 @@ public class Scrabby {
 	GameInfo gi;
 	WordFinder wf;
 	char board[][];
+	char emptyChar;
 	
 	public Scrabby(GameInfo _gi,WordFinder _wf){
 		wf=_wf;
 		setGameInfo(_gi);
+		emptyChar=' ';
 	}
 	
 	public void test(GameInfo _gi,String rack){
@@ -22,7 +24,7 @@ public class Scrabby {
 		char[][] board=gameToBoard(gi.getGame());
 		int[][] bonus=plainBonus(15,15);
 		char[] rack2=rack.toCharArray();
-		ArrayList<Move> res=brute(board, bonus,rack2,' ');
+		ArrayList<Move> res=brute();
 		
 		//print the generated moves/words
 		for(int i=0;i<res.size();i++){
@@ -49,7 +51,7 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
-	public ArrayList<Move> brute(char[][] board, int[][] bonus,char[] rack,char emptyChar){
+	public ArrayList<Move> brute(){
 		ArrayList<Move> res=new ArrayList<Move>();
 		String[] wordlist=wf.getWordlist();
 		//for each word in wordlist
@@ -59,12 +61,12 @@ public class Scrabby {
 			for(int x=0;x<board.length;x++){
 				for(int y=0;y<board[x].length;y++){
 					//calculate points for placing word on board at position and in direction
-					int points=points(board,bonus,rack,word,x,y,true, emptyChar);
+					int points=points(word,x,y,true);
 					if(points>0){
 						//it was a word so add to result
 						res.add(new Move(this,word,x,y,true));
 					}
-					points=points(board,bonus,rack,word,x,y,false,emptyChar);
+					points=points(word,x,y,false);
 					if(points>0){
 						//it was a word so add to result
 						res.add(new Move(this,word,x,y,false));
@@ -76,7 +78,7 @@ public class Scrabby {
 	}
 	
 	public char[][] gameToBoard(String[][] game){
-		return gameToBoard(game,null,' ');
+		return gameToBoard(game,null,emptyChar);
 	}
 	
 	private char[][] gameToBoard(String[][] game,String emptyLetter, char emptyChar){
@@ -112,8 +114,10 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
-	public int points(char[][] board, int[][] bonus,char[] rack, 
-			String word, int x,int y,boolean vertical,final char emptyChar){
+	public int points(//char[][] board, int[][] bonus,char[] rack, 
+			String word, int x,int y,boolean vertical){
+		char[] rack=gi.getRack().toCharArray();
+		int[][] bonus=gi.getBonus();
 		
 		final int xsize=15;
 		final int ysize=15;
@@ -209,7 +213,7 @@ public class Scrabby {
 			}
 			//if letter above or below check if word in that direction
 			if(should){
-				int tmp=crosspoints(board,bonus,x,y,!vertical,emptyChar);
+				int tmp=crosspoints(x,y,!vertical);
 				if(tmp>0){
 					points=points+tmp;
 				} else {
@@ -253,6 +257,15 @@ public class Scrabby {
 	}
 	
 	public int simplePoints2(String word,int x,int y,boolean vertical,boolean recurse){//TODO: implement help methods
+		
+		//TODO: change all other code so it works without hax
+		//DEBUG HAX
+		int tmp=x;
+		x=y;
+		y=tmp;
+		vertical=!vertical;
+		
+		
 		//some variables
 		char emptyChar=' ';
 		int xsize=15;
@@ -264,6 +277,7 @@ public class Scrabby {
 		
 		//the current points
 		int currentPoints=0;
+		//the total factor that currentPoints will be multiplied by
 		int wordFactor=1;
 		
 		//chose the direction
@@ -285,6 +299,7 @@ public class Scrabby {
 				}
 				
 				//points for current word
+				try{
 				if(board[x][y+i]==emptyChar){//added a character
 					//updates points for current word, currentPoints+=valueOfChar*letterBonus
 					currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(gi.getBonus()[x][y+i],false);
@@ -293,6 +308,22 @@ public class Scrabby {
 				} else {
 					//no letter bonus because it already was on board
 					currentPoints+=wf.valueOf(word.charAt(i));
+				}
+				} catch(Exception e){
+					
+					//beror troligen på att spelplanen är i andra riktningen
+					//DEBUG
+					System.out.println("min "+word+" "+x+" "+y+" "+i+" "+(y+i)+" "+recurse);
+					//RE-THROW
+					if(board[x][y+i]==emptyChar){//added a character
+						//updates points for current word, currentPoints+=valueOfChar*letterBonus
+						currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(gi.getBonus()[x][y+i],false);
+						//updates factor for current word, wordFactor*=wordBonus
+						wordFactor*=bonusFactor(gi.getBonus()[x][y+i],true);
+					} else {
+						//no letter bonus because it already was on board
+						currentPoints+=wf.valueOf(word.charAt(i));
+					}
 				}
 			}
 		} else {
@@ -341,6 +372,8 @@ public class Scrabby {
 		}
 	}
 	
+	
+	
 	public int pointsAtPoint(int[][] bonus,int x, int y, char ch){
 		return wf.valueOf(ch)*bonus[x][y];
 	}
@@ -368,6 +401,8 @@ public class Scrabby {
 	
 	
 	/**
+	 * does not work, use simplepoints2 as inspiration instead
+	 * 
 	 * checks for a word in the indicated direction
 	 * returns -1 if the resulting word has length -1
 	 * TODO: must add a contains check
@@ -378,8 +413,8 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
-	public int crosspoints(char[][] board,int[][] bonus,
-			int x, int y, boolean vertical,final char emptyChar){
+	public int crosspoints(//char[][] board,int[][] bonus,
+			int x, int y, boolean vertical){
 		
 		final int xsize=15;
 		final int ysize=15;
@@ -392,7 +427,7 @@ public class Scrabby {
 			} 
 			while(y<ysize && board[x][y]!=emptyChar){
 				sb.append(board[x][y]);
-				points+=pointsAtPoint(bonus,x,y,board[x][y]);
+				points+=pointsAtPoint(gi.getBonus(),x,y,board[x][y]);
 				y++;
 			}
 		} else {
@@ -401,7 +436,7 @@ public class Scrabby {
 			} 
 			while(x<xsize && board[x][y]!=emptyChar){
 				sb.append(board[x][y]);
-				points+=pointsAtPoint(bonus,x,y,board[x][y]);
+				points+=pointsAtPoint(gi.getBonus(),x,y,board[x][y]);
 				x--;
 			}
 		}
