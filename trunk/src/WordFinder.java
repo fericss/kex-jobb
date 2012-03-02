@@ -15,6 +15,11 @@ public class WordFinder {
 	public WordFinder(){
 		wordList = LoadWords();
 	}
+	
+	public String[] getWordlist(){
+		return wordList;
+	}
+	
 	public List<String> Matches(String sourceLetters)
 	{
 		sourceLetters = sourceLetters.toUpperCase();
