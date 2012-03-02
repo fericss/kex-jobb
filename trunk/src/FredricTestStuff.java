@@ -16,7 +16,7 @@ public class FredricTestStuff {
 	Scrabby scrab;
 	Main main;
 	//	private String[][] m_words;
-	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main){
+	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] bonus){
 		//		wordList = _wordList;
 		//		m_words = _m_words;
 		
