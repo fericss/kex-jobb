@@ -42,7 +42,7 @@ public class Main extends JFrame{
 	//    String line = null;
 
 	String[][] game;
-	private HashMap<String, Integer> points;
+	public HashMap<String, Integer> points;
 
 
 	public Main() throws Exception{

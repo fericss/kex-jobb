@@ -13,16 +13,19 @@ public class FredricTestStuff {
 	WordFinder find;
 	String rack;
 	ArrayList<Move> buildAbleWords;
+	Scrabby scrab;
 	Main main;
 	//	private String[][] m_words;
 	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main){
 		//		wordList = _wordList;
 		//		m_words = _m_words;
+		
 		buildAbleWords = new ArrayList<Move>();
 		game = _game;
 		main = _main;
 		rack = _rack;
 		find = new WordFinder();
+		scrab = new Scrabby(main.points,find);
 		buildLocations = _buildLocations;
 		//		ArrayList<String> wordThatCanBeBuildLol= new ArrayList<String>();
 		//		for(Point p: buildLocations){
@@ -69,23 +72,15 @@ public class FredricTestStuff {
 		//		for(String s : words){
 		//			System.out.print("\n"+s+", ");
 		//		}
-		List<String> wordsThatCanBeBuilt = new ArrayList<String>();
+//		List<String> wordsThatCanBeBuilt = new ArrayList<String>();
 		//		System.out.println("\n");
 		List<String> test = find.Matches(rack+letters);
 		for(String word : test){
 			for(String s2 : words){
 				if(word.contains(s2.toLowerCase())){
-					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
 						tryToMatchVertical(word,x);
-					//					System.out.print(word+", ");
-					//					int board_pos = line.indexOf(s2.toUpperCase());
-					//					int word_pos = word.indexOf(s2.toLowerCase());
-					//					if(((word.length()-word_pos)+board_pos<=15) && ((board_pos-word_pos)>=0)){
-					//						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
-					//						if(canBePlaced_RowCheck(word,x,(board_pos-word_pos)))
-					//						System.out.print(word+", ");
-					//						tryToMatch(word,)
-					//					}
+					}
 				}
 			}
 		}
@@ -210,10 +205,10 @@ public class FredricTestStuff {
 		for(String word : test){
 			for(String s2 : words){
 				if(word.contains(s2.toLowerCase())){
-					if(word.equals("rated")){
-						System.out.println("WHEEEEEEE:" + rack+s2);
-					}
-					
+					//					if(word.equals("rated")){
+					//						System.out.println("WHEEEEEEE:" + rack+s2);
+					//					}
+
 					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
 						tryToMatchHorizontal(word,x);
 					//					System.out.print(word+", ");
@@ -231,7 +226,6 @@ public class FredricTestStuff {
 		return null;
 	}
 	private void tryToMatchHorizontal(String word, int x) {
-		//		char ar[] = word.toCharArray();
 		for(int i = 0;i<(15-word.length());i++){ 
 			boolean possible = false;
 			if(i+word.length()!=15){
@@ -260,8 +254,6 @@ public class FredricTestStuff {
 			if(possible){
 				boolean cont = false;
 				for(int c = 0; c<word.length();c++){
-					
-
 					String tempWord = ""+word.charAt(c);
 					int y = x-1;
 					while(y>0 && game[i+c][y]!=null){
@@ -273,11 +265,6 @@ public class FredricTestStuff {
 						tempWord = tempWord+game[i+c][y];
 						y++;
 					}
-					
-					if(word.equals("tree")){
-						System.out.println("treekjh "+tempWord);
-					}
-					
 					if(tempWord.length()>1){
 						if(find.isWord(tempWord.toLowerCase())){
 						}	
@@ -290,42 +277,83 @@ public class FredricTestStuff {
 				if(cont){
 					continue;
 				}
-				
-				
-				buildAbleWords.add(new Move(1, word, x,i, true));
+
+				String gameLetters = "";
+				for(int ic = 0; ic<word.length();ic++){
+					if(game[ic+i][x]!=null){
+						gameLetters +=game[ic+i][x];
+					}
+				}
+				gameLetters += rack;
+				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
+					buildAbleWords.add(new Move(scrab, word, x,i, true));
+				}
 			}
 		}
 	}
-	private void tryToMatchVertical(String word, int col) {
-		//		char ar[] = word.toCharArray();
-		for(int i = 0;i<(13-word.length());i++){
-			for(int c = 0; c<word.length();c++){
-				if(game[col][i]==null){
-					//					continue;
-				}
-				else if(game[col][i].equals("_")){
-					//					continue;
-				}
-				else if(word.charAt(c)!=game[col][i].charAt(0)){
+	private void tryToMatchVertical(String word, int x) {
+		for(int i = 0;i<(15-word.length());i++){ 
+			boolean possible = false;
+			if(i+word.length()!=15){
+				if(game[x][i+word.length()]!=null)
 					continue;
-				}
-				String tempWord = ""+word.charAt(c);
-				int y = col-1;
-				if(y>0 && game[y][i+c]!=null && !game[y][i+c].equals("_")){
-					tempWord = game[y][i+c]+tempWord;
-					y--;
-				}
-				y = col+1;
-				while(y<15 && game[y][i+c]!=null && !game[y][i+c].equals("_")){
-					tempWord = tempWord+game[y][i+c];
-					y++;
-				}
-				if(tempWord.length()>1 && find.isWord(tempWord.toLowerCase())){
-					//					buildAbleWords.put(new Point(i,col), word+" H");
-					//					return false;
-				}
+			}
+			if(i-1>1 && game[x][i-1]!=null){
+				continue;
 			}
 
+			for(int c = 0; c<word.length();c++){
+				if(game[x][i+c]==null){
+					continue;
+				}
+				else{
+					if(game[x][i+c].toLowerCase().equals(""+word.charAt(c))){
+						possible=true;
+						continue;
+					}
+					else{
+						possible = false;
+						break;
+					}
+				}
+			}
+			if(possible){
+				boolean cont = false;
+				for(int c = 0; c<word.length();c++){
+					String tempWord = ""+word.charAt(c);
+					int y = x-1;
+					while(y>0 && game[y][i+c]!=null){
+						tempWord = game[y][i+c]+tempWord;
+						y--;
+					}
+					y = x+1;
+					while(y<15 && game[y][i+c]!=null){
+						tempWord = tempWord+game[y][i+c];
+						y++;
+					}
+					if(tempWord.length()>1){
+						if(find.isWord(tempWord.toLowerCase())){
+						}	
+						else{
+							cont = true;
+							break;
+						}
+					}
+				}
+				if(cont){
+					continue;
+				}
+				String gameLetters = "";
+				for(int ic = 0; ic<word.length();ic++){
+					if(game[x][ic+i]!=null){
+						gameLetters +=game[x][ic+i];
+					}
+				}
+				gameLetters += rack;
+				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
+					buildAbleWords.add(new Move(scrab, word, i,x, false));
+				}
+			}
 		}
 	}
 	private Collection<String> getWordThatCanBeBuilt(Point p) {

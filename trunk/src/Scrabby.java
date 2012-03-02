@@ -54,12 +54,12 @@ public class Scrabby {
 					int points=points(board,bonus,rack,word,x,y,true, emptyChar);
 					if(points>0){
 						//it was a word so add to result
-						res.add(new Move(points,word,x,y,true));
+						res.add(new Move(this,word,x,y,true));
 					}
 					points=points(board,bonus,rack,word,x,y,false,emptyChar);
 					if(points>0){
 						//it was a word so add to result
-						res.add(new Move(points,word,x,y,false));
+						res.add(new Move(this,word,x,y,false));
 					}
 				}
 			}
@@ -380,6 +380,12 @@ public class Scrabby {
 	 */
 	public static int indexOfChar(char ch){
 		return -1;
+	}
+
+
+	public int[][] getGameInfo() {
+		// TODO Auto-generated method stub
+		return null;
 	}
     
 }
