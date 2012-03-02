@@ -255,7 +255,7 @@ public class Scrabby {
 	}
 	
 	public int pointsAtPoint(int[][] bonus,int x, int y, char ch){
-		return value(ch)*bonus[x][y];
+		return wf.valueOf(ch)*bonus[x][y];
 	}
 	
 	public int[][] plainBonus(int xl, int yl){
@@ -268,14 +268,14 @@ public class Scrabby {
 		return arr;
 	}
 	
-	/**
-	 * placeholder
-	 * @param ch
-	 * @return
-	 */
-	public int value(char ch){//TODO: implement
-		return 1;
-	}
+//	/**
+//	 * placeholder
+//	 * @param ch
+//	 * @return
+//	 */
+//	public int value(char ch){//TODO: implement
+//		return 1;
+//	}
 	
 	
 	
