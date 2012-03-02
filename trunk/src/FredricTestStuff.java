@@ -43,7 +43,8 @@ public class FredricTestStuff {
 		//			System.out.println(s);
 		//		}
 		for(Move p : buildAbleWords){
-			System.out.println(p.x+":"+p.y+" "+p.word);
+			System.out.println(p);
+//			System.out.println(p.x+":"+p.y+" "+p.word);
 		}
 	}
 	private Collection<String> getWordThatCanBeBuiltOnRow(int x) {
