@@ -291,6 +291,7 @@ public class Scrabby {
 					//updates factor for current word, wordFactor*=wordBonus
 					wordFactor*=bonusFactor(gi.getBonus()[x][y+i],true);
 				} else {
+					//no letter bonus because it already was on board
 					currentPoints+=wf.valueOf(word.charAt(i));
 				}
 			}
@@ -320,6 +321,7 @@ public class Scrabby {
 					//updates factor for current word, wordFactor*=wordBonus
 					wordFactor*=bonusFactor(gi.getBonus()[x+i][y],true);
 				} else {
+					//no letter bonus because it already was on board
 					currentPoints+=wf.valueOf(word.charAt(i));
 				}
 			}
