@@ -12,7 +12,7 @@ public class Move implements Comparable{//TODO: make comparable
 		x=_x;
 		y=_y;
 		vertical=_vertical;
-		points=scrab.simplePoints(scrab.getGameInfo(), word, x, y, vertical);
+		points=scrab.simplePoints(word, x, y, vertical);
 	}
 	public String toString(){
 		return "{"+this.points+","+word+","+this.x+","+this.y+","+this.vertical+"}";
