@@ -31,7 +31,6 @@ public class FreqList {
 		for(int i=0;i<filterRepeats;i++){
 			ArrayList<String> st=fl.getFilteredList(filter);
 			String s=st.get(0);
-//			System.out.println(s);
 		}
 		t3=System.currentTimeMillis();
 		System.out.println("filter: "+filter+" wordListLength: "+wordlist.length+" constructionTime: "+(t2-t1)+" filterTime: "+(t3-t2)+" filterRepeats: "+filterRepeats);
