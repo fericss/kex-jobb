@@ -303,15 +303,15 @@ public class Scrabby {
 					//only do this for newly created words
 					if(recurse){
 						//check if there is a word in other direction
-						if( (x-1>0 && board[x-1][y]!=emptyChar) || 
-								(x+1<xsize && board[x+1][y]!=emptyChar)){//is there a word in !vertical direction?
+						if( (x-1>0 && board[x-1][y+i]!=emptyChar) || 
+								(x+1<xsize && board[x+1][y+i]!=emptyChar)){//is there a word in !vertical direction?
 							//find start of word
 							int x2=x;
-							while(x2>0 && board[x2-1][y]!=emptyChar){
+							while(x2>0 && board[x2-1][y+i]!=emptyChar){
 								x2--;
 							}
 							//get points for word in other direction
-							otherPoints+=simplePoints2(word,x2,y,!vertical,false);
+							otherPoints+=simplePoints2(word,x2,y+i,!vertical,false);
 						}
 					}
 					
@@ -354,15 +354,15 @@ public class Scrabby {
 					//only do this for newly created words
 					if(recurse){
 						//check if there is a word in other direction
-						if( (y-1>0 && board[x][y-1]!=emptyChar) || 
+						if( (y-1>0 && board[x+i][y-1]!=emptyChar) || 
 								(y+1<ysize && board[x][y+1]!=emptyChar)){//is there a word in !vertical direction?
 							//find start of word
 							int y2=y;
-							while(y2>0 && board[x][y2-1]!=emptyChar){
+							while(y2>0 && board[x+i][y2-1]!=emptyChar){
 								y2--;
 							}
 							//get points for word in other direction
-							otherPoints+=simplePoints2(word,x,y2,!vertical,false);
+							otherPoints+=simplePoints2(word,x+i,y2,!vertical,false);
 						}
 					}
 					
@@ -380,6 +380,8 @@ public class Scrabby {
 		int totalPoints=currentPoints*wordFactor+otherPoints;
 		return totalPoints;
 	}
+	
+	
 	
 	
 	
