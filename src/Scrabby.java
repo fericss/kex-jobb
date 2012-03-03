@@ -253,7 +253,7 @@ public class Scrabby {
 //	}
 	
 	public int simplePoints(String word,int x,int y,boolean vertical){//TODO: implement help methods
-		return simplePoints2(word,x,y,vertical,true);
+		return simplePoints3(word,x,y,vertical,true);
 	}
 	
 	/**
@@ -383,8 +383,13 @@ public class Scrabby {
 	
 	
 	
-	
-	
+	/**
+	 * gets a bounsCode and returns the bonus factor or a 1 if the boolean is the opposite
+	 * of the bonustype (dl or dw)
+	 * @param bonusCode
+	 * @param isWord
+	 * @return
+	 */
 	public int bonusFactor(int bonusCode,boolean isWord){
 		if(bonusCode<=2){//it's a letter bonus
 			return isWord?1:bonusCode+1;
@@ -392,6 +397,131 @@ public class Scrabby {
 			return isWord?bonusCode-1:1;
 		}
 	}
+	
+	
+	/**
+	 * Does the same as simplepoints 2 but is shorter
+	 * @param word
+	 * @param x
+	 * @param y
+	 * @param vertical
+	 * @param recurse
+	 * @return
+	 */
+	public int simplePoints3(String word,int a,int b,boolean vertical,boolean recurse){
+		//TODO: remove HAX
+		//HAX, swaps x and y, and inverts vertical
+		int tmp=a;
+		a=b;
+		b=tmp;
+		vertical=!vertical;
+		
+		
+		//some variables
+		char emptyChar=' ';
+		boolean swap=vertical;
+		int asize=arrSize(board,swap);
+
+		//points accumulated from recursions
+		int otherPoints=0;
+		
+		//the current points
+		int currentPoints=0;
+		//the total factor that currentPoints will be multiplied by
+		int wordFactor=1;
+
+		//for each char
+		for(int i=0;i<word.length();i++){
+
+			//points for current word
+			if(arrGet(board,a,b,swap)==emptyChar){//added a character
+
+				//only do this for newly created words
+				if(recurse){
+					//check if there is a word in other direction
+					if( (a-1>0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
+							(a+1<asize && arrGet(board,a+1,b,swap)!=emptyChar)){//is there a word in !vertical direction?
+						//find start of word
+						int a2=a;
+						while(a2>0 && arrGet(board,a2-1,b,swap)!=emptyChar){
+							a2--;
+						}
+						//get points for word in other direction
+						otherPoints+=simplePoints2(word,a2,b,!vertical,false);
+					}
+				}
+				
+				//gets the bonus code
+				int bonusCode=arrGet(gi.getBonus(),a,b,swap);
+				
+				//updates points for current word, currentPoints+=valueOfChar*letterBonus
+				currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(bonusCode,false);
+				
+				//updates factor for current word, wordFactor*=wordBonus
+				wordFactor*=bonusFactor(bonusCode,true);
+			} else {
+				//no letter bonus because it already was on board
+				currentPoints+=wf.valueOf(word.charAt(i));
+			}
+			b++;
+		}
+		
+		//calculate and return total points
+		int totalPoints=currentPoints*wordFactor+otherPoints;
+		return totalPoints;
+	}
+	
+	/**
+	 * used so that it's easy to swap x and y
+	 * the same as arr[x][y] but it's easier to swap x and y
+	 * @return
+	 */
+	public static char arrGet(final char[][] arr,final int x,final int y,final boolean swap){
+		if(swap){
+			return arr[y][x];
+		} else {
+			return arr[x][y];
+		}
+	}
+	/**
+	 * used so that it's easy to swap x and y
+	 * the same as arr[x][y] but it's easier to swap x and y
+	 * @return
+	 */
+	public static int arrGet(final int[][] arr,final int x,final int y,final boolean swap){
+		if(swap){
+			return arr[y][x];
+		} else {
+			return arr[x][y];
+		}
+	}
+	/**
+	 * used so that it's easy to swap x and y
+	 * the same as arr[x][y] but it's easier to swap x and y
+	 * @return
+	 */
+	public static void arrSet(final char[][] arr,final int x,final int y,final boolean swap,final char value){
+		if(swap){
+			arr[y][x]=value;
+		} else {
+			arr[x][y]=value;
+		}
+	}
+	/**
+	 * used so that it's easy to swap x and y
+	 * the same as arr[x][y] but it's easier to swap x and y
+	 * @return
+	 */
+	public int arrSize(final char[][] arr,final boolean swap){
+		if(swap){
+			return arr[0].length;
+		} else {
+			return arr.length;
+		}
+	}
+	
+	
+	
 	
 	
 	
