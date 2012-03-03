@@ -5,12 +5,38 @@ import java.util.ArrayList;
  * to filter out those words that is impossible to create
  * with the given letters.
  * Assumes that small characters are used.
+ *
+ * performance:
+ * filter: fjriuhouihroij wordListLength: 38619 constructionTime: 10 filterTime: 4780 filterRepeats: 10000
  * @author mbernt.mbernt
  *
  */
 public class FreqList {
 	final ArrayList<Freq> list;
 	
+	/**
+	 * for testing performance
+	 * @param args
+	 */
+	public final  static void main(String[] args){
+		String[] wordlist=new WordFinder().getWordlist();
+		timingTest("fjriuhouihroij",wordlist,10000);
+	}
+	
+	public static void timingTest(String filter,String[] wordlist,int filterRepeats){
+		long t1,t2,t3;
+		t1=System.currentTimeMillis();
+		FreqList fl=new FreqList(wordlist);
+		t2=System.currentTimeMillis();
+		for(int i=0;i<filterRepeats;i++){
+			ArrayList<String> st=fl.getFilteredList(filter);
+			String s=st.get(0);
+//			System.out.println(s);
+		}
+		t3=System.currentTimeMillis();
+		System.out.println("filter: "+filter+" wordListLength: "+wordlist.length+" constructionTime: "+(t2-t1)+" filterTime: "+(t3-t2)+" filterRepeats: "+filterRepeats);
+	}
+
 	/**
 	 * construct with the wordlist as input
 	 * @param wordlist
@@ -28,6 +54,10 @@ public class FreqList {
 		Freq filter=new Freq(rowPlusRack);
 		return filter.filter(this.list);
 	}
+	
+	
+	
+	
 	
 	/**
 	 * use this on the wordlist to get a Freq list
