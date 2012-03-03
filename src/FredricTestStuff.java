@@ -245,7 +245,7 @@ public class FredricTestStuff {
 	private void tryToMatchHorizontal(String word, int x) {
 		int points = 0;
 		int mult = 0;
-		for(int i = 0;i<(15-word.length());i++){ 
+		for(int i = 0;i<(16-word.length());i++){ 
 			boolean possible = false;
 			points = 0;
 			mult = 1;
@@ -306,9 +306,12 @@ public class FredricTestStuff {
 					//					if(bonus[x][i+c]!=0){
 					//						System.out.println(word+" "+bonus[x][i+c]+" "+word.charAt(c));
 					//					}
+					if(game[i+c][x]!=null){
+						continue;
+					}
 					String tempWord = ""+word.charAt(c);
 					int y = x-1;
-					while(y>0 && game[i+c][y]!=null){
+					while(y>=0 && game[i+c][y]!=null){
 						tempWord = game[i+c][y]+tempWord;
 						y--;
 					}
@@ -366,7 +369,7 @@ public class FredricTestStuff {
 	private void tryToMatchVertical(String word, int x) {
 		int points = 0;
 		int mult = 0;
-		for(int i = 0;i<(15-word.length());i++){ 
+		for(int i = 0;i<(16-word.length());i++){ 
 			boolean possible = false;
 			points = 0;
 			mult = 1;
@@ -414,7 +417,6 @@ public class FredricTestStuff {
 			}
 			points = points*mult;
 			if(possible){
-
 				boolean check = false;
 				for(int c = 0; c<word.length();c++){
 					check = game[x][i+c] == null ? true : check;
@@ -422,12 +424,17 @@ public class FredricTestStuff {
 				if(!check){
 					continue;
 				}
+				
 
 				boolean cont = false;
 				for(int c = 0; c<word.length();c++){
+					if(game[x][i+c]!=null){
+						continue;
+					}
+					
 					String tempWord = ""+word.charAt(c);
 					int y = x-1;
-					while(y>0 && game[y][i+c]!=null){
+					while(y>=0 && game[y][i+c]!=null){
 						tempWord = game[y][i+c]+tempWord;
 						y--;
 					}
@@ -466,6 +473,7 @@ public class FredricTestStuff {
 				if(cont){
 					continue;
 				}
+				
 				String gameLetters = "";
 				for(int ic = 0; ic<word.length();ic++){
 					if(game[x][ic+i]!=null){
