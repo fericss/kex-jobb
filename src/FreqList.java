@@ -5,6 +5,8 @@ import java.util.ArrayList;
  * to filter out those words that is impossible to create
  * with the given letters.
  * Assumes that small characters are used.
+ * 
+ * will only need to be constructed once.
  *
  * performance:
  * filter: fjriuhouihroij wordListLength: 38619 constructionTime: 10 filterTime: 4780 filterRepeats: 10000
@@ -16,6 +18,7 @@ public class FreqList {
 	
 	/**
 	 * for testing performance
+	 * or other stuff in this class.
 	 * @param args
 	 */
 	public final  static void main(String[] args){
