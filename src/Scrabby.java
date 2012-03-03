@@ -537,18 +537,7 @@ public class Scrabby {
 			}
 		}
 		return arr;
-	}
-	
-//	/**
-//	 * placeholder
-//	 * @param ch
-//	 * @return
-//	 */
-//	public int value(char ch){//TODO: implement
-//		return 1;
-//	}
-	
-	
+	}	
 	
 	
 	/**
@@ -602,51 +591,9 @@ public class Scrabby {
 	}
 	
 	
-	/**
-	 * experimental class used for checking if the word contains more characters
-	 * of different types than is contained in the rack and the row.
-	 * @author mbernt
-	 *
-	 */
-	public class Freq{
-		final String s;
-		final byte[] freq;
-		public Freq(final String _s){
-			s=_s;
-			freq=createFreq(_s);
-		}
-		
-		/**
-		 * returns false if the word contains more characters of 
-		 * a type than the row and rack put together
-		 * @param rowAndRack
-		 * @return
-		 */
-		public boolean freqTest(final byte [] rowAndRack){
-			for(int i=0;i<freq.length;i++){
-				if(freq[i]>rowAndRack[i]){
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		/**
-		 * call this first with the rack+row
-		 * then use the resulting array with freqTest on each word
-		 * @param s
-		 * @return
-		 */
-		public byte[] createFreq(final String s){
-			byte[] freq=new byte[28];//size of alphabet
-			for(int i=0;i<s.length();i++){
-				freq[indexOfChar(s.charAt(i))]++;
-			}
-			return freq;
-		}
-		
-		
-	}
+	
+	
+	
 	/**
 	 * place holder, use fredric's method instead
 	 * @param ch
@@ -655,6 +602,8 @@ public class Scrabby {
 	public static int indexOfChar(char ch){
 		return -1;
 	}
+	
+	
     
 }
 
