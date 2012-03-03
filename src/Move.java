@@ -29,6 +29,17 @@ public class Move implements Comparable<Move>{//TODO: make comparable
 	}
 	
 	@Override
+	public boolean equals(Object o){
+		Move m=(Move)o;
+		return (this.x==m.x 
+				&& this.y == m.y 
+				&& this.vertical==m.vertical 
+				&& this.points==m.points 
+				&& (this.word==null ? this.word==m.word : this.word.equals(m.word)) 
+				);
+	}
+	
+	@Override
 	public int compareTo(Move arg0) {
 		int points=arg0.points;
 		if(this.points==points){
