@@ -88,6 +88,26 @@ public class FreqList {
 			freq=createFreq(_s);
 		}
 		
+		/**
+		 * not finished constructor for filter, so that there can't be
+		 * 3 a's used from rack when there are only two places to put them
+		 * 
+		 * another rule could be that there can't be three of the same letter in a row
+		 * @param row
+		 * @param rack
+		 */
+		public Freq(final String row,final String rack){
+			int max=15-row.length();
+			Freq tmp=new Freq(rack);
+			for(int i=0;i<rack.length();i++){
+				
+			}
+			s=null;
+			freq=null;
+		}
+		
+		
+		
 		public String getString(){
 			return s;
 		}
