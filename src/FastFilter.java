@@ -5,18 +5,24 @@ import java.util.Arrays;
 
 /**
  * Uses stuff from FreqList and FredricTestStuff to make a very fast and effective filter of the wordlist.
+ * You only need to construct FastFilter once (the constructor is only dependent on the wordlist) 
+ * and then use the filter method with different inputs.
  * 
  * Performance:
- * rack: fihhdf  wordsOnRow: [hej, d]  wordListLength: 38619  constructionTime(ms): 19  filterTime per word(ms): 0.1547  filterRepeats: 10000
- * rack: fihhdf  wordsOnRow: [hej, d, low]  wordListLength: 38619  constructionTime(ms): 19  filterTime per word(ms): 0.1104  filterRepeats: 10000
- * it takes less than 0,2 milliseconds to filter the wordlist from one row
+ * rack: fihhdf  wordsOnRow: [hej, d]  wordListLength: 38619  
+ * constructionTime(ms): 19  filterTime per word(ms): 0.1547  filterRepeats: 10000.
+ * 
+ * rack: fihhdf  wordsOnRow: [hej, d, low]  wordListLength: 38619  
+ * constructionTime(ms): 19  filterTime per word(ms): 0.1104  filterRepeats: 10000.
+ * 
+ * It takes less than 0,2 milliseconds to filter the wordlist from one row.
  * @author MJB1
  *
  */
 public class FastFilter {
-	final String[] wordlist;
-	final int[] neededChars;
-	final byte[][] charFreq;
+	final String[] wordlist; //the wordlist
+	final int[] neededChars; //the ints functions as bit array, with a one for each letter type in the word
+	final byte[][] charFreq;//list of the frequency of each letter in each word
 	final byte[][] checkList;//only need to check chars in the word
 	
 	
@@ -76,23 +82,7 @@ public class FastFilter {
 		}
 	}
 	
-	private static byte[] getCheckList(final byte[] charFreq){
-		byte size=0;
-		for(byte i=0;i<charFreq.length;i++){
-			if(charFreq[i]>0){
-				size++;
-			}
-		}
-		final byte[] res=new byte[size];
-		byte index=0;
-		for(byte i=0;i<charFreq.length;i++){
-			if(charFreq[i]>0){
-				res[index]=i;
-				index++;
-			}
-		}
-		return res;
-	}
+	
 	
 	/**
 	 * Returns a filtered wordlist where some of the words that can't be solutions have been filtered out.
@@ -164,6 +154,29 @@ public class FastFilter {
 //	}
 	
 	/**
+	 * Returns a list of the indexes that contain a number greater than zero.
+	 * @param charFreq
+	 * @return
+	 */
+	private static byte[] getCheckList(final byte[] charFreq){
+		byte size=0;
+		for(byte i=0;i<charFreq.length;i++){
+			if(charFreq[i]>0){
+				size++;
+			}
+		}
+		final byte[] res=new byte[size];
+		byte index=0;
+		for(byte i=0;i<charFreq.length;i++){
+			if(charFreq[i]>0){
+				res[index]=i;
+				index++;
+			}
+		}
+		return res;
+	}
+	
+	/**
 	 * Checks that all the corresponding values in needFreq is less than or equal to hasFreq.
 	 * Only checks the letters that is in the word.
 	 * @param checkList
@@ -206,7 +219,7 @@ public class FastFilter {
 	 * @param s
 	 * @return
 	 */
-	private static byte[] createFreq(final String s){
+	public static byte[] createFreq(final String s){
 		byte[] freq=new byte['z'-'a'+1];//size of alphabet
 		for(int i=0;i<s.length();i++){
 			freq[s.charAt(i)-'a']++;
