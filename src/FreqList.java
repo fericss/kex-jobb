@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 
 /**
+ * Deprecated, FastFilter is probably better.
+ * 
  * will use the frequency of each letter in each word
  * to filter out those words that is impossible to create
  * with the given letters.
@@ -13,6 +15,7 @@ import java.util.ArrayList;
  * @author mbernt.mbernt
  *
  */
+@Deprecated
 public class FreqList {
 	final ArrayList<Freq> list;
 	
