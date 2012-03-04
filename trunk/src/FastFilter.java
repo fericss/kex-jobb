@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 
@@ -6,8 +7,9 @@ import java.util.ArrayList;
  * Uses stuff from FreqList and FredricTestStuff to make a very fast and effective filter of the wordlist.
  * 
  * Performance:
- * filter: fjriuhouihroij wordListLength: 38619 constructionTime: 10 filterTime: 1318 filterRepeats: 10000
- * it takes 0,1318 milliseconds to filter the wordlist
+ * rack: fihhdf  wordsOnRow: [hej, d]  wordListLength: 38619  constructionTime(ms): 10  filterTime per word(ms): 0.1323  filterRepeats: 10000
+ * rack: fihhdf  wordsOnRow: [hej, d, low]  wordListLength: 38619  constructionTime(ms): 10  filterTime per word(ms): 0.1825  filterRepeats: 10000
+ * it takes 0,2 milliseconds to filter the wordlist from one row
  * @author MJB1
  *
  */
@@ -24,15 +26,15 @@ public class FastFilter {
 	 */
 	public final  static void main(String[] args){
 		String[] wordlist=new WordFinder().getWordlist();
-		timingTest("fjriuhouihroij",wordlist,10000);
+		timingTest(wordlist,10000);
 	}
 	
-	public static void timingTest(String filter,String[] wordlist,int filterRepeats){
+	public static void timingTest(String[] wordlist,int filterRepeats){
 		long t1,t2,t3;
 		t1=System.currentTimeMillis();
 		FastFilter ff=new FastFilter(wordlist);
 		t2=System.currentTimeMillis();
-		String[] wordsOnRow={"hej","d"};
+		String[] wordsOnRow={"hej","d","low"};
 		String rack="fihhdf";
 		ArrayList<String> st=null;
 		for(int i=0;i<filterRepeats;i++){
@@ -43,7 +45,14 @@ public class FastFilter {
 		for(String s:st){
 			System.out.println(s);
 		}
-		System.out.println("filter: "+filter+" wordListLength: "+wordlist.length+" constructionTime: "+(t2-t1)+" filterTime: "+(t3-t2)+" filterRepeats: "+filterRepeats);
+		System.out.println(
+				"rack: "+rack
+				+"  wordsOnRow: "+Arrays.toString(wordsOnRow)
+				+"  wordListLength: "+wordlist.length
+				+"  constructionTime(ms): "+(t2-t1)
+				+"  filterTime per word(ms): "+(((double)(t3-t2))/((double)filterRepeats))
+				+"  filterRepeats: "+filterRepeats
+				);
 	}
 	
 	/**
@@ -97,7 +106,8 @@ public class FastFilter {
 	 */
 	private static boolean containsAtleastOne(final String word, final String[] wordsOnRow){
 		for(int i=0;i<wordsOnRow.length;i++){
-			if(word.contains(wordsOnRow[i])){
+			if(word.length()>wordsOnRow[i].length() //the word must be longer
+					&& word.contains(wordsOnRow[i])){
 				return true;
 			}
 		}
