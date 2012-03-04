@@ -232,6 +232,8 @@ public class Scrabby {
 		return points;
 	}
 	
+	
+	
 //	/**
 //	 * Returns the points of a move
 //	 * @param move
@@ -397,6 +399,97 @@ public class Scrabby {
 			return isWord?bonusCode-1:1;
 		}
 	}
+	
+	/**
+	 * untested test
+	 * @param word
+	 * @param a
+	 * @param b
+	 * @param rack
+	 * @param vertical
+	 * @return
+	 */
+	public boolean fitWord(String word, int a, int b, String rack, boolean vertical){
+		//TODO: remove HAX
+		//HAX, swaps x and y, and inverts vertical
+		int tmp=a;
+		a=b;
+		b=tmp;
+		vertical=!vertical;
+
+
+		//some variables
+		char emptyChar=' ';
+		boolean swap=vertical;
+		int asize=arrSize(board,swap);
+		
+		int empty=0;
+		int filled=0;
+				
+		//for each char
+		for(int i=0;i<word.length();i++){
+			if(arrGet(board,a,b,swap)==emptyChar){
+				//check if there is a word in other direction
+				if(!isWord(a,b,!vertical,word.charAt(i))){
+					return false;
+				}
+				//take char from rack
+				int tmpsize=rack.length();
+				rack=rack.replaceFirst(String.valueOf(word.charAt(i)), "");
+				if(tmpsize==rack.length()){
+					return false;
+				}
+				empty++;
+			} else {
+				if(arrGet(board,a,b,swap)!=word.charAt(i)){
+					return false;
+				}
+				filled++;
+			}
+			b++;
+		}
+		if(empty==0 || filled==0){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * untested test
+	 * @param a
+	 * @param b
+	 * @param vertical
+	 * @param atPos
+	 * @return
+	 */
+	public boolean isWord(int a, int b, boolean vertical,char atPos){
+		boolean swap=vertical;
+		int asize=arrSize(board,swap);
+		if( (a-1>0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
+				(a+1<asize && arrGet(board,a+1,b,swap)!=emptyChar)){//is there a word in vertical direction
+			//find start of word
+			int a2=a;
+			while(a2>0 && arrGet(board,a2-1,b,swap)!=emptyChar){
+				a2--;
+			}
+			StringBuilder sb=new StringBuilder();
+			//construct word
+			while( (a2<asize && arrGet(board,a2,b,swap)!=emptyChar) || a2==a){
+				if(a2==a){
+					sb.append(atPos);
+				} else {
+					sb.append(arrGet(board,a2,b,swap));
+				}
+				a2++;
+			}
+			//check
+			if(!wf.isWord(sb.toString())){
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	
 	
 	/**
