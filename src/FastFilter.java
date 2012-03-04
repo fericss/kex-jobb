@@ -7,6 +7,7 @@ import java.util.ArrayList;
  * 
  * Performance:
  * filter: fjriuhouihroij wordListLength: 38619 constructionTime: 10 filterTime: 1318 filterRepeats: 10000
+ * it takes 0,1318 milliseconds to filter the wordlist
  * @author MJB1
  *
  */
@@ -94,7 +95,7 @@ public class FastFilter {
 	 * @param wordsOnRow
 	 * @return
 	 */
-	public static boolean containsAtleastOne(final String word, final String[] wordsOnRow){
+	private static boolean containsAtleastOne(final String word, final String[] wordsOnRow){
 		for(int i=0;i<wordsOnRow.length;i++){
 			if(word.contains(wordsOnRow[i])){
 				return true;
@@ -109,7 +110,7 @@ public class FastFilter {
 	 * @param hasChars
 	 * @return
 	 */
-	public static boolean hasNeededChars(final int neededChars,final int hasChars){
+	private static boolean hasNeededChars(final int neededChars,final int hasChars){
 		return (neededChars & hasChars) == neededChars;
 	}
 	
@@ -138,7 +139,7 @@ public class FastFilter {
 	 * @param s
 	 * @return
 	 */
-	public static int getHasChars(String s){
+	private static int getHasChars(String s){
 		int res=0;
 		for(int i=0;i<s.length();i++){
 			res= res | (1<<(s.charAt(i)-'a'));
@@ -162,10 +163,11 @@ public class FastFilter {
 	
 	/**
 	 * help method for concatinating all strings in a string array.
+	 * Should be moved to a help methods class.
 	 * @param sarr
 	 * @return
 	 */
-	public String concatinate(final String[] sarr){
+	private String concatinate(final String[] sarr){
 		final StringBuilder sb=new StringBuilder();
 		for(int i=0;i<sarr.length;i++){
 			sb.append(sarr[i]);
