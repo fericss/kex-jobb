@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class Scrabby {
@@ -15,23 +13,23 @@ public class Scrabby {
 		emptyChar=' ';
 	}
 	
-	@Deprecated
-	public void test(GameInfo _gi,String rack){
-		//code for use in main
-		//Scrabby sc=new Scrabby(points, wf);
-		//sc.test(game,rack,points, wordlist);
-		
-//		wordlist=_wordlist;
-		char[][] board=gameToBoard(gi.getGame());
-		int[][] bonus=plainBonus(15,15);
-		char[] rack2=rack.toCharArray();
-		ArrayList<Move> res=brute();
-		
-		//print the generated moves/words
-		for(int i=0;i<res.size();i++){
-			res.get(i).toString();
-		}
-	}
+//	@Deprecated
+//	public void test(GameInfo _gi,String rack){
+//		//code for use in main
+//		//Scrabby sc=new Scrabby(points, wf);
+//		//sc.test(game,rack,points, wordlist);
+//		
+////		wordlist=_wordlist;
+//		char[][] board=gameToBoard(gi.getGame());
+//		int[][] bonus=plainBonus(15,15);
+//		char[] rack2=rack.toCharArray();
+//		ArrayList<Move> res=brute();
+//		
+//		//print the generated moves/words
+//		for(int i=0;i<res.size();i++){
+//			res.get(i).toString();
+//		}
+//	}
 	
 	public GameInfo getGameInfo(){
 		return gi;
@@ -42,42 +40,42 @@ public class Scrabby {
 		board=gameToBoard(gi.getGame());
 	}
 	
-	/**
-	 * might be changed to take a filtered wordlist for each row and each column.
-	 * @param board
-	 * @param bonus
-	 * @param charvalues
-	 * @param rack
-	 * @param wordlist
-	 * @param emptyChar
-	 * @return
-	 */
-	@Deprecated
-	public ArrayList<Move> brute(){
-		ArrayList<Move> res=new ArrayList<Move>();
-		String[] wordlist=wf.getWordlist();
-		//for each word in wordlist
-		for(int i=0;i<wordlist.length;i++){
-			String word=wordlist[i];
-			//for each position on board
-			for(int x=0;x<board.length;x++){
-				for(int y=0;y<board[x].length;y++){
-					//calculate points for placing word on board at position and in direction
-					int points=points(word,x,y,true);
-					if(points>0){
-						//it was a word so add to result
-						res.add(new Move(this,word,x,y,true));
-					}
-					points=points(word,x,y,false);
-					if(points>0){
-						//it was a word so add to result
-						res.add(new Move(this,word,x,y,false));
-					}
-				}
-			}
-		}
-		return res;
-	}
+//	/**
+//	 * might be changed to take a filtered wordlist for each row and each column.
+//	 * @param board
+//	 * @param bonus
+//	 * @param charvalues
+//	 * @param rack
+//	 * @param wordlist
+//	 * @param emptyChar
+//	 * @return
+//	 */
+//	@Deprecated
+//	public ArrayList<Move> brute(){
+//		ArrayList<Move> res=new ArrayList<Move>();
+//		String[] wordlist=wf.getWordlist();
+//		//for each word in wordlist
+//		for(int i=0;i<wordlist.length;i++){
+//			String word=wordlist[i];
+//			//for each position on board
+//			for(int x=0;x<board.length;x++){
+//				for(int y=0;y<board[x].length;y++){
+//					//calculate points for placing word on board at position and in direction
+//					int points=points(word,x,y,true);
+//					if(points>0){
+//						//it was a word so add to result
+//						res.add(new Move(this,word,x,y,true));
+//					}
+//					points=points(word,x,y,false);
+//					if(points>0){
+//						//it was a word so add to result
+//						res.add(new Move(this,word,x,y,false));
+//					}
+//				}
+//			}
+//		}
+//		return res;
+//	}
 	
 	public char[][] gameToBoard(String[][] game){
 		return gameToBoard(game,null,emptyChar);
@@ -99,141 +97,141 @@ public class Scrabby {
 	}
 	
 	
-	/**
-	 * calculates the number of points for the word
-	 * -1 if the word can't be there
-	 * 
-	 * 
-	 * maybe should return move instead, but that can be recalculated later
-	 * @param board
-	 * @param bonus
-	 * @param charvalues
-	 * @param rack
-	 * @param word
-	 * @param y
-	 * @param x
-	 * @param vertical
-	 * @param emptyChar
-	 * @return
-	 */
-	@Deprecated
-	public int points(//char[][] board, int[][] bonus,char[] rack, 
-			String word, int x,int y,boolean vertical){
-		char[] rack=gi.getRack().toCharArray();
-		int[][] bonus=gi.getBonus();
-		
-		final int xsize=15;
-		final int ysize=15;
-		//check length of word
-		if(vertical){
-			if(y+word.length()>ysize){
-				return -1;
-			}
-		} else {
-			if(x+word.length()>xsize){
-				return -1;
-			}
-		}
-		
-		//Check chars before and after word
-		if(vertical){
-			//if char before word quit
-			if(y>0 && board[x][y-1]!=emptyChar){return -1;}
-			//if char after word quit
-			if(y+word.length()<ysize-1 && board[x][y+word.length()]!=emptyChar){return -1;}
-		} else {
-			//if char after word quit
-			if(x>0 && board[x-1][y]!=emptyChar){return -1;}
-			//if char after word quit
-			if(x+word.length()<xsize-1 && board[x+word.length()][y]!=emptyChar){return -1;}
-		}
-		
-		//the number of points
-		int points=0;
-		
-		//check word in given direction (horizontal or not horizontal), and calculate points
-		//check correct char at position and that the char is in the rack
-		int usedChars=0;
-		int setChars=0;
-		char[] neededChars=new char[7]; //used chars, TODO: might be returned?
-		boolean[] taken=new boolean[rack.length]; //wich of the char in the rack are taken
-		int y2=y;
-		int x2=x;
-		for(int wi=0;wi<word.length();wi++){
-			char boardCh=board[x2][y2];//retrieve board char
-			char wordCh=word.charAt(wi);//retrieve word char
-			if(boardCh!=emptyChar){
-				//it's a nonempty position =>
-				if(boardCh!=wordCh){
-					return -1;
-				} else {
-					setChars++;
-				}
-			} else {
-				boolean foundChar=false;
-				for(int ri=0;ri<taken.length;ri++){
-					if(!taken[ri]){
-						if(rack[ri]==wordCh){
-							//take char from rack
-							foundChar=true;
-							taken[ri]=true;
-							neededChars[usedChars]=wordCh;
-							usedChars++;
-							break;
-						}
-					}
-				}
-				if(!foundChar){
-					return -1;
-				} 
-			}
-			//a char was "placed" calculate the points for it
-			points+=pointsAtPoint(bonus,x2,y2,wordCh);
-			
-			if(vertical){
-				y2++;//go to next letter in word
-			} else {
-				x2++;//go to next letter in word
-			}
-		}
-		//it has to have added atleast one char and it must contain atleast one char from the board
-		if(setChars==0 || usedChars==0){
-			return -1;
-		}
-		
-		//check words in other direction
-		for(int i=0;i<word.length();i++){
-			boolean should=false;
-			//check if letter above or below
-			if(vertical){
-				if(board[x+1][y]!=emptyChar || board[x-1][y]!=emptyChar){
-					should=true;
-				}
-			} else {
-				if(board[x][y+1]!=emptyChar || board[x][y-1]!=emptyChar){
-					should=true;
-				}
-			}
-			//if letter above or below check if word in that direction
-			if(should){
-				int tmp=crosspoints(x,y,!vertical);
-				if(tmp>0){
-					points=points+tmp;
-				} else {
-					return -1;
-				}
-			}
-			//increment position in direction
-			if(vertical){
-				//go to next letter in word
-				y++;
-			} else {
-				//go to next letter in word
-				x++;
-			}
-		}
-		return points;
-	}
+//	/**
+//	 * calculates the number of points for the word
+//	 * -1 if the word can't be there
+//	 * 
+//	 * 
+//	 * maybe should return move instead, but that can be recalculated later
+//	 * @param board
+//	 * @param bonus
+//	 * @param charvalues
+//	 * @param rack
+//	 * @param word
+//	 * @param y
+//	 * @param x
+//	 * @param vertical
+//	 * @param emptyChar
+//	 * @return
+//	 */
+//	@Deprecated
+//	public int points(//char[][] board, int[][] bonus,char[] rack, 
+//			String word, int x,int y,boolean vertical){
+//		char[] rack=gi.getRack().toCharArray();
+//		int[][] bonus=gi.getBonus();
+//		
+//		final int xsize=15;
+//		final int ysize=15;
+//		//check length of word
+//		if(vertical){
+//			if(y+word.length()>ysize){
+//				return -1;
+//			}
+//		} else {
+//			if(x+word.length()>xsize){
+//				return -1;
+//			}
+//		}
+//		
+//		//Check chars before and after word
+//		if(vertical){
+//			//if char before word quit
+//			if(y>0 && board[x][y-1]!=emptyChar){return -1;}
+//			//if char after word quit
+//			if(y+word.length()<ysize-1 && board[x][y+word.length()]!=emptyChar){return -1;}
+//		} else {
+//			//if char after word quit
+//			if(x>0 && board[x-1][y]!=emptyChar){return -1;}
+//			//if char after word quit
+//			if(x+word.length()<xsize-1 && board[x+word.length()][y]!=emptyChar){return -1;}
+//		}
+//		
+//		//the number of points
+//		int points=0;
+//		
+//		//check word in given direction (horizontal or not horizontal), and calculate points
+//		//check correct char at position and that the char is in the rack
+//		int usedChars=0;
+//		int setChars=0;
+//		char[] neededChars=new char[7]; //used chars, TODO: might be returned?
+//		boolean[] taken=new boolean[rack.length]; //wich of the char in the rack are taken
+//		int y2=y;
+//		int x2=x;
+//		for(int wi=0;wi<word.length();wi++){
+//			char boardCh=board[x2][y2];//retrieve board char
+//			char wordCh=word.charAt(wi);//retrieve word char
+//			if(boardCh!=emptyChar){
+//				//it's a nonempty position =>
+//				if(boardCh!=wordCh){
+//					return -1;
+//				} else {
+//					setChars++;
+//				}
+//			} else {
+//				boolean foundChar=false;
+//				for(int ri=0;ri<taken.length;ri++){
+//					if(!taken[ri]){
+//						if(rack[ri]==wordCh){
+//							//take char from rack
+//							foundChar=true;
+//							taken[ri]=true;
+//							neededChars[usedChars]=wordCh;
+//							usedChars++;
+//							break;
+//						}
+//					}
+//				}
+//				if(!foundChar){
+//					return -1;
+//				} 
+//			}
+//			//a char was "placed" calculate the points for it
+//			points+=pointsAtPoint(bonus,x2,y2,wordCh);
+//			
+//			if(vertical){
+//				y2++;//go to next letter in word
+//			} else {
+//				x2++;//go to next letter in word
+//			}
+//		}
+//		//it has to have added atleast one char and it must contain atleast one char from the board
+//		if(setChars==0 || usedChars==0){
+//			return -1;
+//		}
+//		
+//		//check words in other direction
+//		for(int i=0;i<word.length();i++){
+//			boolean should=false;
+//			//check if letter above or below
+//			if(vertical){
+//				if(board[x+1][y]!=emptyChar || board[x-1][y]!=emptyChar){
+//					should=true;
+//				}
+//			} else {
+//				if(board[x][y+1]!=emptyChar || board[x][y-1]!=emptyChar){
+//					should=true;
+//				}
+//			}
+//			//if letter above or below check if word in that direction
+//			if(should){
+//				int tmp=crosspoints(x,y,!vertical);
+//				if(tmp>0){
+//					points=points+tmp;
+//				} else {
+//					return -1;
+//				}
+//			}
+//			//increment position in direction
+//			if(vertical){
+//				//go to next letter in word
+//				y++;
+//			} else {
+//				//go to next letter in word
+//				x++;
+//			}
+//		}
+//		return points;
+//	}
 	
 	
 	
@@ -273,6 +271,7 @@ public class Scrabby {
 	 * @param recurse
 	 * @return
 	 */
+	@Deprecated
 	public int simplePoints2(String word,int x,int y,boolean vertical,boolean recurse){
 		//TODO: remove HAX
 		//HAX, swaps x and y, and inverts vertical
@@ -403,8 +402,65 @@ public class Scrabby {
 		}
 	}
 	
+//	/**
+//	 * untested test
+//	 * @param word
+//	 * @param a
+//	 * @param b
+//	 * @param rack
+//	 * @param vertical
+//	 * @return
+//	 */
+//	public boolean fitWord(String word, int a, int b, String rack, boolean vertical){
+//		//TODO: remove HAX
+//		//HAX, swaps x and y, and inverts vertical
+//		int tmp=a;
+//		a=b;
+//		b=tmp;
+//		vertical=!vertical;
+//
+//
+//		//some variables
+//		char emptyChar=' ';
+//		boolean swap=vertical;
+//		int asize=arrSize(board,swap);
+//		
+//		int empty=0;
+//		int filled=0;
+//				
+//		//for each char
+//		for(int i=0;i<word.length();i++){
+//			if(arrGet(board,a,b,swap)==emptyChar){
+//				//check if there is a word in other direction
+//				if(!isWord(a,b,!vertical,word.charAt(i))){
+//					return false;
+//				}
+//				//take char from rack
+//				int tmpsize=rack.length();
+//				rack=rack.replaceFirst(String.valueOf(word.charAt(i)), "");
+//				if(tmpsize==rack.length()){
+//					return false;
+//				}
+//				empty++;
+//			} else {
+//				if(arrGet(board,a,b,swap)!=word.charAt(i)){
+//					return false;
+//				}
+//				filled++;
+//			}
+//			b++;
+//		}
+//		if(empty==0 || filled==0){
+//			return false;
+//		}
+//		return true;
+//	}
+	
 	/**
-	 * untested test
+	 * Use this and then fitCrossWords, to see if a word can be fitted to a position and direction.
+	 * This is an experimental method to see if this is faster than the alternative.
+	 * This method is untested.
+	 * 
 	 * @param word
 	 * @param a
 	 * @param b
@@ -419,38 +475,55 @@ public class Scrabby {
 		a=b;
 		b=tmp;
 		vertical=!vertical;
-
-
+		
 		//some variables
 		char emptyChar=' ';
 		boolean swap=vertical;
 		int asize=arrSize(board,swap);
+		int bsize=arrSize(board,!swap);
+
+
+		//return false if the word extends outside the board
+		int endindex=b+word.length()-1;
+		if(endindex >= bsize){
+			return false;
+		}
+		
+		//return false if there is a letter before or after the word
+		if( (b>0 && arrGet(board,a,b-1,swap)!=emptyChar)//return false if it's a letter before
+				|| (endindex+1<bsize && arrGet(board,a,endindex+1,swap)!=emptyChar)){//or after
+			return false;
+		}
 		
 		int empty=0;
 		int filled=0;
+		byte[] rackFreq=FastFilter.createFreq(rack);
 				
 		//for each char
 		for(int i=0;i<word.length();i++){
-			if(arrGet(board,a,b,swap)==emptyChar){
-				//check if there is a word in other direction
-				if(!isWord(a,b,!vertical,word.charAt(i))){
+			char boardChar=arrGet(board,a,b,swap);
+			char wordChar=word.charAt(i);
+			if(boardChar==emptyChar){
+				int letterIndex=wordChar-'a';
+				//return if has no such letter left in rack
+				if(rackFreq[letterIndex]<=0){
 					return false;
-				}
-				//take char from rack
-				int tmpsize=rack.length();
-				rack=rack.replaceFirst(String.valueOf(word.charAt(i)), "");
-				if(tmpsize==rack.length()){
-					return false;
-				}
+				} 
+				//take letter from rack
+				rackFreq[letterIndex]--;
+				//count the number of placed letters
 				empty++;
 			} else {
-				if(arrGet(board,a,b,swap)!=word.charAt(i)){
+				//the board char must be the same a the word char
+				if(boardChar!=wordChar){
 					return false;
 				}
+				//count the number of filled places
 				filled++;
 			}
 			b++;
 		}
+		//must have placed a char and must intercept a word on the board
 		if(empty==0 || filled==0){
 			return false;
 		}
@@ -458,40 +531,99 @@ public class Scrabby {
 	}
 	
 	/**
-	 * untested test
+	 * See fitWord.
+	 * @param word
 	 * @param a
 	 * @param b
 	 * @param vertical
-	 * @param atPos
 	 * @return
 	 */
-	public boolean isWord(int a, int b, boolean vertical,char atPos){
+	public boolean fitCrossWords(String word, int a, int b, boolean vertical){
+		//TODO: remove HAX
+		//HAX, swaps x and y, and inverts vertical
+		int tmp=a;
+		a=b;
+		b=tmp;
+		vertical=!vertical;
+
+
+		//some variables
+		char emptyChar=' ';
 		boolean swap=vertical;
 		int asize=arrSize(board,swap);
-		if( (a-1>0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
-				(a+1<asize && arrGet(board,a+1,b,swap)!=emptyChar)){//is there a word in vertical direction
-			//find start of word
-			int a2=a;
-			while(a2>0 && arrGet(board,a2-1,b,swap)!=emptyChar){
-				a2--;
-			}
-			StringBuilder sb=new StringBuilder();
-			//construct word
-			while( (a2<asize && arrGet(board,a2,b,swap)!=emptyChar) || a2==a){
-				if(a2==a){
-					sb.append(atPos);
-				} else {
-					sb.append(arrGet(board,a2,b,swap));
+				
+		//for each char
+		for(int i=0;i<word.length();i++){
+			char boardChar=arrGet(board,a,b,swap);
+			char wordChar=word.charAt(i);
+			if(boardChar==emptyChar){//check on all added characters
+				//check if there is a possible crossing word
+				if( (a-1>0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
+						(a+1<asize && arrGet(board,a+1,b,swap)!=emptyChar)){
+					//find first letter in word
+					int a2=a;
+					while(a2-1>0 && arrGet(board,a-1,b,swap)!=emptyChar){
+						a2--;
+					}
+					//construct word
+					StringBuilder sb=new StringBuilder();
+					char ch=arrGet(board,a,b,swap);
+					while(a2<asize){
+						if(ch!=emptyChar){
+							sb.append(arrGet(board,a2,b,swap));
+						} else if(a2==a){
+							sb.append(wordChar);
+						} else {
+							break;
+						}
+						a2++;
+					}
+					//check if it is a valid word
+					if(!wf.isWord(sb.toString())){
+						return false;
+					}
 				}
-				a2++;
-			}
-			//check
-			if(!wf.isWord(sb.toString())){
-				return false;
-			}
+			} 
+			b++;
 		}
 		return true;
 	}
+	
+//	/**
+//	 * untested test
+//	 * @param a
+//	 * @param b
+//	 * @param vertical
+//	 * @param atPos
+//	 * @return
+//	 */
+//	public boolean isWord(int a, int b, boolean vertical,char atPos){
+//		boolean swap=vertical;
+//		int asize=arrSize(board,swap);
+//		if( (a-1>0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
+//				(a+1<asize && arrGet(board,a+1,b,swap)!=emptyChar)){//is there a word in vertical direction
+//			//find start of word
+//			int a2=a;
+//			while(a2>0 && arrGet(board,a2-1,b,swap)!=emptyChar){
+//				a2--;
+//			}
+//			StringBuilder sb=new StringBuilder();
+//			//construct word
+//			while( (a2<asize && arrGet(board,a2,b,swap)!=emptyChar) || a2==a){
+//				if(a2==a){
+//					sb.append(atPos);
+//				} else {
+//					sb.append(arrGet(board,a2,b,swap));
+//				}
+//				a2++;
+//			}
+//			//check
+//			if(!wf.isWord(sb.toString())){
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 	
 	
 	
@@ -620,78 +752,78 @@ public class Scrabby {
 	
 	
 	
-	@Deprecated
-	public int pointsAtPoint(int[][] bonus,int x, int y, char ch){
-		return wf.valueOf(ch)*bonus[x][y];
-	}
-	@Deprecated
-	public int[][] plainBonus(int xl, int yl){
-		int[][] arr=new int[xl][yl];
-		for(int x=0;x<xl;x++){
-			for(int y=0;y<yl;y++){
-				arr[x][y]=1;
-			}
-		}
-		return arr;
-	}	
+//	@Deprecated
+//	public int pointsAtPoint(int[][] bonus,int x, int y, char ch){
+//		return wf.valueOf(ch)*bonus[x][y];
+//	}
+//	@Deprecated
+//	public int[][] plainBonus(int xl, int yl){
+//		int[][] arr=new int[xl][yl];
+//		for(int x=0;x<xl;x++){
+//			for(int y=0;y<yl;y++){
+//				arr[x][y]=1;
+//			}
+//		}
+//		return arr;
+//	}	
 	
 	
-	/**
-	 * does not work, use simplepoints2 as inspiration instead
-	 * 
-	 * checks for a word in the indicated direction
-	 * returns -1 if the resulting word has length -1
-	 * TODO: must add a contains check
-	 * @param board
-	 * @param y
-	 * @param x
-	 * @param vertical
-	 * @param emptyChar
-	 * @return
-	 */
-	@Deprecated
-	public int crosspoints(//char[][] board,int[][] bonus,
-			int x, int y, boolean vertical){
-		
-		final int xsize=15;
-		final int ysize=15;
-		
-		StringBuilder sb=new StringBuilder();
-		int points=0;
-		if(vertical){
-			while(y>0 && board[x][y-1]!=emptyChar){
-				y--;
-			} 
-			while(y<ysize && board[x][y]!=emptyChar){
-				sb.append(board[x][y]);
-				points+=pointsAtPoint(gi.getBonus(),x,y,board[x][y]);
-				y++;
-			}
-		} else {
-			while(x>0 && board[x-1][y]!=emptyChar){
-				x--;
-			} 
-			while(x<xsize && board[x][y]!=emptyChar){
-				sb.append(board[x][y]);
-				points+=pointsAtPoint(gi.getBonus(),x,y,board[x][y]);
-				x--;
-			}
-		}
-		if(sb.length()==1){
-			return -1;
-		}
-		
-		if(!wf.isWord(sb.toString())){
-			return -1;
-		}
-		return points;
-	}
+//	/**
+//	 * does not work, use simplepoints2 as inspiration instead
+//	 * 
+//	 * checks for a word in the indicated direction
+//	 * returns -1 if the resulting word has length -1
+//	 * TODO: must add a contains check
+//	 * @param board
+//	 * @param y
+//	 * @param x
+//	 * @param vertical
+//	 * @param emptyChar
+//	 * @return
+//	 */
+//	@Deprecated
+//	public int crosspoints(//char[][] board,int[][] bonus,
+//			int x, int y, boolean vertical){
+//		
+//		final int xsize=15;
+//		final int ysize=15;
+//		
+//		StringBuilder sb=new StringBuilder();
+//		int points=0;
+//		if(vertical){
+//			while(y>0 && board[x][y-1]!=emptyChar){
+//				y--;
+//			} 
+//			while(y<ysize && board[x][y]!=emptyChar){
+//				sb.append(board[x][y]);
+//				points+=pointsAtPoint(gi.getBonus(),x,y,board[x][y]);
+//				y++;
+//			}
+//		} else {
+//			while(x>0 && board[x-1][y]!=emptyChar){
+//				x--;
+//			} 
+//			while(x<xsize && board[x][y]!=emptyChar){
+//				sb.append(board[x][y]);
+//				points+=pointsAtPoint(gi.getBonus(),x,y,board[x][y]);
+//				x--;
+//			}
+//		}
+//		if(sb.length()==1){
+//			return -1;
+//		}
+//		
+//		if(!wf.isWord(sb.toString())){
+//			return -1;
+//		}
+//		return points;
+//	}
 	
 
-	@Deprecated
-	public static int indexOfChar(char ch){
-		return -1;
-	}
+//	@Deprecated
+//	public static int indexOfChar(char ch){
+//		return -1;
+//	}
 	
 	
     
