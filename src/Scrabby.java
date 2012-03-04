@@ -81,7 +81,7 @@ public class Scrabby {
 		return gameToBoard(game,null,emptyChar);
 	}
 	
-	private char[][] gameToBoard(String[][] game,String emptyLetter, char emptyChar){
+	private static char[][] gameToBoard(String[][] game,String emptyLetter, char emptyChar){
 		char[][] board=new char[game.length][game[0].length];
 		for(int x=0;x<game.length;x++){
 			for(int y=0;y<game[0].length;y++){
@@ -394,7 +394,7 @@ public class Scrabby {
 	 * @param isWord
 	 * @return
 	 */
-	public int bonusFactor(int bonusCode,boolean isWord){
+	public static int bonusFactor(int bonusCode,boolean isWord){
 		if(bonusCode<=2){//it's a letter bonus
 			return isWord?1:bonusCode+1;
 		} else { //it's a word bonus
@@ -740,7 +740,7 @@ public class Scrabby {
 	 * the same as arr[x][y] but it's easier to swap x and y
 	 * @return
 	 */
-	public int arrSize(final char[][] arr,final boolean swap){
+	public static int arrSize(final char[][] arr,final boolean swap){
 		if(swap){
 			return arr[0].length;
 		} else {
