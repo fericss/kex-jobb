@@ -7,9 +7,9 @@ import java.util.Arrays;
  * Uses stuff from FreqList and FredricTestStuff to make a very fast and effective filter of the wordlist.
  * 
  * Performance:
- * rack: fihhdf  wordsOnRow: [hej, d]  wordListLength: 38619  constructionTime(ms): 10  filterTime per word(ms): 0.1323  filterRepeats: 10000
- * rack: fihhdf  wordsOnRow: [hej, d, low]  wordListLength: 38619  constructionTime(ms): 10  filterTime per word(ms): 0.1825  filterRepeats: 10000
- * it takes 0,2 milliseconds to filter the wordlist from one row
+ * rack: fihhdf  wordsOnRow: [hej, d]  wordListLength: 38619  constructionTime(ms): 19  filterTime per word(ms): 0.1547  filterRepeats: 10000
+ * rack: fihhdf  wordsOnRow: [hej, d, low]  wordListLength: 38619  constructionTime(ms): 19  filterTime per word(ms): 0.1104  filterRepeats: 10000
+ * it takes less than 0,2 milliseconds to filter the wordlist from one row
  * @author MJB1
  *
  */
@@ -17,6 +17,7 @@ public class FastFilter {
 	final String[] wordlist;
 	final int[] neededChars;
 	final byte[][] charFreq;
+	final byte[][] checkList;//only need to check chars in the word
 	
 	
 	/**
@@ -26,16 +27,16 @@ public class FastFilter {
 	 */
 	public final  static void main(String[] args){
 		String[] wordlist=new WordFinder().getWordlist();
-		timingTest(wordlist,10000);
+		String[] wordsOnRow={"hej","d","low"};
+		String rack="fihhdf";
+		timingTest(rack,wordsOnRow,wordlist,10000);
 	}
 	
-	public static void timingTest(String[] wordlist,int filterRepeats){
+	public static void timingTest(String rack,String[] wordsOnRow, String[] wordlist,int filterRepeats){
 		long t1,t2,t3;
 		t1=System.currentTimeMillis();
 		FastFilter ff=new FastFilter(wordlist);
 		t2=System.currentTimeMillis();
-		String[] wordsOnRow={"hej","d","low"};
-		String rack="fihhdf";
 		ArrayList<String> st=null;
 		for(int i=0;i<filterRepeats;i++){
 			st=ff.filter(rack, wordsOnRow);
@@ -64,12 +65,33 @@ public class FastFilter {
 		wordlist=_wordlist;
 		neededChars=new int[wordlist.length];
 		charFreq=new byte[wordlist.length][];
+		checkList=new byte[wordlist.length][];
+		
 		
 		//calculate properties for each word
 		for(int i=0;i<wordlist.length;i++){
 			neededChars[i]=getHasChars(wordlist[i]);
 			charFreq[i]=createFreq(wordlist[i]);
+			checkList[i]=getCheckList(charFreq[i]);
 		}
+	}
+	
+	private static byte[] getCheckList(final byte[] charFreq){
+		byte size=0;
+		for(byte i=0;i<charFreq.length;i++){
+			if(charFreq[i]>0){
+				size++;
+			}
+		}
+		final byte[] res=new byte[size];
+		byte index=0;
+		for(byte i=0;i<charFreq.length;i++){
+			if(charFreq[i]>0){
+				res[index]=i;
+				index++;
+			}
+		}
+		return res;
 	}
 	
 	/**
@@ -87,7 +109,8 @@ public class FastFilter {
 		
 		for(int i=0;i<wordlist.length;i++){
 			if(hasNeededChars(neededChars[i], hasChars)){//check that the word contains no character that isn't in s
-				if(hasCharFreq(charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
+//				if(hasCharFreq(charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
+				if(hasCharFreq2(checkList[i],charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
 					if(containsAtleastOne(wordlist[i],wordsOnRow)){//check that the word contains at least one of the "words" on the row
 						//passed all the filters, so it's more likely to be a correct word
 						res.add(wordlist[i]);
@@ -124,14 +147,34 @@ public class FastFilter {
 		return (neededChars & hasChars) == neededChars;
 	}
 	
+//	/**
+//	 * Checks that all the corresponding values in needFreq is less than or equal to hasFreq.
+//	 * @param needFreq
+//	 * @param hasFreq
+//	 * @return
+//	 */
+//	private static boolean hasCharFreq(final byte[] needFreq, final byte[] hasFreq){
+//		for(int i=0;i<needFreq.length;i++){
+//			if(needFreq[i]>hasFreq[i]){
+//				//if there are less letters available than needed...
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
+	
 	/**
 	 * Checks that all the corresponding values in needFreq is less than or equal to hasFreq.
+	 * Only checks the letters that is in the word.
+	 * @param checkList
 	 * @param needFreq
 	 * @param hasFreq
 	 * @return
 	 */
-	private static boolean hasCharFreq(final byte[] needFreq, final byte[] hasFreq){
-		for(int i=0;i<needFreq.length;i++){
+	private static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq){
+		int i;
+		for(int j=0;j<checkList.length;j++){
+			i=checkList[j];
 			if(needFreq[i]>hasFreq[i]){
 				//if there are less letters available than needed...
 				return false;
