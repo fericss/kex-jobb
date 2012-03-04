@@ -15,6 +15,7 @@ public class Scrabby {
 		emptyChar=' ';
 	}
 	
+	@Deprecated
 	public void test(GameInfo _gi,String rack){
 		//code for use in main
 		//Scrabby sc=new Scrabby(points, wf);
@@ -51,6 +52,7 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
+	@Deprecated
 	public ArrayList<Move> brute(){
 		ArrayList<Move> res=new ArrayList<Move>();
 		String[] wordlist=wf.getWordlist();
@@ -114,6 +116,7 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
+	@Deprecated
 	public int points(//char[][] board, int[][] bonus,char[] rack, 
 			String word, int x,int y,boolean vertical){
 		char[] rack=gi.getRack().toCharArray();
@@ -617,11 +620,11 @@ public class Scrabby {
 	
 	
 	
-	
+	@Deprecated
 	public int pointsAtPoint(int[][] bonus,int x, int y, char ch){
 		return wf.valueOf(ch)*bonus[x][y];
 	}
-	
+	@Deprecated
 	public int[][] plainBonus(int xl, int yl){
 		int[][] arr=new int[xl][yl];
 		for(int x=0;x<xl;x++){
@@ -646,6 +649,7 @@ public class Scrabby {
 	 * @param emptyChar
 	 * @return
 	 */
+	@Deprecated
 	public int crosspoints(//char[][] board,int[][] bonus,
 			int x, int y, boolean vertical){
 		
@@ -683,15 +687,8 @@ public class Scrabby {
 		return points;
 	}
 	
-	
-	
-	
-	
-	/**
-	 * place holder, use fredric's method instead
-	 * @param ch
-	 * @return
-	 */
+
+	@Deprecated
 	public static int indexOfChar(char ch){
 		return -1;
 	}
