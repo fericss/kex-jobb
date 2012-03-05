@@ -140,6 +140,7 @@ public class FredricTestStuff {
 		String letters = "";
 		String row = null;
 		for(int i = 0; i<15; i++){
+			//add letter to the word
 			if(game[x][i]!=null){
 				if(row==null){
 					row = "";
@@ -147,16 +148,19 @@ public class FredricTestStuff {
 				row+=game[x][i];
 				letters+=game[x][i];
 			}
+			//check for the end of a word
 			if(row!=null && (game[x][i]==null || i==14)){
 				words.add(row);
 				row = null;
 			}
 
 		}
+		//try filtering and then placing word
 		List<String> test = find.Matches(rack+letters);
 		for(String word : test){
 			for(String s2 : words){
 				if(word.contains(s2.toLowerCase())){
+					//buggy check?
 					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
 						tryToMatchVertical(word,x);
 					}
