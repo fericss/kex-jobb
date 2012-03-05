@@ -129,9 +129,9 @@ public class FastFilter {
 		System.out.println(rack+" "+Arrays.toString(wordsOnRow)+" "+sourceLetters);
 		for(int i=0;i<wordlist.length;i++){
 			if(neededChars[i]!=0){
-				if(wordlist[i].equals("coie.gf")){
-					System.out.println("WTF!");
-				}
+//				if(wordlist[i].equals("coie.gf")){
+//					System.out.println("WTF!");
+//				}
 				if(hasNeededChars(neededChars[i], hasChars)){//check that the word contains no character that isn't in s
 					//if(hasCharFreq(charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
 					if(hasCharFreq2(checkList[i],charFreq[i],hasFreq,wildcards)){//check that the word has no more of a char type than in s
@@ -153,6 +153,7 @@ public class FastFilter {
 	 * @return
 	 */
 	private static boolean containsAtleastOne(String word, final String[] wordsOnRow){
+		if(wordsOnRow.length==0){ return true; }
 //		if(word==null){ word=""; }
 		for(int i=0;i<wordsOnRow.length;i++){
 			if(word.length()>wordsOnRow[i].length() //the word must be longer
