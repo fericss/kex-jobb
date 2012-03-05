@@ -784,7 +784,7 @@ public class Scrabby {
 							a2--;
 						}
 						//get points for word in other direction
-						otherPoints+=simplePoints2(word,a2,b,!vertical,false);
+						otherPoints+=simplePoints3(word,a2,b,!vertical,false);
 					}
 				}
 				
