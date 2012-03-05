@@ -74,20 +74,20 @@ public class FredricTestStuff {
 				row = null;
 			}
 		}
+		if(words.size()<1){
+			return null;
+		}
+		System.out.println(letters);
 		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
 //				find.Matches(rack+letters);
+
 		for(String word : test){
 			for(String s2 : words){
 				if(word.contains(s2.toLowerCase())){
-					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
+					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
 						tryToMatchVertical(word,x);
-					}
 				}
 			}
-		}
-		ArrayList<String> list=find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
-		for(String word:list){
-			tryToMatchVertical(word,x);
 		}
 		return null;
 	}
@@ -109,28 +109,22 @@ public class FredricTestStuff {
 				row = null;
 			}
 		}
+		if(words.size()<1){
+			return null;
+		}
+		System.out.println(letters);
 		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
 //				find.Matches(rack+letters);
-
-		if(words.size()<1){
-			for(String word : test){
-				tryToMatchHorizontal(word,x);
-			}
-		}
-		else{
-			for(String word : test){
-				for(String s2 : words){
-					if(word.contains(s2.toLowerCase())){
-						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
-							tryToMatchHorizontal(word,x);
-					}
+		
+		for(String word : test){
+			for(String s2 : words){
+				if(word.contains(s2.toLowerCase())){
+					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+						tryToMatchHorizontal(word,x);
 				}
 			}
 		}
-//		ArrayList<String> list=find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
-//		for(String word:list){
-//			tryToMatchHorizontal(word,x);
-//		}
+
 		return null;
 	}
 	
