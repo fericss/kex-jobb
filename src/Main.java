@@ -111,9 +111,11 @@ public class Main extends JFrame{
 		//
 		//			}
 		//		}
-		printTiles();
-
+//		printTiles();
+		long time = System.currentTimeMillis();
 		new FredricTestStuff(game,buildLocations,rack,this, bonus); 
+		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
+		
 		//				        List<String> build = new ArrayList<String>();
 		//				        for(String[] s : game){
 		//				            String _tmp ="";
