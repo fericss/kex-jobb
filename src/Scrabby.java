@@ -3,7 +3,7 @@ import java.util.Arrays;
 
 
 /**
- * this class uses lower case letters.
+ * this class uses lower case letters, because the wordlist is in lower case.
  * 
  * Will automatically convert upper case from Game to lower case on board.
  * @author MJB1
@@ -516,7 +516,8 @@ public class Scrabby {
 //	}
 	
 	/**
-	 * returns the minimum length of each word in the given direction from each point on the "row".
+	 * returns the minimum length of each word in the given direction from each point on the "row",
+	 * fills in an impossible length for all empty letters from the end.
 	 * @param row
 	 * @param vertical
 	 * @return
