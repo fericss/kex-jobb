@@ -210,7 +210,7 @@ public class FredricTestStuff {
 		List<String> test = find.Matches(rack+letters);
 		if(words.size()<1){
 			for(String word : test){
-				tryToMatchVertical(word,x);
+				tryToMatchHorizontal(word,x);
 			}
 		} else {
 			for(String word : test){
