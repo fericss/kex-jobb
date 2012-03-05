@@ -104,15 +104,29 @@ public class FastFilter {
 	 * @return
 	 */
 	public ArrayList<String> filter(String rack, String[] wordsOnRow){
-		//borde istället ha en freqlist med symbolen ., och när
-		rack=rack.replaceAll(".", "abcdefghijklmnopqrstuvwxyz");
-		String s=rack+concatinate(wordsOnRow);
+		rack=rack.toLowerCase();
+		wordsOnRow=Arrays.copyOf(wordsOnRow, wordsOnRow.length);
+		for(int i=0;i<wordsOnRow.length;i++){
+			wordsOnRow[i]=wordsOnRow[i].toLowerCase();
+		}
+//		System.out.println(rack+"1"+Arrays.toString(wordsOnRow));
+		int wildcards=rack.length();
+		rack=rack.replaceAll("\\.", "");
+		wildcards=wildcards-rack.length();
+//		System.out.println(" wildCards: "+wildcards);
+		
+		String sourceLetters=rack+concatinate(wordsOnRow);
 //		System.out.println("here"+s);
-		final int hasChars=getHasChars(s);
-		final byte[] hasFreq=createFreq(s);
-		
+		final int hasChars;
+		if(wildcards>0){
+			hasChars=-1;
+		} else {
+			hasChars=getHasChars(sourceLetters);
+		}
+		final byte[] hasFreq=createFreq(sourceLetters);
+//		System.out.println("hasFreq: "+Arrays.toString(hasFreq));
 		ArrayList<String> res=new ArrayList<String>();
-		
+		System.out.println(rack+" "+Arrays.toString(wordsOnRow)+" "+sourceLetters);
 		for(int i=0;i<wordlist.length;i++){
 			if(neededChars[i]!=0){
 				if(wordlist[i].equals("coie.gf")){
@@ -120,7 +134,7 @@ public class FastFilter {
 				}
 				if(hasNeededChars(neededChars[i], hasChars)){//check that the word contains no character that isn't in s
 					//if(hasCharFreq(charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
-					if(hasCharFreq2(checkList[i],charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
+					if(hasCharFreq2(checkList[i],charFreq[i],hasFreq,wildcards)){//check that the word has no more of a char type than in s
 						if(containsAtleastOne(wordlist[i],wordsOnRow)){//check that the word contains at least one of the "words" on the row
 							//passed all the filters, so it's more likely to be a correct word
 							res.add(wordlist[i]);
@@ -206,13 +220,18 @@ public class FastFilter {
 	 * @param hasFreq
 	 * @return
 	 */
-	private static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq){
+	private static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildCards){
 		int i;
 		for(int j=0;j<checkList.length;j++){
 			i=checkList[j];
 			if(needFreq[i]>hasFreq[i]){
 				//if there are less letters available than needed...
-				return false;
+//				System.out.println(needFreq[i]+" "+hasFreq[i]+" "+wildCards);
+				wildCards=wildCards-(needFreq[i]-hasFreq[i]);
+//				System.out.println(needFreq[i]+" gg "+hasFreq[i]+" "+wildCards);
+				if(wildCards<0){
+					return false;
+				}
 			}
 		}
 		return true;
