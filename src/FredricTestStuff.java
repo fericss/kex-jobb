@@ -29,14 +29,29 @@ public class FredricTestStuff {
 		buildLocations = _buildLocations;
 
 		for(int row = 0; row<15;row++){
-			getWordThatCanBeBuiltOnCol(row);
-			getWordThatCanBeBuiltOnRow(row);
+			getWordThatCanBeBuiltOnCol2(row);
+			getWordThatCanBeBuiltOnRow2(row);
 		}
 		System.out.println(""+buildAbleWords.size());
 		Collections.sort(buildAbleWords);
-		for(Move p : buildAbleWords){
-			System.out.println(p);
+		ArrayList<Move> s1=buildAbleWords;
+		
+		buildAbleWords=new ArrayList<Move>();
+		for(int row = 0; row<15;row++){
+			getWordThatCanBeBuiltOnCol(row);
+			getWordThatCanBeBuiltOnRow(row);
 		}
+		Collections.sort(buildAbleWords);
+		System.out.println(buildAbleWords.size()+" "+s1.size());
+//		for(int i=0;i<buildAbleWords.size();i++){
+//			if(!buildAbleWords.get(i).equals(s1.get(i))){
+//				System.out.println(i+" "+buildAbleWords.get(i)+" "+s1.get(i));
+//			}
+//		}
+		
+//		for(Move p : buildAbleWords){
+//			System.out.println(p);
+//		}
 
 
 	}
@@ -44,49 +59,78 @@ public class FredricTestStuff {
 	
 	private Collection<String> getWordThatCanBeBuiltOnRow2(int x) {
 		List<String> words = new ArrayList<String>();
+		String letters = "";
 		String row = null;
 		for(int i = 0; i<15; i++){
-			if(row!=null && (game[x][i]==null)){
-				words.add(row.toLowerCase());
-				row = null;
-			}
 			if(game[x][i]!=null){
 				if(row==null){
 					row = "";
 				}
 				row+=game[x][i];
+				letters+=game[x][i];
 			}
-			else{
+			if(row!=null && (game[x][i]==null || i==14) ){
+				words.add(row);
+				row = null;
+			}
+		}
+		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
+//				find.Matches(rack+letters);
+		for(String word : test){
+			for(String s2 : words){
+				if(word.contains(s2.toLowerCase())){
+					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
+						tryToMatchVertical(word,x);
+					}
+				}
 			}
 		}
 		ArrayList<String> list=find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
 		for(String word:list){
-			tryToMatchHorizontal(word,x);
+			tryToMatchVertical(word,x);
 		}
 		return null;
 	}
 	private Collection<String> getWordThatCanBeBuiltOnCol2(int x) {
 		List<String> words = new ArrayList<String>();
+		//		words.add("");
+		String letters = "";
 		String row = null;
 		for(int i = 0; i<15; i++){
-
-			if(row!=null && (game[i][x]==null)){
-				words.add(row.toLowerCase());
-				row = null;
-			}
 			if(game[i][x]!=null){
 				if(row==null){
 					row = "";
 				}
 				row+=game[i][x];
+				letters+=game[i][x];
 			}
-			else{
+			if(row!=null && (game[i][x]==null || i==14)){
+				words.add(row);
+				row = null;
 			}
 		}
-		ArrayList<String> list=find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
-		for(String word:list){
-			tryToMatchHorizontal(word,x);
+		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
+//				find.Matches(rack+letters);
+
+		if(words.size()<1){
+			for(String word : test){
+				tryToMatchHorizontal(word,x);
+			}
 		}
+		else{
+			for(String word : test){
+				for(String s2 : words){
+					if(word.contains(s2.toLowerCase())){
+						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+							tryToMatchHorizontal(word,x);
+					}
+				}
+			}
+		}
+//		ArrayList<String> list=find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
+//		for(String word:list){
+//			tryToMatchHorizontal(word,x);
+//		}
 		return null;
 	}
 	
@@ -116,7 +160,6 @@ public class FredricTestStuff {
 				if(word.contains(s2.toLowerCase())){
 					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
 						tryToMatchVertical(word,x);
-						
 					}
 				}
 			}
