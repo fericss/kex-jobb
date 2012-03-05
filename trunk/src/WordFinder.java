@@ -87,7 +87,7 @@ public class WordFinder {
 	private String[] LoadWords() {
 		m_words = new String[16][];
 		FileInputStream fstream;
-		String[] words = new String[50000];
+		String[] words = null;
 		int counter = 0;
 		try {
 			fstream = new FileInputStream("words.txt");
@@ -112,8 +112,10 @@ public class WordFinder {
 			br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
 			while ((strLine = br.readLine()) != null)   {
-				words[counter] = strLine;
-				counter++;
+				if(strLine.length()<13){ // We only want words of length less then 13 <---------------------------
+					words[counter] = strLine;
+					counter++;
+				}
 			}
 			br.close();
 			in.close();
