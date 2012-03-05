@@ -25,7 +25,7 @@ public class FredricTestStuff {
 		main = _main;
 		rack = _rack;
 		find = new WordFinder();
-		scrab = new Scrabby(new GameInfo(game, bonus,rack),find);
+//		scrab = new Scrabby(new GameInfo(game, bonus,rack),find);
 		buildLocations = _buildLocations;
 
 		for(int row = 0; row<15;row++){
