@@ -17,14 +17,14 @@ public class FredricTestStuff {
 	int[][] bonus;
 	
 	
-	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus){
+	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus, WordFinder _find){
 
 		buildAbleWords = new ArrayList<Move>();
 		game = _game;
 		bonus = _bonus;
 		main = _main;
 		rack = _rack;
-		find = new WordFinder();
+		find = _find;
 //		scrab = new Scrabby(new GameInfo(game, bonus,rack),find);
 		buildLocations = _buildLocations;
 
