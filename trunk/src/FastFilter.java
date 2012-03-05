@@ -62,6 +62,8 @@ public class FastFilter {
 				);
 	}
 	
+	
+	
 	/**
 	 * constructs a FastFilter.
 	 * @param _wordlist
@@ -117,7 +119,8 @@ public class FastFilter {
 	 * @param wordsOnRow
 	 * @return
 	 */
-	private static boolean containsAtleastOne(final String word, final String[] wordsOnRow){
+	private static boolean containsAtleastOne(String word, final String[] wordsOnRow){
+//		if(word==null){ word=""; }
 		for(int i=0;i<wordsOnRow.length;i++){
 			if(word.length()>wordsOnRow[i].length() //the word must be longer
 					&& word.contains(wordsOnRow[i])){
@@ -206,6 +209,7 @@ public class FastFilter {
 	 * @return
 	 */
 	private static int getHasChars(String s){
+//		if(s==null){ s=""; }
 		int res=0;
 		for(int i=0;i<s.length();i++){
 			res= res | (1<<(s.charAt(i)-'a'));
@@ -219,7 +223,8 @@ public class FastFilter {
 	 * @param s
 	 * @return
 	 */
-	public static byte[] createFreq(final String s){
+	public static byte[] createFreq(String s){
+//		if(s==null){ s=""; }
 		byte[] freq=new byte['z'-'a'+1];//size of alphabet
 		for(int i=0;i<s.length();i++){
 			freq[s.charAt(i)-'a']++;
