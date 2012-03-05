@@ -153,8 +153,10 @@ public class WordFinder {
 				}
 			}
 		} catch (FileNotFoundException e) {
+			System.err.println("Words.txt not found!!!!!!");
 			e.printStackTrace();
 		} catch (IOException e) {
+			System.err.println("Words.txt IO Exception!");
 			e.printStackTrace();
 		}
 
