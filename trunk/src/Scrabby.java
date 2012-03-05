@@ -68,7 +68,7 @@ public class Scrabby {
 		int x=0;
 		System.out.println(" 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14");
 		for(char[] b:board){
-			System.out.println(Arrays.toString(b)+" "+(14-x));
+			System.out.println(Arrays.toString(b)+" "+(x));
 			x++;
 		}
 	}

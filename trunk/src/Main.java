@@ -111,7 +111,7 @@ public class Main extends JFrame{
 		//
 		//			}
 		//		}
-//		printTiles();
+		printBoard(gameToBoard(game));
 		long time = System.currentTimeMillis();
 		new FredricTestStuff(game,buildLocations,rack,this, bonus); 
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
@@ -146,6 +146,36 @@ public class Main extends JFrame{
 		//			System.out.print(s+", ");
 		//		}
 
+	}
+	public void printBoard(char[][] board){
+		int x=0;
+		System.out.println(" 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14");
+		for(char[] b:board){
+			System.out.println(Arrays.toString(b)+" "+(x));
+			x++;
+		}
+	}
+	public char[][] gameToBoard(final String[][] game){
+		return gameToBoard(game," ");
+	}
+	private char[][] gameToBoard(final String[][] game,final String emptyLetter){
+		char[][] board=new char[game.length][game[0].length];
+		for(int x=0;x<game.length;x++){
+			for(int y=0;y<game[0].length;y++){
+				String letter=game[x][y];
+				if(letter!=null){ letter=letter.trim(); }
+				if(letter!=null && letter.length()>1){
+					System.out.println("BLAAAAAA");
+				}
+//				if(letter==null || letter.equals(emptyLetter)){
+				if( letter==null || !letter.matches("[a-zA-Z]") ){
+					board[x][y]=' ';
+				} else {
+					board[x][y]=letter.toLowerCase().charAt(0);
+				}
+			}
+		}
+		return board;
 	}
 	private int[][] getGameBoard(String gameInfo) throws Exception {
 
