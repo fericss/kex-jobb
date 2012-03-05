@@ -46,11 +46,11 @@ public class FredricTestStuff {
 		String row = null;
 		for(int i = 0; i<15; i++){
 
-			if(row!=null && (game[x][i]==null || game[x][i].equals("_"))){
+			if(row!=null && (game[x][i]==null)){
 				words.add(row);
 				row = null;
 			}
-			if(game[x][i]!=null && !game[x][i].equals("_")){
+			if(game[x][i]!=null){
 				if(row==null){
 					row = "";
 				}
@@ -66,6 +66,7 @@ public class FredricTestStuff {
 				if(word.contains(s2.toLowerCase())){
 					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
 						tryToMatchVertical(word,x);
+						
 					}
 				}
 			}
@@ -79,7 +80,7 @@ public class FredricTestStuff {
 		String row = null;
 		for(int i = 0; i<15; i++){
 
-			if(row!=null && (game[i][x]==null )){
+			if(row!=null && (game[i][x]==null)){
 				words.add(row);
 				row = null;
 			}

@@ -14,9 +14,9 @@ public class WordFinder {
 	private String[] wordList;
 	private String[][] m_words;
 	private HashMap<String, Integer> points;
-	
+
 	public final static int[] fastPoints={1,4,4,2,1,4,3,4,1,10,5,1,3,1,1,4,10,1,1,1,2,4,4,8,4,10};//TEST
-	
+
 	public WordFinder(){
 		wordList = LoadWords();
 		points = new HashMap<String, Integer>();
@@ -47,7 +47,7 @@ public class WordFinder {
 		points.put("Y", 4);
 		points.put("Z", 10);
 	}
-	
+
 	/**
 	 * det kan vara säkrare att använda valueOf2
 	 * @param ch
@@ -56,7 +56,7 @@ public class WordFinder {
 	public int valueOf(char ch){//TEST
 		return fastPoints[ch-'a'];
 	}
-	
+
 	/**
 	 * h
 	 * @param ch
@@ -65,11 +65,11 @@ public class WordFinder {
 	public int valueOf2(char ch){
 		return points.get(String.valueOf(ch).toUpperCase());
 	}
-	
+
 	public String[] getWordlist(){
 		return wordList;
 	}
-	
+
 	public List<String> Matches(String sourceLetters)
 	{
 		sourceLetters = sourceLetters.toUpperCase();
@@ -99,7 +99,9 @@ public class WordFinder {
 			int numWords = 0;
 			String line=null;
 			while ((line =br.readLine()) != null){
-				numWords++;
+				if(line.length()<13){ 
+					numWords++;
+				}
 			}
 			words = new String[numWords];
 			//			System.out.println(""+numWords);
