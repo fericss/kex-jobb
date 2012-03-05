@@ -76,11 +76,22 @@ public class FastFilter {
 		checkList=new byte[wordlist.length][];
 		
 		
+		
 		//calculate properties for each word
 		for(int i=0;i<wordlist.length;i++){
-			neededChars[i]=getHasChars(wordlist[i]);
-			charFreq[i]=createFreq(wordlist[i]);
-			checkList[i]=getCheckList(charFreq[i]);
+			String s;
+			if(wordlist[i].matches("[a-z]+")){
+				neededChars[i]=getHasChars(wordlist[i]);
+				charFreq[i]=createFreq(wordlist[i]);
+				checkList[i]=getCheckList(charFreq[i]);
+			} else {
+				System.out.println("StrangeWord: "+wordlist[i]);
+				neededChars[i]=0;
+				charFreq[i]=null;
+				checkList[i]=null;
+				System.out.println(neededChars[i]);
+			}
+				
 		}
 	}
 	
@@ -93,19 +104,27 @@ public class FastFilter {
 	 * @return
 	 */
 	public ArrayList<String> filter(String rack, String[] wordsOnRow){
+		//borde istället ha en freqlist med symbolen ., och när
+		rack=rack.replaceAll(".", "abcdefghijklmnopqrstuvwxyz");
 		String s=rack+concatinate(wordsOnRow);
+//		System.out.println("here"+s);
 		final int hasChars=getHasChars(s);
 		final byte[] hasFreq=createFreq(s);
 		
 		ArrayList<String> res=new ArrayList<String>();
 		
 		for(int i=0;i<wordlist.length;i++){
-			if(hasNeededChars(neededChars[i], hasChars)){//check that the word contains no character that isn't in s
-//				if(hasCharFreq(charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
-				if(hasCharFreq2(checkList[i],charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
-					if(containsAtleastOne(wordlist[i],wordsOnRow)){//check that the word contains at least one of the "words" on the row
-						//passed all the filters, so it's more likely to be a correct word
-						res.add(wordlist[i]);
+			if(neededChars[i]!=0){
+				if(wordlist[i].equals("coie.gf")){
+					System.out.println("WTF!");
+				}
+				if(hasNeededChars(neededChars[i], hasChars)){//check that the word contains no character that isn't in s
+					//if(hasCharFreq(charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
+					if(hasCharFreq2(checkList[i],charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
+						if(containsAtleastOne(wordlist[i],wordsOnRow)){//check that the word contains at least one of the "words" on the row
+							//passed all the filters, so it's more likely to be a correct word
+							res.add(wordlist[i]);
+						}
 					}
 				}
 			}
@@ -224,6 +243,7 @@ public class FastFilter {
 	 * @return
 	 */
 	public static byte[] createFreq(String s){
+//		System.out.println("freqOf: "+s);
 //		if(s==null){ s=""; }
 		byte[] freq=new byte['z'-'a'+1];//size of alphabet
 		for(int i=0;i<s.length();i++){
