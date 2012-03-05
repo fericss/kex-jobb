@@ -606,6 +606,11 @@ public class Scrabby {
 		
 		int empty=0;
 		int filled=0;
+		
+		int wildcards=rack.length();
+		rack=rack.replaceAll("\\.", "");
+		wildcards=wildcards-rack.length();//the difference in length is the number of wildcards
+		
 		byte[] rackFreq=FastFilter.createFreq(rack);
 				
 		//for each char
@@ -616,10 +621,15 @@ public class Scrabby {
 				int letterIndex=wordChar-'a';
 				//return if has no such letter left in rack
 				if(rackFreq[letterIndex]<=0){
-					return false;
-				} 
-				//take letter from rack
-				rackFreq[letterIndex]--;
+					//try to use wildcard
+					wildcards--;
+					if(wildcards<0){
+						return false;
+					}
+				} else {
+					//take letter from rack
+					rackFreq[letterIndex]--;
+				}
 				//count the number of placed letters
 				empty++;
 			} else {
