@@ -40,6 +40,56 @@ public class FredricTestStuff {
 
 
 	}
+	
+	
+	private Collection<String> getWordThatCanBeBuiltOnRow2(int x) {
+		List<String> words = new ArrayList<String>();
+		String row = null;
+		for(int i = 0; i<15; i++){
+			if(row!=null && (game[x][i]==null)){
+				words.add(row.toLowerCase());
+				row = null;
+			}
+			if(game[x][i]!=null){
+				if(row==null){
+					row = "";
+				}
+				row+=game[x][i];
+			}
+			else{
+			}
+		}
+		ArrayList<String> list=find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
+		for(String word:list){
+			tryToMatchHorizontal(word,x);
+		}
+		return null;
+	}
+	private Collection<String> getWordThatCanBeBuiltOnCol2(int x) {
+		List<String> words = new ArrayList<String>();
+		String row = null;
+		for(int i = 0; i<15; i++){
+
+			if(row!=null && (game[i][x]==null)){
+				words.add(row.toLowerCase());
+				row = null;
+			}
+			if(game[i][x]!=null){
+				if(row==null){
+					row = "";
+				}
+				row+=game[i][x];
+			}
+			else{
+			}
+		}
+		ArrayList<String> list=find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
+		for(String word:list){
+			tryToMatchHorizontal(word,x);
+		}
+		return null;
+	}
+	
 	private Collection<String> getWordThatCanBeBuiltOnRow(int x) {
 		List<String> words = new ArrayList<String>();
 		String letters = "";
