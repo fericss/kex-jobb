@@ -29,29 +29,31 @@ public class FredricTestStuff {
 		buildLocations = _buildLocations;
 
 		for(int row = 0; row<15;row++){
-			getWordThatCanBeBuiltOnCol2(row);
-			getWordThatCanBeBuiltOnRow2(row);
-		}
-		System.out.println(""+buildAbleWords.size());
-		Collections.sort(buildAbleWords);
-		ArrayList<Move> s1=buildAbleWords;
-		
-		buildAbleWords=new ArrayList<Move>();
-		for(int row = 0; row<15;row++){
 			getWordThatCanBeBuiltOnCol(row);
 			getWordThatCanBeBuiltOnRow(row);
 		}
+		System.out.println(""+buildAbleWords.size());
 		Collections.sort(buildAbleWords);
-		System.out.println(buildAbleWords.size()+" "+s1.size());
+		for(Move p : buildAbleWords){
+			System.out.println(p);
+		}
+		
+		
+//		ArrayList<Move> tmp=buildAbleWords;
+//		buildAbleWords=new ArrayList<Move>();
+//		for(int row = 0; row<15;row++){
+//			getWordThatCanBeBuiltOnCol2(row);
+//			getWordThatCanBeBuiltOnRow2(row);
+//		}
+//		Collections.sort(buildAbleWords);
+//		System.out.println(buildAbleWords.size()+" "+tmp.size());
 //		for(int i=0;i<buildAbleWords.size();i++){
 //			if(!buildAbleWords.get(i).equals(s1.get(i))){
 //				System.out.println(i+" "+buildAbleWords.get(i)+" "+s1.get(i));
 //			}
 //		}
 		
-//		for(Move p : buildAbleWords){
-//			System.out.println(p);
-//		}
+//		
 
 
 	}
@@ -119,7 +121,7 @@ public class FredricTestStuff {
 		for(String word : test){
 			for(String s2 : words){
 				if(word.contains(s2.toLowerCase())){
-					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())) //bug: could contain several s2 => overly restrictive
 						tryToMatchHorizontal(word,x);
 				}
 			}
