@@ -1,16 +1,49 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
+/**
+ * this class uses lower case letters.
+ * 
+ * Will automatically convert upper case from Game to lower case on board.
+ * @author MJB1
+ *
+ */
 public class Scrabby {
 	//global
 	GameInfo gi;
 	WordFinder wf;
 	char board[][];
-	char emptyChar;
+	final char emptyChar;
 	
 	public Scrabby(GameInfo _gi,WordFinder _wf){
+		emptyChar=' ';
 		wf=_wf;
 		setGameInfo(_gi);
-		emptyChar=' ';
+		
+		//print the board as seen from scrabby
+		printBoard();
+		
+//		boolean[][] bo=new boolean[15][15];
+//		for(int i=0;i<15;i++){
+//			for(int j=0;j<15;j++){
+//				bo[i][j]=board[i][j]!=emptyChar;
+//			}
+//		}
+//		for(boolean[] b:bo){
+//			System.out.println(Arrays.toString(b));
+//		}
+		
+		
+		//TEST of min length
+//		for(int j=0;j<2;j++){
+//			boolean vertical=j==0;
+//			System.out.println("vert:"+vertical);
+//			for(int i=0;i<15;i++){
+//				System.out.println(//"row:"+i+" vert:"+vertical+" "+
+//			Arrays.toString(getMinSizes(i,vertical)));
+//			}
+//		}
 	}
 	
 //	@Deprecated
@@ -30,6 +63,15 @@ public class Scrabby {
 //			res.get(i).toString();
 //		}
 //	}
+	
+	public void printBoard(){
+		int x=0;
+		System.out.println(" 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14");
+		for(char[] b:board){
+			System.out.println(Arrays.toString(b)+" "+(14-x));
+			x++;
+		}
+	}
 	
 	public GameInfo getGameInfo(){
 		return gi;
@@ -77,22 +119,39 @@ public class Scrabby {
 //		return res;
 //	}
 	
-	public char[][] gameToBoard(String[][] game){
-		return gameToBoard(game,null,emptyChar);
+	public char[][] gameToBoard(final String[][] game){
+		return gameToBoard(game," ");
 	}
 	
-	private static char[][] gameToBoard(String[][] game,String emptyLetter, char emptyChar){
+	private char[][] gameToBoard(final String[][] game,final String emptyLetter){
 		char[][] board=new char[game.length][game[0].length];
 		for(int x=0;x<game.length;x++){
 			for(int y=0;y<game[0].length;y++){
 				String letter=game[x][y];
-				if(letter==null || letter.equals(emptyLetter)){
+				if(letter!=null){ letter=letter.trim(); }
+				if(letter!=null && letter.length()>1){
+					System.out.println("BLAAAAAA");
+				}
+//				if(letter==null || letter.equals(emptyLetter)){
+				if( letter==null || !letter.matches("[a-zA-Z]") ){
 					board[x][y]=emptyChar;
 				} else {
-					board[x][y]=letter.charAt(0);
+					board[x][y]=letter.toLowerCase().charAt(0);
 				}
 			}
 		}
+//		for(char[] b:board){
+//			System.out.println(Arrays.toString(b));
+//		}
+//		boolean[][] bo=new boolean[15][15];
+//		for(int i=0;i<15;i++){
+//			for(int j=0;j<15;j++){
+//				bo[i][j]=board[i][j]!=emptyChar;
+//			}
+//		}
+//		for(boolean[] b:bo){
+//			System.out.println(Arrays.toString(b));
+//		}
 		return board;
 	}
 	
@@ -457,6 +516,56 @@ public class Scrabby {
 //	}
 	
 	/**
+	 * returns the minimum length of each word in the given direction from each point on the "row".
+	 * @param row
+	 * @param vertical
+	 * @return
+	 */
+	public int[] getMinLengths(int row, boolean vertical){
+		boolean swap=vertical;
+
+		int bsize=arrSize(board, swap);
+		int a=row;
+		int b=bsize-1;
+		
+		int[] mins=new int[bsize];
+		int point=bsize-1;
+		
+		boolean k=true;
+		for(;b>=0;b--){
+			if(k && arrGet(board,a,b,swap)!=emptyChar){
+//				System.out.print(1+""+arrGet(board,a,b,swap));
+				point=b;
+				k=false;
+			} else if(arrGet(board,a,b,swap)==emptyChar){
+//				System.out.print(2+""+arrGet(board,a,b,swap));
+				k=true;
+			} else {
+//				System.out.print(3+""+arrGet(board,a,b,swap));
+			}
+//			System.out.println(point+" "+b);
+			mins[b]=point-b+1;
+		}
+		
+		//make some places forbidden
+		b=bsize-1;
+		while(b>=0 && arrGet(board,a,b,swap)==emptyChar){
+			mins[b]=bsize+1;
+			b--;
+		}
+		
+//		System.out.println();
+		return mins;
+	}
+	
+	public ArrayList<Move> tryWord(ArrayList<String> list, ArrayList<Move> old,int row, boolean vertical){
+		
+		
+		
+		return null;
+	}
+	
+	/**
 	 * Use this and then fitCrossWords, to see if a word can be fitted to a position and direction.
 	 * This is an experimental method to see if this is faster than the alternative.
 	 * This method is untested.
@@ -477,9 +586,8 @@ public class Scrabby {
 		vertical=!vertical;
 		
 		//some variables
-		char emptyChar=' ';
+//		char emptyChar=' ';
 		boolean swap=vertical;
-		int asize=arrSize(board,swap);
 		int bsize=arrSize(board,!swap);
 
 
@@ -548,7 +656,7 @@ public class Scrabby {
 
 
 		//some variables
-		char emptyChar=' ';
+//		char emptyChar=' ';
 		boolean swap=vertical;
 		int asize=arrSize(board,swap);
 				
@@ -646,7 +754,7 @@ public class Scrabby {
 		
 		
 		//some variables
-		char emptyChar=' ';
+//		char emptyChar=' ';
 		boolean swap=vertical;
 		int asize=arrSize(board,swap);
 
