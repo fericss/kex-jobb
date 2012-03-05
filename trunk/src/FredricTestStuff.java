@@ -130,6 +130,78 @@ public class FredricTestStuff {
 		return null;
 	}
 	
+	/**
+	 * debug
+	 * @param x
+	 * @return
+	 */
+	private Collection<String> getWordThatCanBeBuiltOnRowD(int x) {
+		List<String> words = new ArrayList<String>();
+		String letters = "";
+		String row = null;
+		for(int i = 0; i<15; i++){
+			if(game[x][i]!=null){
+				if(row==null){
+					row = "";
+				}
+				row+=game[x][i];
+				letters+=game[x][i];
+			}
+			if(row!=null && (game[x][i]==null || i==14)){
+				words.add(row);
+				row = null;
+			}
+
+		}
+		List<String> test = find.Matches(rack+letters);
+		for(String word : test){
+			for(String s2 : words){
+				if(word.contains(s2.toLowerCase())){
+					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
+						tryToMatchVertical(word,x);
+					}
+				}
+			}
+		}
+		return null;
+	}
+	/**
+	 * debug
+	 * @param x
+	 * @return
+	 */
+	private Collection<String> getWordThatCanBeBuiltOnColD(int x) {
+		List<String> words = new ArrayList<String>();
+		//		words.add("");
+		String letters = "";
+		String row = null;
+		for(int i = 0; i<15; i++){
+			//add letter to the word
+			if(game[i][x]!=null){
+				if(row==null){
+					row = "";
+				}
+				row+=game[i][x];
+				letters+=game[i][x];
+			}
+			//check for the end of a word
+			if(row!=null && (game[i][x]==null || i==14)){
+				words.add(row);
+				row = null;
+			}
+		}
+		List<String> test = find.Matches(rack+letters);
+		for(String word : test){
+			for(String s2 : words){
+				if(word.contains(s2.toLowerCase())){
+					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+						tryToMatchHorizontal(word,x);
+				}
+			}
+		}
+		return null;
+	}
+	
 	private Collection<String> getWordThatCanBeBuiltOnRow(int x) {
 		List<String> words = new ArrayList<String>();
 		String letters = "";
@@ -203,6 +275,7 @@ public class FredricTestStuff {
 		}
 		return null;
 	}
+	
 	private void tryToMatchHorizontal(String word, int x) {
 		int points = 0;
 		int mult = 0;
