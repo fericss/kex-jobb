@@ -114,7 +114,7 @@ public class Main extends JFrame{
 		System.out.println("Rack: "+rack);
 		printBoard(gameToBoard(game));
 		long time = System.currentTimeMillis();
-		new FredricTestStuff(game,buildLocations,rack,this, bonus); 
+		new FredricTestStuff(game,buildLocations,rack,this, bonus, find); 
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
 		
 		//				        List<String> build = new ArrayList<String>();
