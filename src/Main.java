@@ -111,6 +111,7 @@ public class Main extends JFrame{
 		//
 		//			}
 		//		}
+		System.out.println("Rack: "+rack);
 		printBoard(gameToBoard(game));
 		long time = System.currentTimeMillis();
 		new FredricTestStuff(game,buildLocations,rack,this, bonus); 
@@ -380,6 +381,9 @@ public class Main extends JFrame{
 			if(gameInfo.charAt(pos)>='A' && gameInfo.charAt(pos)<='Z' && gameInfo.charAt(pos-1)=='"' && gameInfo.charAt(pos+1)=='"'){
 				//                System.out.println(""+gameInfo.charAt(pos));
 				setRack(getRack()+gameInfo.charAt(pos));
+			}
+			if(gameInfo.charAt(pos)=='"'&&gameInfo.charAt(pos+1)=='"'){
+				setRack(getRack()+".");
 			}
 			if(gameInfo.charAt(pos)==']'&& gameInfo.charAt(pos+1)=='}'){
 				done = true;
