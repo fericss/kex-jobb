@@ -160,13 +160,19 @@ public class FredricTestStuff {
 		
 		//try filtering and then placing word
 		List<String> test = find.Matches(rack+letters);
-		for(String word : test){
-			for(String s2 : words){
-				if(word.contains(s2.toLowerCase())){
-					//buggy check?
-//					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+letters).toLowerCase())){
+		if(words.size()<1){
+			for(String word : test){
+				tryToMatchVertical(word,x);
+			}
+		}else {
+			for(String word : test){
+				for(String s2 : words){
+					if(word.contains(s2.toLowerCase())){
+						//buggy check?
+						//					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+letters).toLowerCase())){
 						tryToMatchVertical(word,x);
-//					}
+						//					}
+					}
 				}
 			}
 		}
@@ -202,12 +208,18 @@ public class FredricTestStuff {
 			
 		//try filtering and then placing word
 		List<String> test = find.Matches(rack+letters);
-		for(String word : test){
-			for(String s2 : words){
-				if(word.contains(s2.toLowerCase())){
-//					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+letters).toLowerCase()))
+		if(words.size()<1){
+			for(String word : test){
+				tryToMatchVertical(word,x);
+			}
+		} else {
+			for(String word : test){
+				for(String s2 : words){
+					if(word.contains(s2.toLowerCase())){
+						//					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+letters).toLowerCase()))
 						tryToMatchHorizontal(word,x);
-//					}
+						//					}
+					}
 				}
 			}
 		}
@@ -235,11 +247,17 @@ public class FredricTestStuff {
 			}
 		}
 		List<String> test = find.Matches(rack+letters);
-		for(String word : test){
-			for(String s2 : words){
-				if(word.contains(s2.toLowerCase())){
-					if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
-						tryToMatchVertical(word,x);
+		if(words.size()<1){
+			for(String word : test){
+				tryToMatchVertical(word,x);
+			}
+		} else {
+			for(String word : test){
+				for(String s2 : words){
+					if(word.contains(s2.toLowerCase())){
+						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
+							tryToMatchVertical(word,x);
+						}
 					}
 				}
 			}
