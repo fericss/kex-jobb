@@ -16,7 +16,7 @@ import java.util.Arrays;
  * constructionTime(ms): 19  filterTime per word(ms): 0.1104  filterRepeats: 10000.
  * 
  * It takes less than 0,2 milliseconds to filter the wordlist from one row.
- * @author MJB1
+ * @author mbernt.mbernt
  *
  */
 public class FastFilter {
