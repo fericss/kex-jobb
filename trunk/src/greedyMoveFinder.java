@@ -227,15 +227,17 @@ public class greedyMoveFinder {
 			     }
 			    }
 			    if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
-			    	Move mov=null;
-			    		mov = new Move(points, word, x,i, true);
-			    		if(!buildAbleWords.contains(mov))
-							buildAbleWords.add(mov);
+			    	Move mov = new Move(points, word, x,i, true);
+			    	if(!buildAbleWords.contains(mov)){
+			    		buildAbleWords.add(mov);
+			    	}
 			    	if(scrab!=null){
 			    		ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
 			    		for(String s:list){
+			    			mov = new Move(scrab, s, x,i, true);
+			    			System.out.println("jag:"+mov);
 			    			if(!buildAbleWords.contains(mov)){
-			    				mov = new Move(scrab, word, x,i, true);
+			    				buildAbleWords.add(mov);
 			    			}
 			    		}	
 			    	}
@@ -367,8 +369,10 @@ public class greedyMoveFinder {
 					if(scrab!=null){
 			    		ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
 			    		for(String s:list){
+			    			mov = new Move(scrab, s, i,x, true);
+			    			System.out.println("jag:"+mov);
 			    			if(!buildAbleWords.contains(mov)){
-			    				mov = new Move(scrab, word, i,x, true);
+			    				buildAbleWords.add(mov);
 			    			}
 			    		}	
 			    	}
