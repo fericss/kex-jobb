@@ -3,12 +3,14 @@ public class GameInfo {
 
 	private int bonus[][];
 	private String game[][];
+	private boolean wildCards[][];
 	private String rack;
 	
-	public GameInfo(String _game[][], int _bonus[][],String _rack){
+	public GameInfo(String _game[][], int _bonus[][],boolean _wildCards[][],String _rack){
 		setGame(_game);
 		setBonus(_bonus);
 		setRack(_rack);
+		setWildCards(_wildCards);
 	}
 
 	public void setBonus(int bonus[][]) {
@@ -35,6 +37,9 @@ public class GameInfo {
 		return rack;
 	}
 	
+	public void setWildCards(boolean[][] wildcards){
+		
+	}
 	public boolean[][] getWildCards(){
 		return null;
 	}
