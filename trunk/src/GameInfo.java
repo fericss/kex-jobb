@@ -34,4 +34,8 @@ public class GameInfo {
 	public String getRack() {
 		return rack;
 	}
+	
+	public boolean[][] getWildCards(){
+		return null;
+	}
 }
