@@ -139,7 +139,7 @@ public class WordFinder {
 
 		return words;
 	}
-	public boolean WordCanBeBuiltFromSourceLetters(String targetWord, String sourceLetters)
+	public static boolean WordCanBeBuiltFromSourceLetters(String targetWord, String sourceLetters)
 	{
 		String builtWord = "";
 		char[] letters = targetWord.toCharArray();
@@ -169,7 +169,7 @@ public class WordFinder {
 		}
 		return builtWord.equals(targetWord);
 	}
-	private String Remove(int pos, String sourceLetters) {
+	private static String Remove(int pos, String sourceLetters) {
 		char[] wat = sourceLetters.toCharArray();
 		for(int i = pos+1;i<wat.length;i++){
 			wat[i-1] = wat[i];

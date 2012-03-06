@@ -598,4 +598,6 @@ public class FredricTestStuff {
 		}
 		return word_points;
 	}
+	
+	
 }
