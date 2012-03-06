@@ -759,17 +759,16 @@ public class Scrabby {
 	 * @return
 	 */
 	public int simplePoints3(String word,int a,int b,boolean vertical,boolean recurse){//TODO: need to add that "blank" letters give zero points
+		
 		//TODO: remove HAX
 		//HAX, swaps x and y, and inverts vertical
-		int tmp=a;
-		a=b;
-		b=tmp;
-		vertical=!vertical;
-		
+//		int tmp=a;
+//		a=b;
+//		b=tmp;
 		
 		//some variables
 //		char emptyChar=' ';
-		boolean swap=vertical;
+		boolean swap=!vertical;
 		int asize=arrSize(board,swap);
 
 		//points accumulated from recursions
@@ -779,45 +778,52 @@ public class Scrabby {
 		int currentPoints=0;
 		//the total factor that currentPoints will be multiplied by
 		int wordFactor=1;
-
+		System.out.println("start: "+a+" "+b+" "+vertical+" "+word.length()+" "+word);
 		//for each char
 		for(int i=0;i<word.length();i++){
-
-			//points for current word
-			if(arrGet(board,a,b,swap)==emptyChar){//added a character
-
-				//only do this for newly created words
-				if(recurse){
-					//check if there is a word in other direction
-					if( (a-1>0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
-							(a+1<asize && arrGet(board,a+1,b,swap)!=emptyChar)){//is there a word in !vertical direction?
-						//find start of word
-						int a2=a;
-						while(a2>0 && arrGet(board,a2-1,b,swap)!=emptyChar){
-							a2--;
-						}
-						//get points for word in other direction
-						otherPoints+=simplePoints3(word,a2,b,!vertical,false);
-					}
-				}
-				
-				//gets the bonus code
-				int bonusCode=arrGet(gi.getBonus(),a,b,swap);
-				
-				//updates points for current word, currentPoints+=valueOfChar*letterBonus
-				currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(bonusCode,false);
-				
-				//updates factor for current word, wordFactor*=wordBonus
-				wordFactor*=bonusFactor(bonusCode,true);
-			} else {
-				//no letter bonus because it already was on board
-				currentPoints+=wf.valueOf(word.charAt(i));
-			}
+			System.out.println(a+" "+b+" "+vertical+" "+word.length());
+			arrGet(board,a,b,swap);
 			b++;
 		}
+//		for(int i=0;i<word.length();i++){
+//
+//			//points for current word
+//			if(arrGet(board,a,b,swap)==emptyChar){//added a character
+//
+//				//only do this for newly created words
+//				if(recurse){
+//					//check if there is a word in other direction
+//					if( (a-1>0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
+//							(a+1<asize && arrGet(board,a+1,b,swap)!=emptyChar)){//is there a word in !vertical direction?
+//						//find start of word
+//						int a2=a;
+//						while(a2>0 && arrGet(board,a2-1,b,swap)!=emptyChar){
+//							a2--;
+//						}
+//						//get points for word in other direction
+//						otherPoints+=simplePoints3(word,a2,b,!vertical,false);
+//					}
+//				}
+//				
+//				//gets the bonus code
+//				int bonusCode=arrGet(gi.getBonus(),a,b,swap);
+//				
+//				//updates points for current word, currentPoints+=valueOfChar*letterBonus
+//				currentPoints+=wf.valueOf(word.charAt(i))*bonusFactor(bonusCode,false);
+//				
+//				//updates factor for current word, wordFactor*=wordBonus
+//				wordFactor*=bonusFactor(bonusCode,true);
+//			} else {
+//				//no letter bonus because it already was on board
+//				currentPoints+=wf.valueOf(word.charAt(i));
+//			}
+//			b++;
+//		}
+//		
+//		//calculate and return total points
+//		int totalPoints=currentPoints*wordFactor+otherPoints;
 		
-		//calculate and return total points
-		int totalPoints=currentPoints*wordFactor+otherPoints;
+		int totalPoints=1;
 		return totalPoints;
 	}
 	
