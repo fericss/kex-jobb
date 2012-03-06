@@ -60,13 +60,16 @@ public class Main extends JFrame{
 		ArrayList<Point> buildLocations = new ArrayList<Point>();
 		List<String> bla;
 		
-		GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
-		Scrabby scrab=new Scrabby(gi,find);
+		
 
 		System.out.println("Rack: "+rack);
 		printBoard(gameToBoard(game));
+		rack = "whehe.";
+		GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
+		Scrabby scrab=new Scrabby(gi,find);
 		long time = System.currentTimeMillis();
 //		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
+		
 		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find,scrab); //TEST
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
 
