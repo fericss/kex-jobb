@@ -33,11 +33,11 @@ public class FredricTestStuff {
 			getWordThatCanBeBuiltOnCol(row);
 			getWordThatCanBeBuiltOnRow(row);
 		}
-		System.out.println(""+buildAbleWords.size());
 		Collections.sort(buildAbleWords);
 		for(Move p : buildAbleWords){
 			System.out.println(p);
 		}
+		System.out.println(""+buildAbleWords.size());
 
 
 		//		ArrayList<Move> tmp=buildAbleWords;
@@ -249,23 +249,25 @@ public class FredricTestStuff {
 		}
 		words.add("");
 		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
-
-		//find.Matches(rack+letters);
-		if(words.size()<1){
-			for(String word : test){
-				tryToMatchVertical(word,x);
-			}
-		} else {
-			for(String word : test){
-				for(String s2 : words){
-					if(word.contains(s2.toLowerCase())){
-						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
-							tryToMatchVertical(word,x);
-						}
-					}
-				}
-			}
+		for(String word : test){
+			tryToMatchVertical(word,x);
 		}
+//		//find.Matches(rack+letters);
+//		if(words.size()<1){
+//			for(String word : test){
+//				tryToMatchVertical(word,x);
+//			}
+//		} else {
+//			for(String word : test){
+//				for(String s2 : words){
+//					if(word.contains(s2.toLowerCase())){
+//						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase())){
+//							tryToMatchVertical(word,x);
+//						}
+//					}
+//				}
+//			}
+//		}
 		return null;
 	}
 	private Collection<String> getWordThatCanBeBuiltOnCol(int x) {
@@ -293,23 +295,25 @@ public class FredricTestStuff {
 		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
 
 		//find.Matches(rack+letters);
-
-		if(words.size()<1){
-			for(String word : test){
-				tryToMatchHorizontal(word,x);
-			}
+		for(String word : test){
+			tryToMatchHorizontal(word,x);
 		}
-		else{
-
-			for(String word : test){
-				//				for(String s2 : words){
-				//					if(word.contains(s2.toLowerCase())){
-				//						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
-				tryToMatchHorizontal(word,x);
-				//					}
-				//				}
-			}
-		}
+//		if(words.size()<1){
+//			for(String word : test){
+//				tryToMatchHorizontal(word,x);
+//			}
+//		}
+//		else{
+//
+//			for(String word : test){
+//				//				for(String s2 : words){
+//				//					if(word.contains(s2.toLowerCase())){
+//				//						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+//				tryToMatchHorizontal(word,x);
+//				//					}
+//				//				}
+//			}
+//		}
 		return null;
 	}
 
