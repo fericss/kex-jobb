@@ -13,7 +13,7 @@ public class MartinTest {
 	 * @param nededLetters
 	 * @param rack
 	 */
-	public static ArrayList<String> testCombinations(String nededLetters,String rack){
+	public static ArrayList<String> testCombinations(String nededLetters,String rack/*,int[] indexes*/){
 		int wildcards=rack.length();
 		wildcards=wildcards-rack.replaceAll("\\.", "").length();
 //		System.out.println(wildcards);
@@ -34,7 +34,7 @@ public class MartinTest {
 		for(String s:res2){
 //			System.out.println(s);
 		}
-		System.out.println(res2.size()+" wild combinations.");
+		System.out.println("need: "+nededLetters+" rack: "+rack+" wildCombinations "+res2.size());
 		return res2;
 		
 	}
@@ -49,5 +49,50 @@ public class MartinTest {
 			} 
 			neededLetters.setCharAt(i, ch);
 		}
+	}
+	
+	/**
+	 * returns null if couldn't construct word else returns wildCount
+	 * @param targetWord
+	 * @param sourceLetters
+	 * @return
+	 */
+	public static byte[] wildCount(String targetWord, String sourceLetters)
+	{
+		
+		String builtWord = "";
+		char[] letters = targetWord.toCharArray();
+		byte[] wildCount=new byte['z'-'a'+1];
+		for(char letter : letters){
+			int pos = sourceLetters.indexOf(letter);
+			if (pos >= 0){
+				builtWord += letter;
+				sourceLetters = Remove(pos, sourceLetters);
+				continue;
+			}
+			// check for wildcard
+			pos = sourceLetters.indexOf(".");
+			if (pos >= 0){
+				wildCount[letter-'a']++;
+				builtWord += letter;
+				sourceLetters = Remove(pos, sourceLetters);
+			}
+		}
+		if(builtWord.equals(targetWord)){
+			return wildCount;
+		} else {
+			return null;
+		}
+	}
+	private static String Remove(int pos, String sourceLetters) {
+		char[] wat = sourceLetters.toCharArray();
+		for(int i = pos+1;i<wat.length;i++){
+			wat[i-1] = wat[i];
+			wat[i] = 0;
+		}
+		if(pos==wat.length-1){
+			wat[pos]=0;
+		}
+		return (""+String.valueOf(wat));
 	}
 }
