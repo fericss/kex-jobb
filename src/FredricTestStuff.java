@@ -252,7 +252,9 @@ public class FredricTestStuff {
 		for(String word : test){
 			tryToMatchVertical(word,x);
 		}
-//		//find.Matches(rack+letters);
+		
+		
+		//find.Matches(rack+letters);
 //		if(words.size()<1){
 //			for(String word : test){
 //				tryToMatchVertical(word,x);
@@ -294,7 +296,7 @@ public class FredricTestStuff {
 		words.add("");
 		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
 
-		//find.Matches(rack+letters);
+		//		find.Matches(rack+letters);
 		for(String word : test){
 			tryToMatchHorizontal(word,x);
 		}
@@ -306,12 +308,12 @@ public class FredricTestStuff {
 //		else{
 //
 //			for(String word : test){
-//				//				for(String s2 : words){
-//				//					if(word.contains(s2.toLowerCase())){
-//				//						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+//								for(String s2 : words){
+//									if(word.contains(s2.toLowerCase())){
+//										if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
 //				tryToMatchHorizontal(word,x);
-//				//					}
-//				//				}
+//									}
+//								}
 //			}
 //		}
 		return null;
@@ -422,6 +424,7 @@ public class FredricTestStuff {
 					continue;
 				}
 
+
 //				String gameLetters = "";
 //				for(int ic = 0; ic<word.length();ic++){
 //					if(game[ic+i][x]!=null){
@@ -437,10 +440,10 @@ public class FredricTestStuff {
 			     }
 			    }
 			    if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
-					//					System.out.println(x+":"+i+" "+word+" "+points);
 					Move mov = new Move(points, word, i,x, true);
 					if(!buildAbleWords.contains(mov))
 					buildAbleWords.add(mov);
+
 				}
 			}
 		}
@@ -552,6 +555,18 @@ public class FredricTestStuff {
 				if(cont){
 					continue;
 				}
+//<<<<<<< .mine
+//				String gameLetters = "";
+//				for(int ic = 0; ic<word.length();ic++){
+//					if(game[x][ic+i]!=null){
+//						gameLetters +=game[x][ic+i];
+//					}
+//				}
+//				gameLetters += rack;
+//				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
+//					System.out.println(word+" "+i+" "+x+" false");
+//					buildAbleWords.add(new Move(scrab, word, i,x, false));
+//=======
 
 //				String gameLetters = "";
 //				for(int ic = 0; ic<word.length();ic++){
@@ -571,6 +586,7 @@ public class FredricTestStuff {
 					Move mov = new Move(points, word, i,x, false);
 					if(!buildAbleWords.contains(mov))
 						buildAbleWords.add(mov);
+//>>>>>>> .r99
 				}
 			}
 		}
