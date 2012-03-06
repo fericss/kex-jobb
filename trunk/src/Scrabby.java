@@ -642,8 +642,8 @@ public class Scrabby {
 			}
 			b++;
 		}
-		//must have placed a char and must intercept a word on the board
-		if(empty==0 || filled==0){
+		//must have placed a char and must intercept a word on the board, if it doesen't create a word in another direction
+		if(empty==0){
 			return false;
 		}
 		return true;
