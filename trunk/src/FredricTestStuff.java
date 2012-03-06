@@ -418,14 +418,21 @@ public class FredricTestStuff {
 					continue;
 				}
 
-				String gameLetters = "";
-				for(int ic = 0; ic<word.length();ic++){
-					if(game[ic+i][x]!=null){
-						gameLetters +=game[ic+i][x];
-					}
-				}
-				gameLetters += rack;
-				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
+//				String gameLetters = "";
+//				for(int ic = 0; ic<word.length();ic++){
+//					if(game[ic+i][x]!=null){
+//						gameLetters +=game[ic+i][x];
+//					}
+//				}
+//				gameLetters += rack;
+//				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
+				String usedLetters="";
+			    for(int ic = 0; ic<word.length();ic++){
+			     if(game[ic+i][x]==null){
+			      usedLetters +=word.charAt(ic);
+			     }
+			    }
+			    if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
 					//					System.out.println(x+":"+i+" "+word+" "+points);
 					Move mov = new Move(points, word, i,x, true);
 					if(!buildAbleWords.contains(mov))
@@ -542,14 +549,21 @@ public class FredricTestStuff {
 					continue;
 				}
 
-				String gameLetters = "";
-				for(int ic = 0; ic<word.length();ic++){
-					if(game[x][ic+i]!=null){
-						gameLetters +=game[x][ic+i];
-					}
-				}
-				gameLetters += rack;
-				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
+//				String gameLetters = "";
+//				for(int ic = 0; ic<word.length();ic++){
+//					if(game[x][ic+i]!=null){
+//						gameLetters +=game[x][ic+i];
+//					}
+//				}
+//				gameLetters += rack;
+//				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
+				String usedLetters="";
+			    for(int ic = 0; ic<word.length();ic++){
+			     if(game[x][ic+i]==null){
+			      usedLetters +=word.charAt(ic);
+			     }
+			    }
+			    if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
 					Move mov = new Move(points, word, i,x, false);
 					if(!buildAbleWords.contains(mov))
 						buildAbleWords.add(mov);
