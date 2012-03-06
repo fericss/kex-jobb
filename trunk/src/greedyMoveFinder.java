@@ -15,9 +15,31 @@ public class greedyMoveFinder {
 	ArrayList<Move> buildAbleWords;
 	Main main;
 	int[][] bonus;
+	Scrabby scrab=null;
 	
 	public greedyMoveFinder(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus, WordFinder _find){
 
+		buildAbleWords = new ArrayList<Move>();
+		game = _game;
+		bonus = _bonus;
+		main = _main;
+		rack = _rack;
+		find = _find;
+		buildLocations = _buildLocations;
+
+		for(int row = 0; row<15;row++){
+			getWordThatCanBeBuiltOnCol(row);
+			getWordThatCanBeBuiltOnRow(row);
+		}
+		Collections.sort(buildAbleWords);
+		for(Move p : buildAbleWords){
+			System.out.println(p);
+		}
+		System.out.println(""+buildAbleWords.size());
+	}
+	public greedyMoveFinder(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus, WordFinder _find,Scrabby _scrab){
+		scrab=_scrab;
+		
 		buildAbleWords = new ArrayList<Move>();
 		game = _game;
 		bonus = _bonus;
@@ -205,9 +227,20 @@ public class greedyMoveFinder {
 			     }
 			    }
 			    if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
-					Move mov = new Move(points, word, x,i, true);
-					if(!buildAbleWords.contains(mov))
-					buildAbleWords.add(mov);
+			    	Move mov=null;
+			    		mov = new Move(points, word, x,i, true);
+			    		if(!buildAbleWords.contains(mov))
+							buildAbleWords.add(mov);
+			    	if(scrab!=null){
+			    		ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
+			    		for(String s:list){
+			    			if(!buildAbleWords.contains(mov)){
+			    				mov = new Move(scrab, word, x,i, true);
+			    			}
+			    		}	
+			    	}
+					
+					
 
 				}
 			}
@@ -328,8 +361,17 @@ public class greedyMoveFinder {
 			    }
 			    if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
 					Move mov = new Move(points, word, i,x, false);
-					if(!buildAbleWords.contains(mov))
+					if(!buildAbleWords.contains(mov)){
 						buildAbleWords.add(mov);
+					}
+					if(scrab!=null){
+			    		ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
+			    		for(String s:list){
+			    			if(!buildAbleWords.contains(mov)){
+			    				mov = new Move(scrab, word, i,x, true);
+			    			}
+			    		}	
+			    	}
 				}
 			}
 		}
