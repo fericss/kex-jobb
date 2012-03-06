@@ -38,43 +38,16 @@ public class Main extends JFrame{
 	BufferedReader rd  = null;
 	StringBuilder sb = null;
 	private String rack;
+	private boolean[][] wildcards;
 
 	//    String line = null;
 
 	String[][] game;
-	public HashMap<String, Integer> points;
 
 
 	public Main() throws Exception{
-		points = new HashMap<String, Integer>();
-		points.put("A", 1);
-		points.put("B", 4);
-		points.put("C", 4);
-		points.put("D", 2);
-		points.put("E", 1);
-		points.put("F", 4);
-		points.put("G", 3);
-		points.put("H", 4);
-		points.put("I", 1);
-		points.put("J", 10);
-		points.put("K", 5);
-		points.put("L", 1);
-		points.put("M", 3);
-		points.put("N", 1);
-		points.put("O", 1);
-		points.put("P", 4);
-		points.put("Q", 10);
-		points.put("R", 1);
-		points.put("S", 1);
-		points.put("T", 1);
-		points.put("U", 2);
-		points.put("V", 4);
-		points.put("W", 4);
-		points.put("X", 8);
-		points.put("Y", 4);
-		points.put("Z", 10);
 
-
+		wildcards = new boolean[15][15];
 		game = new String[15][15];
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
@@ -114,7 +87,8 @@ public class Main extends JFrame{
 		System.out.println("Rack: "+rack);
 		printBoard(gameToBoard(game));
 		long time = System.currentTimeMillis();
-		new FredricTestStuff(game,buildLocations,rack,this, bonus, find); 
+//		rack = ".......";
+		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
 		
 		//				        List<String> build = new ArrayList<String>();
@@ -159,6 +133,13 @@ public class Main extends JFrame{
 	public char[][] gameToBoard(final String[][] game){
 		return gameToBoard(game," ");
 	}
+	
+	/**
+	 * 
+	 * @param game
+	 * @param emptyLetter
+	 * @return
+	 */
 	private char[][] gameToBoard(final String[][] game,final String emptyLetter){
 		char[][] board=new char[game.length][game[0].length];
 		for(int x=0;x<game.length;x++){
@@ -264,36 +245,36 @@ public class Main extends JFrame{
 
 		return retThis;
 	}
-	private int calcPoints(String s){
-		int word_points = 0;
-		for(char c : s.toCharArray()){
-			word_points+=points.get(""+((char)(c-32)));
-		}
-		return word_points;
-	}
-	List<String> sortByPoints(List<String> bla) {
-		// this needs fixing, it really sucks and does not work
-		List<String> returnList = new ArrayList<String>();
-		for(String s : bla){
-			returnList.add(""+calcPoints(s)+" "+s);
-		}
-		Collections.sort(returnList, new Comparator<String>(){
-
-			@Override
-			public int compare(String arg0, String arg1) {
-				int one =Integer.parseInt(arg0.split(" ")[0]);
-				int two =Integer.parseInt(arg1.split(" ")[0]);
-
-				return one>two ? 0 : one==two ? 0 : 1;
-			}
-
-		}); 
-		//		String temp[] = (String[])returnList.toArray();
-		//		Arrays.sort(temp);
-		//		ArrayList.
-		//		returnList.
-		return returnList;
-	}
+//	private int calcPoints(String s){
+//		int word_points = 0;
+//		for(char c : s.toCharArray()){
+//			word_points+=points.get(""+((char)(c-32)));
+//		}
+//		return word_points;
+//	}
+//	List<String> sortByPoints(List<String> bla) {
+//		// this needs fixing, it really sucks and does not work
+//		List<String> returnList = new ArrayList<String>();
+//		for(String s : bla){
+//			returnList.add(""+calcPoints(s)+" "+s);
+//		}
+//		Collections.sort(returnList, new Comparator<String>(){
+//
+//			@Override
+//			public int compare(String arg0, String arg1) {
+//				int one =Integer.parseInt(arg0.split(" ")[0]);
+//				int two =Integer.parseInt(arg1.split(" ")[0]);
+//
+//				return one>two ? 0 : one==two ? 0 : 1;
+//			}
+//
+//		}); 
+//		//		String temp[] = (String[])returnList.toArray();
+//		//		Arrays.sort(temp);
+//		//		ArrayList.
+//		//		returnList.
+//		return returnList;
+//	}
 	private void printTiles() {
 		for(String[] s : game){
 			for(String i : s){
@@ -340,6 +321,7 @@ public class Main extends JFrame{
 			String l3 = String.valueOf(gameInfo.charAt(pos-2));
 			//						System.out.println(""+l1+" "+l2+" "+l3);
 			game[l2][l1] = ""+l3;
+//			wildcards[l2][l1] = Boolean.parseBoolean(gameInfo.substring( , endIndex))
 			if(gameInfo.charAt(pos+7)==']'&& gameInfo.charAt(pos+8)==']'){
 				done = true;
 				//                break;
