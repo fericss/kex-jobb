@@ -11,12 +11,13 @@ public class FredricTestStuff {
 	ArrayList<Point> buildLocations;
 	WordFinder find;
 	String rack;
+	//	ArrayList<Move> buildAbleWords;
 	ArrayList<Move> buildAbleWords;
 	Scrabby scrab;
 	Main main;
 	int[][] bonus;
-	
-	
+
+
 	public FredricTestStuff(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus, WordFinder _find){
 
 		buildAbleWords = new ArrayList<Move>();
@@ -25,40 +26,40 @@ public class FredricTestStuff {
 		main = _main;
 		rack = _rack;
 		find = _find;
-//		scrab = new Scrabby(new GameInfo(game, bonus,rack),find);
+		//		scrab = new Scrabby(new GameInfo(game, bonus,rack),find);
 		buildLocations = _buildLocations;
 
 		for(int row = 0; row<15;row++){
-			getWordThatCanBeBuiltOnColD(row);
-			getWordThatCanBeBuiltOnRowD(row);
+			getWordThatCanBeBuiltOnCol(row);
+			getWordThatCanBeBuiltOnRow(row);
 		}
 		System.out.println(""+buildAbleWords.size());
 		Collections.sort(buildAbleWords);
-//		for(Move p : buildAbleWords){
-//			System.out.println(p);
-//		}
-		
-		
-//		ArrayList<Move> tmp=buildAbleWords;
-//		buildAbleWords=new ArrayList<Move>();
-//		for(int row = 0; row<15;row++){
-//			getWordThatCanBeBuiltOnCol2(row);
-//			getWordThatCanBeBuiltOnRow2(row);
-//		}
-//		Collections.sort(buildAbleWords);
-//		System.out.println(buildAbleWords.size()+" "+tmp.size());
-//		for(int i=0;i<buildAbleWords.size();i++){
-//			if(!buildAbleWords.get(i).equals(s1.get(i))){
-//				System.out.println(i+" "+buildAbleWords.get(i)+" "+s1.get(i));
-//			}
-//		}
-		
-//		
+		for(Move p : buildAbleWords){
+			System.out.println(p);
+		}
+
+
+		//		ArrayList<Move> tmp=buildAbleWords;
+		//		buildAbleWords=new ArrayList<Move>();
+		//		for(int row = 0; row<15;row++){
+		//			getWordThatCanBeBuiltOnCol2(row);
+		//			getWordThatCanBeBuiltOnRow2(row);
+		//		}
+		//		Collections.sort(buildAbleWords);
+		//		System.out.println(buildAbleWords.size()+" "+tmp.size());
+		//		for(int i=0;i<buildAbleWords.size();i++){
+		//			if(!buildAbleWords.get(i).equals(s1.get(i))){
+		//				System.out.println(i+" "+buildAbleWords.get(i)+" "+s1.get(i));
+		//			}
+		//		}
+
+		//		
 
 
 	}
-	
-	
+
+
 	private Collection<String> getWordThatCanBeBuiltOnRow2(int x) {
 		List<String> words = new ArrayList<String>();
 		String letters = "";
@@ -81,7 +82,7 @@ public class FredricTestStuff {
 		}
 		System.out.println(letters);
 		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
-//				find.Matches(rack+letters);
+		//				find.Matches(rack+letters);
 
 		for(String word : test){
 			for(String s2 : words){
@@ -116,8 +117,8 @@ public class FredricTestStuff {
 		}
 		System.out.println(letters);
 		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
-//				find.Matches(rack+letters);
-		
+		//				find.Matches(rack+letters);
+
 		for(String word : test){
 			for(String s2 : words){
 				if(word.contains(s2.toLowerCase())){
@@ -129,7 +130,7 @@ public class FredricTestStuff {
 
 		return null;
 	}
-	
+
 	/**
 	 * debug
 	 * @param x
@@ -157,7 +158,7 @@ public class FredricTestStuff {
 		}
 		//DEBUG, see if all words are found and letters are correct
 		System.out.println(rack+" "+words+" "+letters);
-		
+
 		//try filtering and then placing word
 		List<String> test = find.Matches(rack+letters);
 		if(words.size()<1){
@@ -205,7 +206,7 @@ public class FredricTestStuff {
 		}
 		//DEBUG, see if all words are found and letters are correct
 		System.out.println(rack+" "+words+" "+letters);
-			
+
 		//try filtering and then placing word
 		List<String> test = find.Matches(rack+letters);
 		if(words.size()<1){
@@ -225,7 +226,7 @@ public class FredricTestStuff {
 		}
 		return null;
 	}
-	
+
 	private Collection<String> getWordThatCanBeBuiltOnRow(int x) {
 		List<String> words = new ArrayList<String>();
 		String letters = "";
@@ -246,7 +247,10 @@ public class FredricTestStuff {
 			else{
 			}
 		}
-		List<String> test = find.Matches(rack+letters);
+		words.add("");
+		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
+
+		//find.Matches(rack+letters);
 		if(words.size()<1){
 			for(String word : test){
 				tryToMatchVertical(word,x);
@@ -285,7 +289,10 @@ public class FredricTestStuff {
 			else{
 			}
 		}
-		List<String> test = find.Matches(rack+letters);
+		words.add("");
+		List<String> test = find.getFastFilter().filter(rack.toLowerCase(), words.toArray(new String[words.size()]));
+
+		//find.Matches(rack+letters);
 
 		if(words.size()<1){
 			for(String word : test){
@@ -295,17 +302,17 @@ public class FredricTestStuff {
 		else{
 
 			for(String word : test){
-				for(String s2 : words){
-					if(word.contains(s2.toLowerCase())){
-						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
-							tryToMatchHorizontal(word,x);
-					}
-				}
+				//				for(String s2 : words){
+				//					if(word.contains(s2.toLowerCase())){
+				//						if(find.WordCanBeBuiltFromSourceLetters(word,(rack+s2).toLowerCase()))
+				tryToMatchHorizontal(word,x);
+				//					}
+				//				}
 			}
 		}
 		return null;
 	}
-	
+
 	private void tryToMatchHorizontal(String word, int x) {
 		int points = 0;
 		int mult = 0;
@@ -324,16 +331,16 @@ public class FredricTestStuff {
 			for(int c = 0; c<word.length();c++){
 				int type = bonus[x][i+c];
 				int tempMult = 1;
-				
+
 				if(x<14)
-				if(game[i+c][x+1]!=null){
-					possible=true;
-				}
+					if(game[i+c][x+1]!=null){
+						possible=true;
+					}
 				if(x>0)
-				if(game[i+c][x-1]!=null){
-					possible=true;
-				}	
-				
+					if(game[i+c][x-1]!=null){
+						possible=true;
+					}	
+
 				if(game[i+c][x]==null){
 					tempMult = type == 1 ? 2 : type==2 ? 3 : 1;
 					mult = mult * (type == 3 ? 2 : type==4 ? 3 : 1);
@@ -420,7 +427,9 @@ public class FredricTestStuff {
 				gameLetters += rack;
 				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
 					//					System.out.println(x+":"+i+" "+word+" "+points);
-					buildAbleWords.add(new Move(points, word, x,i, true));
+					Move mov = new Move(points, word, i,x, true);
+					if(!buildAbleWords.contains(mov))
+					buildAbleWords.add(mov);
 				}
 			}
 		}
@@ -443,17 +452,17 @@ public class FredricTestStuff {
 			for(int c = 0; c<word.length();c++){
 				int type = bonus[i+c][x];
 				int tempMult = 1;
-				
+
 				if(x<14)
-				if(game[x+1][i+c]!=null){
-					possible=true;
-				}
+					if(game[x+1][i+c]!=null){
+						possible=true;
+					}
 				if(x>0)
-				if(game[x-1][i+c]!=null){
-					possible=true;
-				}	
-				
-				
+					if(game[x-1][i+c]!=null){
+						possible=true;
+					}	
+
+
 				if(game[x][i+c]==null){
 					tempMult = type == 1 ? 2 : type==2 ? 3 : 1;
 					mult = mult * (type == 3 ? 2 : type==4 ? 3 : 1);
@@ -483,14 +492,14 @@ public class FredricTestStuff {
 				if(!check){
 					continue;
 				}
-				
+
 
 				boolean cont = false;
 				for(int c = 0; c<word.length();c++){
 					if(game[x][i+c]!=null){
 						continue;
 					}
-					
+
 					String tempWord = ""+word.charAt(c);
 					int y = x-1;
 					while(y>=0 && game[y][i+c]!=null){
@@ -532,7 +541,7 @@ public class FredricTestStuff {
 				if(cont){
 					continue;
 				}
-				
+
 				String gameLetters = "";
 				for(int ic = 0; ic<word.length();ic++){
 					if(game[x][ic+i]!=null){
@@ -541,7 +550,9 @@ public class FredricTestStuff {
 				}
 				gameLetters += rack;
 				if(find.WordCanBeBuiltFromSourceLetters(word, gameLetters.toLowerCase())){
-					buildAbleWords.add(new Move(points, word, i,x, false));
+					Move mov = new Move(points, word, i,x, false);
+					if(!buildAbleWords.contains(mov))
+						buildAbleWords.add(mov);
 				}
 			}
 		}
