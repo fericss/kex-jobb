@@ -578,7 +578,7 @@ public class Scrabby {
 	 * @param vertical
 	 * @return
 	 */
-	public boolean fitWord(String word, int a, int b, String rack, boolean vertical){
+	public boolean fitWord(String word, int a, int b, String rack, boolean vertical){//TODO: add check for word in other direction
 		//TODO: remove HAX
 		//HAX, swaps x and y, and inverts vertical
 		int tmp=a;
@@ -642,8 +642,9 @@ public class Scrabby {
 			}
 			b++;
 		}
+		//TODO: ff
 		//must have placed a char and must intercept a word on the board, if it doesen't create a word in another direction
-		if(empty==0){
+		if(empty==0 /*||filled==0*/){
 			return false;
 		}
 		return true;
@@ -748,6 +749,8 @@ public class Scrabby {
 	
 	/**
 	 * Does the same as simplepoints 2 but is shorter
+	 * 
+	 * need to add that "blank" letters give zero points
 	 * @param word
 	 * @param x
 	 * @param y
@@ -755,7 +758,7 @@ public class Scrabby {
 	 * @param recurse
 	 * @return
 	 */
-	public int simplePoints3(String word,int a,int b,boolean vertical,boolean recurse){
+	public int simplePoints3(String word,int a,int b,boolean vertical,boolean recurse){//TODO: need to add that "blank" letters give zero points
 		//TODO: remove HAX
 		//HAX, swaps x and y, and inverts vertical
 		int tmp=a;
