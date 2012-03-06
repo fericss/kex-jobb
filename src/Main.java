@@ -54,15 +54,20 @@ public class Main extends JFrame{
 		String _gameInfo = getGame(gamesIDList.get(0));
 		int[][] bonus = getGameBoard(_gameInfo);
 		parseTiles(_gameInfo);
-
+		
+		
 		WordFinder find = new WordFinder();
 		ArrayList<Point> buildLocations = new ArrayList<Point>();
 		List<String> bla;
+		
+		GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
+		Scrabby scrab=new Scrabby(gi,find);
 
 		System.out.println("Rack: "+rack);
 		printBoard(gameToBoard(game));
 		long time = System.currentTimeMillis();
-		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
+//		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
+		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find,scrab); //TEST
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
 
 
