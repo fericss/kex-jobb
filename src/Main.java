@@ -58,68 +58,13 @@ public class Main extends JFrame{
 		WordFinder find = new WordFinder();
 		ArrayList<Point> buildLocations = new ArrayList<Point>();
 		List<String> bla;
-		/// TEST  
-		//		for(int i = 0; i<15; i++){
-		//			for(int i2 = 0; i2<15; i2++){
-		//				if(game[i][i2]!=null && !game[i][i2].equals("_")){
-		//					if(i2 < 14 && game[i][i2+1]==null){
-		//						game[i][i2+1]="_";
-		//						buildLocations.add(new Point(i,i2+1));
-		////						System.out.println("what");
-		//					}
-		//					if(i<14 && game[i+1][i2]==null){
-		//						game[i+1][i2]="_";
-		//						buildLocations.add(new Point(i+1,i2));
-		//					}	
-		//					if(i > 0 &&game[i-1][i2]==null){
-		//						game[i-1][i2]="_";
-		//						buildLocations.add(new Point(i-1,i2));
-		//					}
-		//					if(i2 > 0 && game[i][i2-1]==null){
-		//						game[i][i2-1]="_";
-		//						buildLocations.add(new Point(i,i2-1));
-		//					}
-		//				}
-		//
-		//
-		//			}
-		//		}
+
 		System.out.println("Rack: "+rack);
 		printBoard(gameToBoard(game));
 		long time = System.currentTimeMillis();
-//		rack = ".......";
 		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
-		
-		//				        List<String> build = new ArrayList<String>();
-		//				        for(String[] s : game){
-		//				            String _tmp ="";
-		//				            for(String st : s){
-		//				                _tmp += st==null? "" : st;
-		//				                if()
-		//				            }
-		//				            System.out.println(_tmp);
-		//				            bla = find.Matches(rack+_tmp);
-		//				            for(String st : bla){
-		//		//		                System.out.print(st+", ");
-		//				                if(!st.equals("") && st.contains(_tmp)){
-		//				                    build.add(st);
-		//				                }
-		//				            }
-		//				        }
-		//				        for(String s : build){
-		//				            System.out.println(s);
-		//				        }
 
-		//        /// END TEST
-		//		System.out.print("Words built with rack: ");
-		//		bla = find.Matches(getRack());
-		//		List<String> test = sortByPoints(bla);
-		//		List<String> test = bla;
-		//
-		//		for(String s : test){
-		//			System.out.print(s+", ");
-		//		}
 
 	}
 	public void printBoard(char[][] board){
@@ -321,7 +266,7 @@ public class Main extends JFrame{
 			String l3 = String.valueOf(gameInfo.charAt(pos-2));
 			//						System.out.println(""+l1+" "+l2+" "+l3);
 			game[l2][l1] = ""+l3;
-//			wildcards[l2][l1] = Boolean.parseBoolean(gameInfo.substring( , endIndex))
+			wildcards[l2][l1] = Boolean.parseBoolean(gameInfo.substring( pos+2, pos+6));
 			if(gameInfo.charAt(pos+7)==']'&& gameInfo.charAt(pos+8)==']'){
 				done = true;
 				//                break;
