@@ -51,4 +51,9 @@ public class Move implements Comparable<Move>{//TODO: make comparable
 			return 1;
 		}
 	}
+	@Override
+	public int hashCode(){
+		return word.hashCode();
+	}
+	
 }
