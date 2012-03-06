@@ -31,7 +31,7 @@ public class WordFinder {
 	 * @return
 	 */
 	public int valueOf(char ch){//TEST
-		return fastPoints[ch-'a'];
+		return ch=='.' ? 0 : fastPoints[ch-'a'];
 	}
 
 //	/**
