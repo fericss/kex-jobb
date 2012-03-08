@@ -35,7 +35,7 @@ public class FastFilter {
 		String[] wordlist=new WordFinder().getWordlist();
 		String[] wordsOnRow={"hej","d","low"};
 		String rack="fihhdf";
-		timingTest(rack,wordsOnRow,wordlist,10000);
+		timingTest(rack,wordsOnRow,wordlist,1000);
 	}
 	
 	public static void timingTest(String rack,String[] wordsOnRow, String[] wordlist,int filterRepeats){
@@ -262,10 +262,10 @@ public class FastFilter {
 	 * @param s
 	 * @return
 	 */
-	public static byte[] createFreq(String s){
+	public static byte[] createFreq(final String s){
 //		System.out.println("freqOf: "+s);
 //		if(s==null){ s=""; }
-		byte[] freq=new byte['z'-'a'+1];//size of alphabet
+		final byte[] freq=new byte['z'-'a'+1];//size of alphabet
 		for(int i=0;i<s.length();i++){
 			freq[s.charAt(i)-'a']++;
 		}
