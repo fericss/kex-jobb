@@ -84,6 +84,16 @@ public class Help {
 		return possible;
 	}
 	
+	/**
+	 * checks that all crossing words are correct words.
+	 * very fast, because it only has to do this check:
+	 * if(possible[index]!=null && !possible[index][word.charAt(i)-'a']){return false;}
+	 * for each letter in the word
+	 * @param word
+	 * @param index
+	 * @param possible
+	 * @return
+	 */
 	public static boolean correctCrossing(String word, int index,boolean[][] possible){
 		for(int i=0;i<word.length();i++,index++){
 			if(possible[index]!=null && 
@@ -96,13 +106,14 @@ public class Help {
 	
 	
 	/**
-	 * 
+	 * Much slower than the other correct crossing
 	 * @param word
 	 * @param index
 	 * @param fastCrossing
 	 * @param wf
 	 * @return
 	 */
+	@Deprecated
 	public static boolean correctCrossing(String word, int index,String[][] fastCrossing,WordFinder wf){
 		for(int i=0;i<word.length();i++,index++){
 			if(fastCrossing[index]!=null){
@@ -170,7 +181,7 @@ public class Help {
 	 * @param hasFreq
 	 * @return
 	 */
-	static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildCards){
+	public static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildCards){
 		int i;
 		for(int j=0;j<checkList.length;j++){
 			i=checkList[j];
