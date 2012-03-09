@@ -479,7 +479,8 @@ public class MartinsFilterTest {
 	} 
 	
 	/**
-	 * twice as fast as slowfilter2
+	 * twice as fast as slowfilter2, and should not return words
+	 * that can't fit to a position.
 	 * @param rack
 	 * @param row
 	 * @param length
