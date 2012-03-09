@@ -481,6 +481,14 @@ public class MartinsFilterTest {
 	/**
 	 * twice as fast as slowfilter2, and should not return words
 	 * that can't fit to a position.
+	 * The returned list is accessed in the following way:
+	 * list.get(wordLength)[startPos].get(i);
+	 * where wordLength is the length of the words and startPor is the
+	 * position the word is on the board.
+	 * iterate through i in the following way:
+	 * for(int i=0;i<list.get(wordLength)[startPos].length;i++){
+	 * 		String word=list.get(wordLength)[startPos].get(i);
+	 * }
 	 * @param rack
 	 * @param row
 	 * @param length
@@ -685,7 +693,7 @@ public class MartinsFilterTest {
 
 	
 	
-	
+	@Deprecated
 	public static String[] getCharCombinations(final String row,final int length){
 		final String[] sarr=new String[row.length()-length+1];
 		for(int i=0;i+length-1<row.length();i++){
@@ -708,7 +716,7 @@ public class MartinsFilterTest {
 		}
 		return sarr;
 	}
-	
+	@Deprecated
 	public static String[] getCharCombinations2(final String row,final int length){
 		final String[] sarr=new String[row.length()-length+1];
 		for(int i=0;i+length-1<row.length();i++){
@@ -731,7 +739,7 @@ public class MartinsFilterTest {
 		}
 		return sarr;
 	}
-	
+	@Deprecated
 	public static String[] getCharCombinations3(final String row,final int length,boolean[] haveAdjacent){
 		final String[] sarr=new String[row.length()-length+1];
 		for(int i=0;i+length-1<row.length();i++){
@@ -806,6 +814,66 @@ public class MartinsFilterTest {
 					}
 
 				}
+			}
+		}
+		return sarr;
+	}
+	
+	/**
+	 * Made for the advanced bot.
+	 * row is the whole row.
+	 * length is the length of the words tested for.
+	 * crossing is a string array with all words that cross the row with a space for
+	 * the crossing point.
+	 * impossible is points that it's impossible to create a word by inserting one letter.
+	 * from and to is used in advanced bot to only allow new words that intersect the
+	 * 
+	 * null means impossible to create word there.
+	 * empty string means it dosent intersect the new word
+	 * @param row
+	 * @param length
+	 * @param haveAdjacent
+	 * @param fastCrossers
+	 * @return
+	 */
+	public static String[] getCharCombinations5(final int rackLength, final String row,final int length,
+			String[][] fastCrossers, boolean[] impossible, int from, int to){
+		
+		final String[] sarr=new String[row.length()-length+1];
+		for(int i=0;i+length-1<row.length();i++){
+			//from and to must be inside the word
+			if(from>=i && to<=i+length-1){
+				//it must not be impossible
+				if(!impossibleInRange(i,length,impossible)){
+					String tmp=row.substring(i,i+length);
+					String tmp2=tmp.replaceAll(" ", "");
+					//must have room to place pieces
+					if(tmp.length()!=tmp2.length()){
+						//must have enough letters
+						if(length-tmp2.length()<=rackLength){
+							//it must be empty before and after the word, or else it's not the given length
+							if( (i==0 || row.charAt(i-1)==' ') && ((i+length)==row.length() || row.charAt(i+length)==' ')){
+								if(tmp2.length()==0){
+									//maybe should check if it's possible to complete each crossing word, and if not call the place forbidden
+									//check if there are letters above or below
+									for(int j=i;j<i+length;j++){
+										//must be letters above or below, if it's empty
+										if(fastCrossers[j]!=null){
+											sarr[i]=tmp.replaceAll(" ", ".");
+											break;
+										}
+									}
+								} else {
+									sarr[i]=tmp.replaceAll(" ", ".");
+								}
+
+							}
+						}
+
+					}
+				}
+			} else {
+				sarr[i]="";
 			}
 		}
 		return sarr;
