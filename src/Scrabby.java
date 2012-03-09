@@ -611,7 +611,7 @@ public class Scrabby {
 		rack=rack.replaceAll("\\.", "");
 		wildcards=wildcards-rack.length();//the difference in length is the number of wildcards
 		
-		byte[] rackFreq=FastFilter.createFreq(rack);
+		byte[] rackFreq=Help.createFreq(rack);
 				
 		//for each char
 		for(int i=0;i<word.length();i++){
@@ -678,7 +678,7 @@ public class Scrabby {
 			char wordChar=word.charAt(i);
 			if(boardChar==emptyChar){//check on all added characters
 				//check if there is a possible crossing word
-				if( (a-1>0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
+				if( (a-1>=0 && arrGet(board,a-1,b,swap)!=emptyChar) || 
 						(a+1<asize && arrGet(board,a+1,b,swap)!=emptyChar)){
 					//find first letter in word
 					int a2=a;
