@@ -81,9 +81,9 @@ public class FastFilter {
 		for(int i=0;i<wordlist.length;i++){
 			String s;
 			if(wordlist[i].matches("[a-z]+")){
-				neededChars[i]=getHasChars(wordlist[i]);
-				charFreq[i]=createFreq(wordlist[i]);
-				checkList[i]=getCheckList(charFreq[i]);
+				neededChars[i]=Help.getHasChars(wordlist[i]);
+				charFreq[i]=Help.createFreq(wordlist[i]);
+				checkList[i]=Help.getCheckList(charFreq[i]);
 			} else {
 				System.out.println("StrangeWord: "+wordlist[i]);
 				neededChars[i]=0;
@@ -115,15 +115,15 @@ public class FastFilter {
 		wildcards=wildcards-rack.length();
 //		System.out.println(" wildCards: "+wildcards);
 		
-		String sourceLetters=rack+concatinate(wordsOnRow);
+		String sourceLetters=rack+Help.concatinate(wordsOnRow);
 //		System.out.println("here"+s);
 		final int hasChars;
 		if(wildcards>0){
 			hasChars=-1;
 		} else {
-			hasChars=getHasChars(sourceLetters);
+			hasChars=Help.getHasChars(sourceLetters);
 		}
-		final byte[] hasFreq=createFreq(sourceLetters);
+		final byte[] hasFreq=Help.createFreq(sourceLetters);
 //		System.out.println("hasFreq: "+Arrays.toString(hasFreq));
 		ArrayList<String> res=new ArrayList<String>();
 //		System.out.println(rack+" "+Arrays.toString(wordsOnRow)+" "+sourceLetters);
@@ -132,9 +132,9 @@ public class FastFilter {
 //				if(wordlist[i].equals("coie.gf")){
 //					System.out.println("WTF!");
 //				}
-				if(hasNeededChars(neededChars[i], hasChars)){//check that the word contains no character that isn't in s
+				if(Help.hasNeededChars(neededChars[i], hasChars)){//check that the word contains no character that isn't in s
 					//if(hasCharFreq(charFreq[i],hasFreq)){//check that the word has no more of a char type than in s
-					if(hasCharFreq2(checkList[i],charFreq[i],hasFreq,wildcards)){//check that the word has no more of a char type than in s
+					if(Help.hasCharFreq2(checkList[i],charFreq[i],hasFreq,wildcards)){//check that the word has no more of a char type than in s
 //						if(wordsOnRow.length==0 || containsAtleastOne(wordlist[i],wordsOnRow)){//check that the word contains at least one of the "words" on the row
 							//passed all the filters, so it's more likely to be a correct word
 							res.add(wordlist[i]);
@@ -146,144 +146,22 @@ public class FastFilter {
 		return res;
 	}
 	
-	/**
-	 * Checks that word contains at least one of the strings from wordsOnRow, but returns true if
-	 * wordsonrow has length 0.
-	 * @param word
-	 * @param wordsOnRow
-	 * @return
-	 */
-	private static boolean containsAtleastOne(String word, final String[] wordsOnRow){
-//		if(word==null){ word=""; }
-		for(int i=0;i<wordsOnRow.length;i++){
-			if(word.length()>wordsOnRow[i].length() //the word must be longer
-					&& word.contains(wordsOnRow[i])){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Checks that all the "neededChars" is in "hasChars". 
-	 * @param neededChars
-	 * @param hasChars
-	 * @return
-	 */
-	private static boolean hasNeededChars(final int neededChars,final int hasChars){
-		return (neededChars & hasChars) == neededChars;
-	}
-	
 //	/**
-//	 * Checks that all the corresponding values in needFreq is less than or equal to hasFreq.
-//	 * @param needFreq
-//	 * @param hasFreq
+//	 * Checks that word contains at least one of the strings from wordsOnRow, but returns true if
+//	 * wordsonrow has length 0.
+//	 * @param word
+//	 * @param wordsOnRow
 //	 * @return
 //	 */
-//	private static boolean hasCharFreq(final byte[] needFreq, final byte[] hasFreq){
-//		for(int i=0;i<needFreq.length;i++){
-//			if(needFreq[i]>hasFreq[i]){
-//				//if there are less letters available than needed...
-//				return false;
+//	private static boolean containsAtleastOne(String word, final String[] wordsOnRow){
+////		if(word==null){ word=""; }
+//		for(int i=0;i<wordsOnRow.length;i++){
+//			if(word.length()>wordsOnRow[i].length() //the word must be longer
+//					&& word.contains(wordsOnRow[i])){
+//				return true;
 //			}
 //		}
-//		return true;
+//		return false;
 //	}
-	
-	/**
-	 * Returns a list of the indexes that contain a number greater than zero.
-	 * @param charFreq
-	 * @return
-	 */
-	private static byte[] getCheckList(final byte[] charFreq){
-		byte size=0;
-		for(byte i=0;i<charFreq.length;i++){
-			if(charFreq[i]>0){
-				size++;
-			}
-		}
-		final byte[] res=new byte[size];
-		byte index=0;
-		for(byte i=0;i<charFreq.length;i++){
-			if(charFreq[i]>0){
-				res[index]=i;
-				index++;
-			}
-		}
-		return res;
-	}
-	
-	/**
-	 * Checks that all the corresponding values in needFreq is less than or equal to hasFreq.
-	 * Only checks the letters that is in the word.
-	 * @param checkList
-	 * @param needFreq
-	 * @param hasFreq
-	 * @return
-	 */
-	private static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildCards){
-		int i;
-		for(int j=0;j<checkList.length;j++){
-			i=checkList[j];
-			if(needFreq[i]>hasFreq[i]){
-				//if there are less letters available than needed...
-//				System.out.println(needFreq[i]+" "+hasFreq[i]+" "+wildCards);
-				wildCards=wildCards-(needFreq[i]-hasFreq[i]);
-//				System.out.println(needFreq[i]+" gg "+hasFreq[i]+" "+wildCards);
-				if(wildCards<0){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	
-	
-	/**
-	 * Uses an int as a bit array to store which chars are in the word.
-	 * It's then very fast to check if one string contains all the letter types by
-	 * using: (a&b)==a.
-	 * If that returns true then b contains all letter types in a.
-	 * @param s
-	 * @return
-	 */
-	private static int getHasChars(String s){
-//		if(s==null){ s=""; }
-		int res=0;
-		for(int i=0;i<s.length();i++){
-			res= res | (1<<(s.charAt(i)-'a'));
-		}
-		return res;
-	}
-	
-	/**
-	 * Counts the frequency of each letter and stores the count for each letter in a byte array, where 
-	 * index 0 contains the count for 'a'.
-	 * @param s
-	 * @return
-	 */
-	public static byte[] createFreq(final String s){
-//		System.out.println("freqOf: "+s);
-//		if(s==null){ s=""; }
-		final byte[] freq=new byte['z'-'a'+1];//size of alphabet
-		for(int i=0;i<s.length();i++){
-			freq[s.charAt(i)-'a']++;
-		}
-		return freq;
-	}
-	
-	/**
-	 * help method for concatinating all strings in a string array.
-	 * Should be moved to a help methods class.
-	 * @param sarr
-	 * @return
-	 */
-	private String concatinate(final String[] sarr){
-		final StringBuilder sb=new StringBuilder();
-		for(int i=0;i<sarr.length;i++){
-			sb.append(sarr[i]);
-		}
-		return sb.toString();
-	}
 	
 }
