@@ -51,7 +51,7 @@ public class Main extends JFrame{
 		game = new String[15][15];
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
-		String _gameInfo = getGame(gamesIDList.get(1));
+		String _gameInfo = getGame(gamesIDList.get(0));
 		int[][] bonus = getGameBoard(_gameInfo);
 		parseTiles(_gameInfo);
 		
@@ -64,7 +64,7 @@ public class Main extends JFrame{
 
 		System.out.println("Rack: "+rack);
 		printBoard(gameToBoard(game));
-		rack = "whehe.";
+//		rack = "whehe.";
 		GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
 		Scrabby scrab=new Scrabby(gi,find);
 		
@@ -140,8 +140,8 @@ public class Main extends JFrame{
 //		}
 
 		long time = System.currentTimeMillis();
-//		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
-		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find,scrab); //TEST
+		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
+//		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find,scrab); //TEST
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
 
 
