@@ -126,7 +126,7 @@ public class greedyMoveFinder {
 				if(game[i+word.length()][x]!=null)
 					continue;
 			}
-			if(i-1>1 && game[i-1][x]!=null){
+			if(i-1>=0 && game[i-1][x]!=null){
 				continue;
 			}
 
@@ -259,9 +259,10 @@ public class greedyMoveFinder {
 				if(game[x][i+word.length()]!=null)
 					continue;
 			}
-			if(i-1>1 && game[x][i-1]!=null){
+			if(i-1>=0 && game[x][i-1]!=null){
 				continue;
 			}
+			
 
 			for(int c = 0; c<word.length();c++){
 				int type = bonus[i+c][x];
