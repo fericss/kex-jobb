@@ -228,12 +228,14 @@ public class MartinsFilterTest {
 		wordlist=_wordlist;
 		limit=maxDoubles(wordlist);
 		neededChars=new int[limit][wordlist.length];
+//		neededChars=new int[wordlist.length][];//NEW
 		lengths=new byte[wordlist.length];
 		System.out.println("limit: "+limit);
 		
 		//calculate properties for each word
 		for(int i=0;i<wordlist.length;i++){
 			if(wordlist[i].matches("[a-z]+")){
+//				neededChars[i]=getHasChars(wordlist[i],0,0);//NEW
 				int[] tmp=getHasChars(wordlist[i],0,0);
 				for(int j=0;j<tmp.length;j++){
 					neededChars[j][i]=tmp[j];
@@ -249,6 +251,11 @@ public class MartinsFilterTest {
 	}
 	
 	
+	/**
+	 * returns an int array with special properties...
+	 * @param charFreq
+	 * @return
+	 */
 	private static int[] getHasChars(final byte[] charFreq){
 		int max=0;
 		for(int i=0;i<charFreq.length;i++){
@@ -270,6 +277,7 @@ public class MartinsFilterTest {
 		return res;
 	}
 	
+	@Deprecated
 	private static int[] getHasChars(final byte[] charFreq, final int wildCards){
 		int max=0;
 		for(int i=0;i<charFreq.length;i++){
@@ -567,7 +575,9 @@ public class MartinsFilterTest {
 					final int[] hasChars=hasCharss[index][j];
 					final Pattern p=patterns[index][j];
 					//check, ha enough chars in rack
-					if(hasNeededChars(i,hasChars,wildcards) && (p==null || p.matcher(word).matches())
+					if(hasNeededChars(i,hasChars,wildcards) 
+							//hasNeededChars(neededChars[i],hasChars,wildcards) 
+							&& (p==null || p.matcher(word).matches())
 							//(p.matcher(wordlist[i]).matches())
 							//&& Help.correctCrossing(wordlist[i],j,fastCrossers,wf)
 							&& Help.correctCrossing(word, j, possible)
@@ -917,6 +927,7 @@ public class MartinsFilterTest {
 //		return res;
 //	}
 	
+	@Deprecated
 	private boolean hasNeededChars(final int i,final int hasChars[]){
 		final int limit=lengths[i]; 
 		if(limit>hasChars.length){ return false; }
@@ -939,6 +950,16 @@ public class MartinsFilterTest {
 		return true;
 	}
 	
+	/**
+	 * This doeas not work if there are wildcards because it can be
+	 * several characters that need a wildcard the same time. This can only
+	 * work as a kind of faster filter that dosen't filter completely.
+	 * @param i
+	 * @param hasChars
+	 * @param wildcards
+	 * @return
+	 */
+	@Deprecated
 	private boolean hasNeededChars(final int i,final int hasChars[],final int wildcards){
 		final int limit=lengths[i]; 
 		if(limit>hasChars.length+wildcards){ return false; }
@@ -957,6 +978,17 @@ public class MartinsFilterTest {
 //		}
 //		return true;
 	}
+	
+	@Deprecated
+	private boolean hasNeededChars(final int neededChars[],final int hasChars[],final int wildcards){
+		for(int i=0,j=wildcards;i<neededChars.length && j< hasChars.length;i++,j++){
+			if(!Help.hasNeededChars(neededChars[i],hasChars[j])){
+				return false;
+			}
+		}
+		return true;
+	}
+	
 
 	
 }

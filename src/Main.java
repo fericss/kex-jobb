@@ -125,22 +125,22 @@ public class Main extends JFrame{
 //		System.out.println();
 		
 		
-//		MartinsFilterTest mft=new MartinsFilterTest(find.getWordlist());
-//		long time = System.currentTimeMillis();
-//		//test martin's filter test
-//		for(int j=0;j<2;j++){
-//			boolean vertical=j!=0;
-//			for(int row=0;row<15;row++){
-//				ArrayList<ArrayList<String>[]> list=mft.testSlowFilter2(gi, find, row, vertical);
-//				System.out.println("row "+row+" vertical "+vertical);
-////				for(int i=0;i<list.size();i++){
-////					System.out.println(i+Arrays.toString(list.get(i)));
-////				}
-//			}
-//		}
-
+		MartinsFilterTest mft=new MartinsFilterTest(find.getWordlist());
 		long time = System.currentTimeMillis();
-		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
+		//test martin's filter test
+		for(int j=0;j<2;j++){
+			boolean vertical=j!=0;
+			for(int row=0;row<15;row++){
+				ArrayList<ArrayList<String>[]> list=mft.testSlowFilter2(gi, find, row, vertical);
+				System.out.println("row "+row+" vertical "+vertical);
+//				for(int i=0;i<list.size();i++){
+//					System.out.println(i+Arrays.toString(list.get(i)));
+//				}
+			}
+		}
+
+//		long time = System.currentTimeMillis();
+//		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
 //		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find,scrab); //TEST
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
 
