@@ -29,6 +29,7 @@ public class Help {
 	 * @param fastCrossers
 	 * @return
 	 */
+	@Deprecated
 	public static boolean[] impossible(String[][] fastCrossers,WordFinder wf){
 		boolean[] impossible=new boolean[fastCrossers.length];
 		for(int i=0;i<fastCrossers.length;i++){
@@ -176,6 +177,7 @@ public class Help {
 	 * Only checks the letters that is in the word.
 	 * Uses the values in checklist to only check the indexes that need to be checked.
 	 * Uses wildcards if it's needed.
+	 * 
 	 * @param checkList
 	 * @param needFreq
 	 * @param hasFreq
@@ -193,6 +195,65 @@ public class Help {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * untested, can be used in advanced bot.
+	 * @param checkList
+	 * @param needFreq
+	 * @param hasFreq
+	 * @param wildCards
+	 * @param unknown
+	 * @param unknowns
+	 * @return
+	 */
+	public static boolean charFreq3(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildcards,
+			int unknownWildCards,byte[] unknown,int unknowns){
+		//it dosen't matter what type of wildcard it is
+		int wildCards=wildcards+unknownWildCards;
+		int i;
+		for(int j=0;j<checkList.length;j++){
+			i=checkList[j];
+			//check if need to use unknowns or wildcards
+			if(needFreq[i]>hasFreq[i]){
+				int need=needFreq[i]-hasFreq[i];
+				
+				//available=Math.min(unknowns, unknown[i]);
+				//used unknowns
+				int used=Math.min(need, Math.min(unknowns, unknown[i]));
+				unknowns-=used;
+				//check if need to use wildcards
+				if(used!=need){
+					need=need-used;
+					wildcards-=need;
+					if(wildCards<0){
+						return false;
+					}
+				}
+			} 
+		}
+		return true;
+	}
+	
+	
+//	public static int min(final int a, final int b){
+//		return a<b? a:b;
+//	}
+	
+	
+	/**
+	 * adds the corresponding values places the result in a new byte array in the
+	 * corresponding places.
+	 * @param freq1
+	 * @param freq2
+	 * @return
+	 */
+	public byte[] addFreq(final byte[] freq1,final byte[] freq2){
+		final byte[] res=new byte[freq1.length];
+		for(int i=0;i<res.length;i++){
+			res[i]=(byte) (freq1[i]+freq2[i]);
+		}
+		return res;
 	}
 
 	/**
