@@ -51,6 +51,8 @@ public class MartinTest {
 		}
 	}
 	
+	
+	
 	/**
 	 * returns null if couldn't construct word else returns wildCount
 	 * @param targetWord
