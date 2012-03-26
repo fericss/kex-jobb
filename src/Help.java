@@ -198,16 +198,17 @@ public class Help {
 	}
 	
 	/**
-	 * untested, can be used in advanced bot.
+	 * untested can be used in advanced bot
 	 * @param checkList
 	 * @param needFreq
 	 * @param hasFreq
-	 * @param wildCards
+	 * @param wildcards
+	 * @param unknownWildCards
 	 * @param unknown
 	 * @param unknowns
 	 * @return
 	 */
-	public static boolean charFreq3(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildcards,
+	public static boolean hasCharFreq3(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildcards,
 			int unknownWildCards,byte[] unknown,int unknowns){
 		//it dosen't matter what type of wildcard it is
 		int wildCards=wildcards+unknownWildCards;
@@ -287,6 +288,23 @@ public class Help {
 	 */
 	public static boolean hasNeededChars(final int neededChars,final int hasChars){
 		return (neededChars & hasChars) == neededChars;
+	}
+	
+	/**
+	 * returns true if one index in impossible[] is true, else returns false.
+	 * @param start
+	 * @param length
+	 * @param impossible
+	 * @return
+	 */
+	public static boolean impossibleInRange(final int start,final int length,final boolean[] impossible){
+		final int limit=start+length;
+		for(int i=start;i<limit;i++){
+			if(impossible[i]){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
