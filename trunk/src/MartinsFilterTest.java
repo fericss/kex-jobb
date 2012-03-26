@@ -28,6 +28,8 @@ public class MartinsFilterTest {
 	final byte[] lengths;
 	final int limit;
 	
+	
+	
 	/**
 	 * for testing performance
 	 * or other stuff in this class.

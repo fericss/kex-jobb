@@ -5,6 +5,7 @@ public class GameInfo {
 	private String game[][];
 	private boolean wildCards[][];
 	private String rack;
+	final int length=15;
 	
 	public GameInfo(String _game[][], int _bonus[][],boolean _wildCards[][],String _rack){
 		setGame(_game);
@@ -45,6 +46,26 @@ public class GameInfo {
 	}
 	
 	/**
+	 * Unimplemented! 
+	 * returns a freq array with the number of each unknown chartype
+	 * except unknown wildcard
+	 * @return
+	 */
+	public byte[] getUnknownFreq(){
+		return new byte['z'-'a'+1];
+	}
+	
+	/**
+	 * Unimplemented! 
+	 * returns the number of unknown wildcards
+	 * @return
+	 */
+	public int getUnknownWildCards(){
+		return 0;
+	}
+	
+	
+	/**
 	 * Once you have the row and crossers you don't have to care about coordinates
 	 * so you only have to make one version of the methods...
 	 * @param row
@@ -70,6 +91,7 @@ public class GameInfo {
 		}
 		return sb.toString().toLowerCase();
 	}
+	
 	
 	/**
 	 * 
