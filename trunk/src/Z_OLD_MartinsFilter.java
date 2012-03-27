@@ -100,6 +100,105 @@ public class Z_OLD_MartinsFilter {
 					//Initialize
 					final String boardLetters=comb[index][i].replaceAll(".","");
 					final String sourceLetters=rack+boardLetters;
+					final byte[] freq=Help.createFreq(sourceLetters);
+					//Real
+					hasBytess[index][i]=freq;
+					//Real
+					patterns[index][i]=boardLetters.length()==0?null:Pattern.compile(comb[index][i]);
+				}
+			}
+			//Initialize
+			@SuppressWarnings("unchecked")
+			ArrayList<String>[] tmp =new ArrayList[comb[index].length];
+			for(int i=0;i<tmp.length;i++){
+				tmp[i]=new ArrayList<String>();
+			}
+			res.add(tmp);
+		}
+		
+
+		//do filtering
+		//for each word
+		for(int i=0;i<wordlist.length;i++){
+			final String word=wordlist[i];
+			final int index=word.length()-2;
+			//			final ArrayList<String>[] res1=res.get(index);
+			final String sarr[]=comb[index];
+			//for each starting position on the row for the word
+			for(int j=0;j<sarr.length;j++){
+				if(sarr[j]!=null){
+					//retrieve data about position
+					final byte[] hasFreq=hasBytess[index][j];
+					final Pattern p=patterns[index][j];
+					//check, ha enough chars in rack
+					if(Help.hasCharFreq3(checkList[i], charFreq[i], hasFreq, wildcards, unknownWildCards, unknown, unknowns)
+							&& (p==null || p.matcher(word).matches())
+							&& Help.correctCrossing(word, j, possible)
+					){
+						res.get(index)[j].add(word);
+					}
+
+				}
+			}
+		}
+		return res;
+	}
+	
+	public boolean[][] invalidated(int[] changed){
+		for(int i=0;i<changed.length;i++){
+			
+		}
+		return null;
+	}
+	
+	public ArrayList<ArrayList<String>[]> slowFilter3Update(String rack, String row,
+			final String[][] fastCrossers,final boolean[] impossible,final WordFinder wf,final GameInfo gi,
+			ArrayList<ArrayList<String>[]> oldRes,String newRow,final String[][] newFastCrossers,int changed[]){
+		
+		int racklength=rack.length();
+
+		rack=rack.toLowerCase();
+		row=row.toLowerCase();
+
+		//count wildcards
+		int wildcards=rack.length();
+		rack=rack.replaceAll("\\.", "");
+		wildcards=wildcards-rack.length();
+		//count unknowns
+		int unknowns=rack.length();
+		rack=rack.replaceAll(",", "");
+		unknowns=unknowns-rack.length();
+		//count unknown wildcards
+		int unknownWildCards=gi.getUnknownWildCards();
+		//get freq of unknown chars
+		byte[] unknown=gi.getUnknownFreq();
+
+		final boolean[][] possible=Help.possible(fastCrossers, wf);
+
+		int size=15-1;
+		
+		
+		//data about row and position
+		final String[][] comb=new String[size][];
+		final Pattern[][] patterns=new Pattern[size][];
+		final byte[][][] hasBytess=new byte[size][][];
+
+		//Initialize
+		ArrayList<ArrayList<String>[]> res=new ArrayList<ArrayList<String>[]>();
+
+		//
+		for(int length=2,index=0;length<=15;length++,index++){
+			//Real, get the combinations for a length
+			comb[index]=MartinsFilterTest.getCharCombinations4(racklength,row,length,fastCrossers,impossible);
+			//Initialize
+			hasBytess[index]=new byte[comb[index].length][];
+			patterns[index]=new Pattern[comb[index].length];
+			//get properties for each comb
+			for(int i=0;i<comb[index].length;i++){
+				if(comb[index][i]!=null){
+					//Initialize
+					final String boardLetters=comb[index][i].replaceAll(".","");
+					final String sourceLetters=rack+boardLetters;
 					//final int[] hasChars=getHasChars(Help.createFreq(sourceLetters));
 					final byte[] freq=Help.createFreq(sourceLetters);
 					//Real
