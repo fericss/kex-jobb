@@ -186,6 +186,12 @@ public class GameInfo {
 	
 	
 	//TEST
+	/**
+	 * TODO
+	 * update version here: almost finished
+	 * update version of Help methods
+	 * update version of filter methods
+	 */
 	
 	/**
 	 * Used by when making counter clone and is used when making counter moves.
