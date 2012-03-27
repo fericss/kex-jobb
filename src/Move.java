@@ -24,6 +24,16 @@ public class Move implements Comparable<Move>{//TODO: make comparable
 		points=_points;
 	}
 	
+	
+	/**
+	 * not implemented!
+	 * @param pos
+	 * @return
+	 */
+	public boolean isWildCard(final int pos){//TEST
+		return false;
+	}
+	
 	public String toString(){
 		return "{"+this.points+","+word+","+this.x+","+this.y+","+this.vertical+"}";
 	}
