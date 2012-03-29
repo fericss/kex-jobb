@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 
 /**
  * contains some methods.
@@ -69,7 +71,7 @@ public class Help {
 	 * @param fastCrossers
 	 * @return
 	 */
-	public static boolean[][] possible(String[][] fastCrossers,WordFinder wf){
+	public static boolean[][] possibleLetters(String[][] fastCrossers,WordFinder wf){
 		boolean[][] possible=new boolean[fastCrossers.length]['z'-'a'+1];
 		for(int i=0;i<fastCrossers.length;i++){
 			if(fastCrossers[i]!=null){
@@ -78,6 +80,36 @@ public class Help {
 						possible[i][j-'a']=true;
 					}
 				}
+			} else {
+				possible[i]=null;
+			}
+		}
+		return possible;
+	}
+	
+	/**
+	 * untested!
+	 * @param fastCrossers
+	 * @param wf
+	 * @param oldPossibleLetters
+	 * @param changed
+	 * @return
+	 */
+	public static boolean[][] possibleLettersUpdate(String[][] fastCrossers, WordFinder wf, boolean[][] oldPossibleLetters, 
+			int[] changed){
+		
+		final int length=15;
+		boolean[][] possible=Arrays.copyOf(oldPossibleLetters, oldPossibleLetters.length);
+		for(int i=0;i<fastCrossers.length;i++){
+			if(fastCrossers[i]!=null){
+				if(changed[i]==0){
+					possible[i]=new boolean[length];
+					for(char j='a';j<='z';j++){
+						if(wf.isWord(fastCrossers[i][0]+j+fastCrossers[i][1])){
+							possible[i][j-'a']=true;
+						}
+					}
+				} 
 			} else {
 				possible[i]=null;
 			}

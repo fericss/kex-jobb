@@ -74,7 +74,7 @@ public class Z_OLD_MartinsFilter {
 		int unknownWildCards=gi.getUnknownWildCards();
 		byte[] unknown=gi.getUnknownFreq();
 
-		final boolean[][] possible=Help.possible(fastCrossers, wf);
+		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
 
 		int size=15-1;
 		
@@ -173,7 +173,7 @@ public class Z_OLD_MartinsFilter {
 		//get freq of unknown chars
 		byte[] unknown=gi.getUnknownFreq();
 
-		final boolean[][] possible=Help.possible(fastCrossers, wf);
+		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
 
 		int size=15-1;
 		
