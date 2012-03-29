@@ -437,7 +437,7 @@ public class MartinsFilterTest {
 		rack=rack.replaceAll("\\.", "");
 		wildcards=wildcards-rack.length();
 		
-		boolean[][] possible=Help.possible(fastCrossers, wf);
+		boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
 		
 		HashMap<String, ArrayList<String>> map=new HashMap<String, ArrayList<String>>();
 		
@@ -518,7 +518,7 @@ public class MartinsFilterTest {
 		rack=rack.replaceAll("\\.", "");
 		wildcards=wildcards-rack.length();
 		
-		final boolean[][] possible=Help.possible(fastCrossers, wf);
+		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
 		
 		int size=15-1;
 		//data about row and position

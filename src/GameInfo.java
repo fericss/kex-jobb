@@ -209,32 +209,7 @@ public class GameInfo {
 		setOldGameInfo(old);
 	}
 	
-	/**
-	 * two means on new word, one means adjacent to new word
-	 * 
-	 * gives null pointer exception if it wasn't created from another GameInfo
-	 * @param row
-	 * @param vertical
-	 * @param old
-	 * @return
-	 */
-	public int[] changed(final int row, boolean vertical){
-		GameInfo old=oldGameInfo;
-		final int length=15;
-		int[] changed=new int[15];
-		final String[][] game=getGame();
-		final String[][] oldGame=old.getGame();
-		if(vertical){
-			for(int i=0;i<length;i++){
-				changed[i]=changed(row,i,game,oldGame);
-			}
-		} else {
-			for(int i=0;i<length;i++){
-				changed[i]=changed(i,row,game,oldGame);
-			}
-		}
-		return changed;
-	}
+	
 	
 	@Override
 	public GameInfo clone(){
@@ -256,6 +231,8 @@ public class GameInfo {
 	/**
 	 * Clones the current object and then add the word to the cloned object
 	 * and the newRack. Useful when you want to calculate counter moves.
+	 * 
+	 * Maybe should have new rack as input isntead if Move has the used letters.
 	 * @param newRack
 	 * @param m
 	 * @return
@@ -282,19 +259,46 @@ public class GameInfo {
 	}
 	
 	/**
-	 * returns -1=no change, 0=change adjacent, 1=on change
+	 * two means on new word, one means adjacent to new word
+	 * 
+	 * gives null pointer exception if it wasn't created from another GameInfo
+	 * @param row
+	 * @param vertical
+	 * @param old
+	 * @return
+	 */
+	public int[] changed(final int row, boolean vertical){
+		final GameInfo old=oldGameInfo;
+		int[] changed=new int[length];
+		final String[][] game=getGame();
+		final String[][] oldGame=old.getGame();
+		if(vertical){
+			for(int i=0;i<length;i++){
+				changed[i]=changed(row,i,game,oldGame);
+			}
+		} else {
+			for(int i=0;i<length;i++){
+				changed[i]=changed(i,row,game,oldGame);
+			}
+		}
+		return changed;
+	}
+	
+	/**
+	 * returns -1=no change, 0=change adjacent, 1=on change for a coordinate in game
 	 * @param x
 	 * @param y
 	 * @param game
 	 * @param oldGame
 	 * @return
 	 */
-	public int changed(final int x,final int y,final String[][] game,final String[][] oldGame){
+	private static int changed(final int x,final int y,final String[][] game,final String[][] oldGame){
 		int x2=x;
 		int y2=y;
 		int ret=1;
 		for(int i=0;i<=4;i++){
 			ret=0;//return 0 if something adjacent changed
+			//change parameter values
 			switch(i){
 			case 0: x2=y; y2=y; ret=1; break;//return a two if on change
 			case 1: x2=x+1; y2=y; break;
@@ -315,16 +319,9 @@ public class GameInfo {
 		return -1;
 	}
 	
-	public String[] getRowCrossers2(final int row,boolean vertical){
-		//everything has changed
-		//crossers only contain null
-		//fikgopkgh
-		return getRowCrossers2Update(row,vertical,new String[15], new int[15]);
-	}
 	
 	public String[] getRowCrossers2Update(final int row, boolean vertical, final String[] oldCrossers, final int[] change){
 		vertical=!vertical;
-		final int length=15;
 		final String[][] game=getGame();
 		final String[] crossers=Arrays.copyOf(oldCrossers,oldCrossers.length);
 		
@@ -393,6 +390,103 @@ public class GameInfo {
 			}
 		}
 		return crossers;
+	}
+	
+	/**
+	 * Not tested!
+	 * creates fast row crossers directly. 
+	 * @param row
+	 * @param vertical
+	 * @param oldCrossers
+	 * @param change
+	 * @return
+	 */
+	public String[][] getFastRowCrossers2Update(final int row, boolean vertical, final String[][] oldCrossers, final int[] change1){
+		vertical=!vertical;
+		final String[][] game=getGame();
+		//copy if not null, else 
+		final String[][] fastCrossers=oldCrossers!=null?Arrays.copyOf(oldCrossers, length):new String[length][];
+		//copy if not null else create new array filled with zeroes (0 or larger means something was changed)
+		final int[] change=change1!=null?change1:new int[length];
+		
+		StringBuilder sb;//=new StringBuilder(length);
+		StringBuilder sb2;
+		if(vertical){
+			for(int i=0;i<length;i++){
+				if(game[row][i]!=null){ //can be no crossers here
+					fastCrossers[i]=null;//overwrite
+				} else{//game[row][i]==null
+					//only update the value if it has been updated
+					if(change[i]==0){ //null char and, update if changed else keep the old
+						//check if it's possible
+						if( (row-1>=0 && game[row-1][i]!=null) || (row+1<length && game[row+1][i]!=null)){
+							int row2=row;
+							//go to start of word
+							while(row2-1>=0 && game[row2-1][i]!=null){
+								row2--;
+							}
+							//construct word
+							sb=new StringBuilder("");
+							sb2=new StringBuilder("");
+							boolean before=true;
+							while( row2==row || (row2<length && game[row2][i]!=null) ){
+								if(row2 == row){
+									before=false;
+								} else {//before or after
+									if(before){
+										sb.append(game[row2][i]);
+									} else {
+										sb2.append(game[row2][i]);
+									}
+								}
+								row2++;
+							}
+							//save word
+							fastCrossers[i]=new String[] {sb.toString().toLowerCase(),sb2.toString().toLowerCase()};
+						}
+					}
+				}
+
+			}
+		}else {
+			for(int i=0;i<length;i++){
+				if(game[i][row]!=null){ //can be no crossers here
+					fastCrossers[i]=null; //overwrite
+				} else {//game[i][row]==null
+					//only update the value if it has been updated
+					if(change[i]==0){//null char and, update if changed else keep the old
+						//check if it's possible
+						if( (row-1>=0 && game[i][row-1]!=null) || (row+1<length && game[i][row+1]!=null)){
+							int row2=row;
+							//go to start of word
+							while(row2-1>=0 && game[i][row2-1]!=null){
+								row2--;
+							}
+							//construct word
+							sb=new StringBuilder();
+							sb2=new StringBuilder();
+							boolean before=true;
+							while( row2==row || (row2<length && game[i][row2]!=null) ){
+								if(row2 == row){
+									before=false;
+								} else {//before or after
+									if(before){
+										sb.append(game[i][row2]);
+									} else {
+										sb2.append(game[i][row2]);
+									}
+								}
+								row2++;
+							}
+							//save word
+							fastCrossers[i]=new String[] {sb.toString().toLowerCase(), sb2.toString().toLowerCase()};
+						}
+					}
+				}
+
+			}
+		}
+		return fastCrossers;
 	}
 	
 }
