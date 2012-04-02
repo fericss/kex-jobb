@@ -7,7 +7,7 @@ import java.util.List;
 
 public class greedyMoveFinder {
 
-	
+
 	private String[][] game;
 	ArrayList<Point> buildLocations;
 	WordFinder find;
@@ -16,7 +16,7 @@ public class greedyMoveFinder {
 	Main main;
 	int[][] bonus;
 	Scrabby scrab=null;
-	
+
 	public greedyMoveFinder(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus, WordFinder _find){
 
 		buildAbleWords = new ArrayList<Move>();
@@ -39,7 +39,7 @@ public class greedyMoveFinder {
 	}
 	public greedyMoveFinder(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus, WordFinder _find,Scrabby _scrab){
 		scrab=_scrab;
-		
+
 		buildAbleWords = new ArrayList<Move>();
 		game = _game;
 		bonus = _bonus;
@@ -115,11 +115,12 @@ public class greedyMoveFinder {
 	}
 
 	private void tryToMatchHorizontal(String word, int x) {
-				
+
 		int points = 0;
 		int mult = 0;
 		for(int i = 0;i<(16-word.length());i++){ 
 			boolean possible = false;
+			
 			points = 0;
 			mult = 1;
 			if(i+word.length()!=15){
@@ -133,6 +134,10 @@ public class greedyMoveFinder {
 			for(int c = 0; c<word.length();c++){
 				int type = bonus[x][i+c];
 				int tempMult = 1;
+				
+				if(x == 7 && (c+i)==7 && game[i+c][x]==null){
+					possible = true;
+				}
 
 				if(x<14)
 					if(game[i+c][x+1]!=null){
@@ -144,7 +149,7 @@ public class greedyMoveFinder {
 					}	
 
 				if(game[i+c][x]==null){
-//					word.charAt(c)
+					//					word.charAt(c)
 					tempMult = type == 1 ? 2 : type==2 ? 3 : 1;
 					mult = mult * (type == 3 ? 2 : type==4 ? 3 : 1);
 				}
@@ -221,28 +226,31 @@ public class greedyMoveFinder {
 					continue;
 				}
 				String usedLetters="";
-			    for(int ic = 0; ic<word.length();ic++){
-			     if(game[ic+i][x]==null){
-			      usedLetters +=word.charAt(ic);
-			     }
-			    }
-			    if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
-			    	Move mov = new Move(points, word, x,i, true);
-			    	if(!buildAbleWords.contains(mov)){
-			    		buildAbleWords.add(mov);
-			    	}
-			    	if(scrab!=null){
-			    		ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
-			    		for(String s:list){
-			    			mov = new Move(scrab, s, x,i, true);
-			    			System.out.println("jag:"+mov);
-			    			if(!buildAbleWords.contains(mov)){
-			    				buildAbleWords.add(mov);
-			    			}
-			    		}	
-			    	}
-					
-					
+				for(int ic = 0; ic<word.length();ic++){
+					if(game[ic+i][x]==null){
+						usedLetters +=word.charAt(ic);
+					}
+				}
+				if(usedLetters.length()==7){
+					points += 40;
+				}
+				if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
+					Move mov = new Move(points, word, x,i, true);
+					if(!buildAbleWords.contains(mov)){
+						buildAbleWords.add(mov);
+					}
+					if(scrab!=null){
+						ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
+						for(String s:list){
+							mov = new Move(scrab, s, x,i, true);
+							System.out.println("jag:"+mov);
+							if(!buildAbleWords.contains(mov)){
+								buildAbleWords.add(mov);
+							}
+						}	
+					}
+
+
 
 				}
 			}
@@ -262,12 +270,16 @@ public class greedyMoveFinder {
 			if(i-1>=0 && game[x][i-1]!=null){
 				continue;
 			}
-			
+
 
 			for(int c = 0; c<word.length();c++){
 				int type = bonus[i+c][x];
 				int tempMult = 1;
 
+				if(x == 7 && (c+i)==7 && game[x][i+c]==null){
+					possible = true;
+				}
+				
 				if(x<14)
 					if(game[x+1][i+c]!=null){
 						possible=true;
@@ -279,7 +291,7 @@ public class greedyMoveFinder {
 
 
 				if(game[x][i+c]==null){
-					tempMult = type == 1 ? 2 : type==2 ? 3 : 1;
+					tempMult = type == 1 ? 2 : type==2 ? 3 : 1; 
 					mult = mult * (type == 3 ? 2 : type==4 ? 3 : 1);
 				}
 				points += tempMult*WordFinder.fastPoints[word.charAt(c)-'a'];
@@ -357,26 +369,29 @@ public class greedyMoveFinder {
 					continue;
 				}
 				String usedLetters="";
-			    for(int ic = 0; ic<word.length();ic++){
-			     if(game[x][ic+i]==null){
-			      usedLetters +=word.charAt(ic);
-			     }
-			    }
-			    if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
+				for(int ic = 0; ic<word.length();ic++){
+					if(game[x][ic+i]==null){
+						usedLetters +=word.charAt(ic);
+					}
+				}
+				if(usedLetters.length()==7){
+					points += 40;
+				}
+				if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
 					Move mov = new Move(points, word, i,x, false);
 					if(!buildAbleWords.contains(mov)){
 						buildAbleWords.add(mov);
 					}
 					if(scrab!=null){
-			    		ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
-			    		for(String s:list){
-			    			mov = new Move(scrab, s, i,x, true);
-			    			System.out.println("jag:"+mov);
-			    			if(!buildAbleWords.contains(mov)){
-			    				buildAbleWords.add(mov);
-			    			}
-			    		}	
-			    	}
+						ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
+						for(String s:list){
+							mov = new Move(scrab, s, i,x, true);
+							System.out.println("jag:"+mov);
+							if(!buildAbleWords.contains(mov)){
+								buildAbleWords.add(mov);
+							}
+						}	
+					}
 				}
 			}
 		}

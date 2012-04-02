@@ -58,7 +58,7 @@ public class Main extends JFrame{
 		
 		WordFinder find = new WordFinder();
 		ArrayList<Point> buildLocations = new ArrayList<Point>();
-		List<String> bla;
+		List<String> bla; 
 		
 		
 
@@ -66,82 +66,9 @@ public class Main extends JFrame{
 		printBoard(gameToBoard(game));
 //		rack = "whehe.";
 		GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
-		Scrabby scrab=new Scrabby(gi,find);
 		
-		
-		//TEST some game info methods
-//		//test get row
-//		for(int i=0;i<15;i++){
-//			System.out.println(gi.getRow(i, false)+i);
-//		}
-//		//test get croessers
-//		for(int i=0;i<15;i++){
-//			System.out.println(i+Arrays.toString(gi.getRowCrossers(i, false)));
-//		}
-//		System.out.println();
-//		//test get fast crossers
-//		for(int i=0;i<15;i++){
-//			String[][] sarr=Help.fastCrossers(gi.getRowCrossers(i, false));
-//			String res[]=new String[sarr.length];
-//			for(int j=0;j<res.length;j++){
-//				if(sarr[j]!=null){
-//					res[j]=
-//							sarr[j][0]+
-//							"."+
-//									sarr[j][1];
-//				}
-//			}
-//			System.out.println(i+Arrays.toString(res));
-//		}
-//		System.out.println();
-//		//test possible
-//		for(int i=0;i<15;i++){
-//			System.out.println(i+Arrays.toString(Help.impossible(Help.fastCrossers(gi.getRowCrossers(i, false)), find)));
-//		}
-//		System.out.println();
-		
-		//test martin's filter test
-//		MartinsFilterTest mft=new MartinsFilterTest(find.getWordlist());
-//		for(int row=0;row<15;row++){
-//			ArrayList<ArrayList<String>[]> list=mft.testSlowFilter2(gi, find, row, false);
-//			System.out.println("row "+row);
-//			for(int i=0;i<list.size();i++){
-//				System.out.println(i+Arrays.toString(list.get(i)));
-//			}
-//		}
-		
-//		
-//		int rowIndex=0;
-//		boolean vertical=false;
-//		String row=gi.getRow(rowIndex, false);
-//		String[][] fastCrossers=Help.fastCrossers(gi.getRowCrossers(rowIndex, vertical));
-//		boolean[] impossible =Help.impossible(fastCrossers, find);
-		
-		
-//		ArrayList<String>[] list=mft.slowFilter2(rack, row, 2, fastCrossers, impossible, find);
-//		for(int i=0;i<list.length;i++){
-//			System.out.println(i+list[i].toString());
-//		}
-//		System.out.println();
-		
-		
-		MartinsFilterTest mft=new MartinsFilterTest(find.getWordlist());
 		long time = System.currentTimeMillis();
-		//test martin's filter test
-		for(int j=0;j<2;j++){
-			boolean vertical=j!=0;
-			for(int row=0;row<15;row++){
-				ArrayList<ArrayList<String>[]> list=mft.testSlowFilter2(gi, find, row, vertical);
-				System.out.println("row "+row+" vertical "+vertical);
-//				for(int i=0;i<list.size();i++){
-//					System.out.println(i+Arrays.toString(list.get(i)));
-//				}
-			}
-		}
-
-//		long time = System.currentTimeMillis();
-//		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
-//		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find,scrab); //TEST
+		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
 
 
@@ -316,6 +243,9 @@ public class Main extends JFrame{
 			pos++;
 		}
 		boolean done = false;
+		if(gameInfo.charAt(pos+1)!='['){
+			done = true;
+		}
 		while(!done){
 
 
@@ -479,6 +409,7 @@ public class Main extends JFrame{
 	}
 	public String getCookie() throws Exception{
 		user = "fredric.ericsson@gmail.com";
+//		user = "lather"
 		password = "icpmwq";
 		String salt = "JarJarBinks9";
 		//        new Main();
