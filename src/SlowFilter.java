@@ -6,22 +6,14 @@ import java.util.regex.Pattern;
 
 
 /**
- * Uses stuff from FreqList and FredricTestStuff to make a very fast and effective filter of the wordlist.
- * You only need to construct FastFilter once (the constructor is only dependent on the wordlist) 
- * and then use the filter method with different inputs.
+ * Uses stuff from FastFilter and greedy bot to make a complete filtering with only valid words for each position.
  * 
- * Performance:
- * rack: fihhdf  wordsOnRow: [hej, d]  wordListLength: 38619  
- * constructionTime(ms): 19  filterTime per word(ms): 0.1547  filterRepeats: 10000.
+ * Might be used in advanced bot because it can replace just those places that need to be recalculated.
  * 
- * rack: fihhdf  wordsOnRow: [hej, d, low]  wordListLength: 38619  
- * constructionTime(ms): 19  filterTime per word(ms): 0.1104  filterRepeats: 10000.
  * 
- * It takes less than 0,2 milliseconds to filter the wordlist from one row.
  * @author mbernt.mbernt
  *
  */
-@Deprecated
 public class SlowFilter {
 	final String[] wordlist; //the wordlist
 	final int[] neededChars; //the ints functions as bit array, with a one for each letter type in the word
@@ -171,20 +163,19 @@ public class SlowFilter {
 	 * @param res
 	 * @return
 	 */
-	public ArrayList<ArrayList<String>[]> slowFilter(final int rowIndex, boolean vertical, final WordFinder wf,final GameInfo gi,
+	public ArrayList<ArrayList<String>[]> slowFilterUpdate(final int rowIndex, boolean vertical, final WordFinder wf,final GameInfo gi,
 			ArrayList<ArrayList<String>[]> res){
+		//maybe change so that res is saved in gameinfo?
+		
 		//pre-calculate stuff...
 		String rack=gi.getRack();
 		String row=gi.getRow(rowIndex, vertical);
 		final String[][] fastCrossers=gi.getFastRowCrossers2Update(rowIndex, vertical);
-		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
-		final boolean[] impossible =Help.impossible(possible); //7 ms
-		int[] changed=gi.changed(rowIndex, vertical);
+		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);//want update version, maybe add it to gameinfo
+		final boolean[] impossible=Help.impossible(possible);//want update version, maybe add it to gameinfo
+		final int[] changed=gi.changed(rowIndex, vertical);
 		
-		
-		
-		
-		//clone oldRes so that old data isn't destroyed
+		//clone old res so that old data isn't destroyed
 		if(changed!=null){
 			res=cloneResList(res);
 		}
@@ -259,8 +250,6 @@ public class SlowFilter {
 				}
 				res.add(tmp);
 			}
-			
-			
 		} else {
 			//clean all places that might may have changed
 			for(int length=2,index=0;length<=15;length++,index++){
@@ -313,7 +302,7 @@ public class SlowFilter {
 	 * crossing is a string array with all words that cross the row with a space for
 	 * the crossing point.
 	 * impossible is points that it's impossible to create a word by inserting one letter.
-	 * from and to is used in advanced bot to only allow new words that intersect the
+	 * mayHaveChanged is the result from the method with the same name
 	 * 
 	 * null means impossible to create word there.
 	 * empty string means it dosent intersect the new word
