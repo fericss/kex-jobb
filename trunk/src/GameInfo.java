@@ -11,6 +11,8 @@ public class GameInfo {
 	
 	//TEST
 	GameInfo oldGameInfo=null;
+	String[][] fastCrossers=null;
+	int[] changed=null;
 	
 	public GameInfo(String _game[][], int _bonus[][],boolean _wildCards[][],String _rack){
 		setGame(_game);
@@ -259,15 +261,17 @@ public class GameInfo {
 	}
 	
 	/**
-	 * two means on new word, one means adjacent to new word
+	 * -1=no change, 0=change adjacent, 1=on change.
 	 * 
-	 * gives null pointer exception if it wasn't created from another GameInfo
+	 * returns null if oldGameInfo==null.
 	 * @param row
 	 * @param vertical
 	 * @param old
 	 * @return
 	 */
 	public int[] changed(final int row, boolean vertical){
+		if(this.changed!=null){ return this.changed; }
+		if(oldGameInfo==null){ return null; }
 		final GameInfo old=oldGameInfo;
 		int[] changed=new int[length];
 		final String[][] game=getGame();
@@ -392,6 +396,8 @@ public class GameInfo {
 		return crossers;
 	}
 	
+	
+	
 	/**
 	 * Not tested!
 	 * creates fast row crossers directly. 
@@ -401,11 +407,18 @@ public class GameInfo {
 	 * @param change
 	 * @return
 	 */
-	public String[][] getFastRowCrossers2Update(final int row, boolean vertical, final String[][] oldCrossers, final int[] change1){
+	public String[][] getFastRowCrossers2Update(final int row, boolean vertical){
+		if(this.fastCrossers!=null){ return this.fastCrossers; }
+		final int[] change1=this.changed(row, vertical);
+		final String[][] fastCrossers;
+		if(oldGameInfo!=null){
+			fastCrossers=Arrays.copyOf(oldGameInfo.getFastRowCrossers2Update(row, vertical), length);
+		} else {
+			fastCrossers=new String[length][];
+		}
+		
 		vertical=!vertical;
 		final String[][] game=getGame();
-		//copy if not null, else 
-		final String[][] fastCrossers=oldCrossers!=null?Arrays.copyOf(oldCrossers, length):new String[length][];
 		//copy if not null else create new array filled with zeroes (0 or larger means something was changed)
 		final int[] change=change1!=null?change1:new int[length];
 		

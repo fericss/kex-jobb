@@ -330,9 +330,8 @@ public class Help {
 	 * @return
 	 */
 	public static boolean impossibleInRange(final int start,final int length,final boolean[] impossible){
-		final int limit=start+length;
-		for(int i=start;i<limit;i++){
-			if(impossible[i]){
+		for(int i=0,index=start;i<length;i++,index++){
+			if(impossible[index]){
 				return true;
 			}
 		}

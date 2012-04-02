@@ -182,7 +182,11 @@ public class WordFinder {
 	}
 	public static void main(String[] args){
 		WordFinder wordList = new WordFinder();
-		System.out.println(wordList.Matches("fhosedextrnaa"));
+		  String[] s = new String[0];
+		//  Collections.so
+		  System.out.println(wordList.getFastFilter().filter("xfsoukd", s));
+		//WordFinder wordList = new WordFinder();
+		//System.out.println(wordList.Matches("fhosedextrnaa"));
 
 	}
 	public boolean isWord(String s) {
