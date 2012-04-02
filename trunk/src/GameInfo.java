@@ -11,8 +11,9 @@ public class GameInfo {
 	
 	//TEST
 	GameInfo oldGameInfo=null;
-	String[][] fastCrossers=null;
-	int[] changed=null;
+	
+	//Won't work, has to be copies to each row and each direction
+	Holder h=new Holder();
 	
 	public GameInfo(String _game[][], int _bonus[][],boolean _wildCards[][],String _rack){
 		setGame(_game);
@@ -264,27 +265,31 @@ public class GameInfo {
 	 * -1=no change, 0=change adjacent, 1=on change.
 	 * 
 	 * returns null if oldGameInfo==null.
-	 * @param row
+	 * 
+	 * uses the holder.
+	 * @param rowIndex
 	 * @param vertical
 	 * @param old
 	 * @return
 	 */
-	public int[] changed(final int row, boolean vertical){
-		if(this.changed!=null){ return this.changed; }
+	public int[] changed(final int rowIndex, boolean vertical){
 		if(oldGameInfo==null){ return null; }
+		vertical=!vertical;
+		if(h.getChanged(rowIndex, vertical)!=null){ return h.getChanged(rowIndex, vertical); }//load previous result if it exists
 		final GameInfo old=oldGameInfo;
 		int[] changed=new int[length];
 		final String[][] game=getGame();
 		final String[][] oldGame=old.getGame();
 		if(vertical){
 			for(int i=0;i<length;i++){
-				changed[i]=changed(row,i,game,oldGame);
+				changed[i]=changed(rowIndex,i,game,oldGame);
 			}
 		} else {
 			for(int i=0;i<length;i++){
-				changed[i]=changed(i,row,game,oldGame);
+				changed[i]=changed(i,rowIndex,game,oldGame);
 			}
 		}
+		h.setChanged(rowIndex, vertical, changed);//save result
 		return changed;
 	}
 	
@@ -401,23 +406,24 @@ public class GameInfo {
 	/**
 	 * Not tested!
 	 * creates fast row crossers directly. 
-	 * @param row
+	 * 
+	 * uses the holder.
+	 * @param rowIndex
 	 * @param vertical
 	 * @param oldCrossers
 	 * @param change
 	 * @return
 	 */
-	public String[][] getFastRowCrossers2Update(final int row, boolean vertical){
-		if(this.fastCrossers!=null){ return this.fastCrossers; }
-		final int[] change1=this.changed(row, vertical);
+	public String[][] getFastRowCrossers2Update(final int rowIndex, boolean vertical){
+		vertical=!vertical;
+		if(h.getFastCrossers(rowIndex, vertical)!=null){ return h.getFastCrossers(rowIndex, vertical); }//load previous result if it exists
+		final int[] change1=this.changed(rowIndex, vertical);
 		final String[][] fastCrossers;
 		if(oldGameInfo!=null){
-			fastCrossers=Arrays.copyOf(oldGameInfo.getFastRowCrossers2Update(row, vertical), length);
+			fastCrossers=Arrays.copyOf(oldGameInfo.getFastRowCrossers2Update(rowIndex, vertical), length);
 		} else {
 			fastCrossers=new String[length][];
 		}
-		
-		vertical=!vertical;
 		final String[][] game=getGame();
 		//copy if not null else create new array filled with zeroes (0 or larger means something was changed)
 		final int[] change=change1!=null?change1:new int[length];
@@ -426,14 +432,14 @@ public class GameInfo {
 		StringBuilder sb2;
 		if(vertical){
 			for(int i=0;i<length;i++){
-				if(game[row][i]!=null){ //can be no crossers here
+				if(game[rowIndex][i]!=null){ //can be no crossers here
 					fastCrossers[i]=null;//overwrite
 				} else{//game[row][i]==null
 					//only update the value if it has been updated
 					if(change[i]==0){ //null char and, update if changed else keep the old
 						//check if it's possible
-						if( (row-1>=0 && game[row-1][i]!=null) || (row+1<length && game[row+1][i]!=null)){
-							int row2=row;
+						if( (rowIndex-1>=0 && game[rowIndex-1][i]!=null) || (rowIndex+1<length && game[rowIndex+1][i]!=null)){
+							int row2=rowIndex;
 							//go to start of word
 							while(row2-1>=0 && game[row2-1][i]!=null){
 								row2--;
@@ -442,8 +448,8 @@ public class GameInfo {
 							sb=new StringBuilder("");
 							sb2=new StringBuilder("");
 							boolean before=true;
-							while( row2==row || (row2<length && game[row2][i]!=null) ){
-								if(row2 == row){
+							while( row2==rowIndex || (row2<length && game[row2][i]!=null) ){
+								if(row2 == rowIndex){
 									before=false;
 								} else {//before or after
 									if(before){
@@ -463,14 +469,14 @@ public class GameInfo {
 			}
 		}else {
 			for(int i=0;i<length;i++){
-				if(game[i][row]!=null){ //can be no crossers here
+				if(game[i][rowIndex]!=null){ //can be no crossers here
 					fastCrossers[i]=null; //overwrite
 				} else {//game[i][row]==null
 					//only update the value if it has been updated
 					if(change[i]==0){//null char and, update if changed else keep the old
 						//check if it's possible
-						if( (row-1>=0 && game[i][row-1]!=null) || (row+1<length && game[i][row+1]!=null)){
-							int row2=row;
+						if( (rowIndex-1>=0 && game[i][rowIndex-1]!=null) || (rowIndex+1<length && game[i][rowIndex+1]!=null)){
+							int row2=rowIndex;
 							//go to start of word
 							while(row2-1>=0 && game[i][row2-1]!=null){
 								row2--;
@@ -479,8 +485,8 @@ public class GameInfo {
 							sb=new StringBuilder();
 							sb2=new StringBuilder();
 							boolean before=true;
-							while( row2==row || (row2<length && game[i][row2]!=null) ){
-								if(row2 == row){
+							while( row2==rowIndex || (row2<length && game[i][row2]!=null) ){
+								if(row2 == rowIndex){
 									before=false;
 								} else {//before or after
 									if(before){
@@ -499,7 +505,38 @@ public class GameInfo {
 
 			}
 		}
+		h.setFastCrossers(rowIndex, vertical, fastCrossers);//save result
 		return fastCrossers;
+	}
+	
+	
+	/**
+	 * used for saving results of calculations so that they can be retrieved instead of calculated later.
+	 * @author mbernt
+	 *
+	 */
+	class Holder{
+		int length=15;
+		String[][][] fastCrosserss=new String[length*2][][];
+		int[][] changedd=new int[length*2][];
+		public String[][] getFastCrossers(final int rowIndex, boolean vertical){
+			return  fastCrosserss[getIndex(rowIndex,vertical)];
+		}
+		public void setFastCrossers(final int rowIndex, boolean vertical,String[][] fastCrossers){
+			fastCrosserss[getIndex(rowIndex,vertical)]=fastCrossers;
+		}
+		
+		public int[] getChanged(final int rowIndex, boolean vertical){
+			return  changedd[getIndex(rowIndex,vertical)];
+		}
+		
+		public void setChanged(final int rowIndex, boolean vertical,int[] changed){
+			changedd[getIndex(rowIndex,vertical)]=changed;
+		}
+		
+		public int getIndex(final int rowIndex, boolean vertical){
+			return vertical?rowIndex:this.length+rowIndex;
+		}
 	}
 	
 }

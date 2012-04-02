@@ -48,30 +48,43 @@ public class Help {
 		return impossible;
 	}
 	
-	public static boolean[] impossible(boolean[][] possible){
+	/**
+	 * check if there are any columns in possible that only contains false,
+	 * if so there is no single valid move that will create a valid crossing
+	 * word at that position, i.e. it's impossible.
+	 * @param possible
+	 * @return
+	 */
+	public static boolean[] impossible(final boolean[][] possible){
 		boolean[] impossible=new boolean[possible.length];
 		boolean impos;
 		for(int i=0;i<impossible.length;i++){
-			impos=true;
-			for(int j=0;j<possible[i].length;j++){
-				if(possible[i][j]){
-					impos=false;
-					break;
+			//possible[i] means that it's never impossible due to a crossing
+			if(possible[i]!=null){
+				impos=true;
+				for(int j=0;j<possible[i].length;j++){
+					if(possible[i][j]){
+						impos=false;
+						break;
+					}
 				}
+				impossible[i]=impos;
 			}
-			impossible[i]=impos;
 		}
 		return impossible;
 	}
 	
 	/**
-	 * possible[charPos]==null means any character is possible, possible[charPos][char-'a']==true means that
-	 * that char can be at that position.
+	 * possible[charPos]==null means that there are no adjacent letters
+	 * in the crossing direction or there is a letter directly on that position,
+	 * that means that you don't have to check for a crossing word there.
+	 * 
+	 * But possible[charPos][char-'a']==true means that that char can be at that position.
 	 * (it would be great if it could also)
 	 * @param fastCrossers
 	 * @return
 	 */
-	public static boolean[][] possibleLetters(String[][] fastCrossers,WordFinder wf){
+	public static boolean[][] possibleLetters(final String[][] fastCrossers,final WordFinder wf){
 		boolean[][] possible=new boolean[fastCrossers.length]['z'-'a'+1];
 		for(int i=0;i<fastCrossers.length;i++){
 			if(fastCrossers[i]!=null){
@@ -95,15 +108,17 @@ public class Help {
 	 * @param changed
 	 * @return
 	 */
-	public static boolean[][] possibleLettersUpdate(String[][] fastCrossers, WordFinder wf, boolean[][] oldPossibleLetters, 
-			int[] changed){
-		
-		final int length=15;
+	public static boolean[][] possibleLettersUpdate(final String[][] fastCrossers, final WordFinder wf, 
+			final boolean[][] oldPossibleLetters, final int[] changed){
+		if(oldPossibleLetters==null){
+			return possibleLetters(fastCrossers,wf);
+		}
+		final int alphabetLength='z'-'a'+1;
 		boolean[][] possible=Arrays.copyOf(oldPossibleLetters, oldPossibleLetters.length);
 		for(int i=0;i<fastCrossers.length;i++){
 			if(fastCrossers[i]!=null){
 				if(changed[i]==0){
-					possible[i]=new boolean[length];
+					possible[i]=new boolean[alphabetLength];
 					for(char j='a';j<='z';j++){
 						if(wf.isWord(fastCrossers[i][0]+j+fastCrossers[i][1])){
 							possible[i][j-'a']=true;
@@ -121,7 +136,8 @@ public class Help {
 	 * checks that all crossing words are correct words.
 	 * very fast, because it only has to do this check:
 	 * if(possible[index]!=null && !possible[index][word.charAt(i)-'a']){return false;}
-	 * for each letter in the word
+	 * for each letter in the word. It is a constant time operation for each letter, so
+	 * the time complexity for the whole word is O(word.length()).
 	 * @param word
 	 * @param index
 	 * @param possible
