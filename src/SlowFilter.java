@@ -22,13 +22,13 @@ import java.util.regex.Pattern;
  *
  */
 @Deprecated
-public class Z_OLD_MartinsFilter {
+public class SlowFilter {
 	final String[] wordlist; //the wordlist
 	final int[] neededChars; //the ints functions as bit array, with a one for each letter type in the word
 	final byte[][] charFreq;//list of the frequency of each letter in each word
 	final byte[][] checkList;//only need to check chars in the word
 	
-	public Z_OLD_MartinsFilter(String[] _wordlist){
+	public SlowFilter(String[] _wordlist){
 		//initialize
 		wordlist=_wordlist;
 		neededChars=new int[wordlist.length];
@@ -144,16 +144,50 @@ public class Z_OLD_MartinsFilter {
 		return res;
 	}
 	
-	public boolean[][] invalidated(int[] changed){
-		for(int i=0;i<changed.length;i++){
-			
+
+	/**
+	 * copies all the way to arrays.copy 
+	 * as long as the lists in the array lists at
+	 * each index in the array isn't modified and instead 
+	 * replaced then the old res won't be changed.
+	 * @param res
+	 * @return
+	 */
+	public ArrayList<ArrayList<String>[]> cloneResList(ArrayList<ArrayList<String>[]> res){
+		ArrayList<ArrayList<String>[]> newRes=new ArrayList<ArrayList<String>[]>();
+		for(int length=2,index=0;length<=15;length++,index++){
+			newRes.add(Arrays.copyOf(res.get(index), res.get(index).length));
 		}
-		return null;
+		return newRes;
 	}
 	
-	public ArrayList<ArrayList<String>[]> slowFilter3Update(String rack, String row,
-			final String[][] fastCrossers,final boolean[] impossible,final WordFinder wf,final GameInfo gi,
-			ArrayList<ArrayList<String>[]> oldRes,String newRow,final String[][] newFastCrossers,int changed[]){
+	/**
+	 * if res==null it means that it has to calculate everything from scratch.
+	 * 
+	 * @param rowIndex
+	 * @param vertical
+	 * @param wf
+	 * @param gi
+	 * @param res
+	 * @return
+	 */
+	public ArrayList<ArrayList<String>[]> slowFilter(final int rowIndex, boolean vertical, final WordFinder wf,final GameInfo gi,
+			ArrayList<ArrayList<String>[]> res){
+		//pre-calculate stuff...
+		String rack=gi.getRack();
+		String row=gi.getRow(rowIndex, vertical);
+		final String[][] fastCrossers=gi.getFastRowCrossers2Update(rowIndex, vertical);
+		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
+		final boolean[] impossible =Help.impossible(possible); //7 ms
+		int[] changed=gi.changed(rowIndex, vertical);
+		
+		
+		
+		
+		//clone oldRes so that old data isn't destroyed
+		if(changed!=null){
+			res=cloneResList(res);
+		}
 		
 		int racklength=rack.length();
 
@@ -173,51 +207,69 @@ public class Z_OLD_MartinsFilter {
 		//get freq of unknown chars
 		byte[] unknown=gi.getUnknownFreq();
 
-		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
+		
 
 		int size=15-1;
 		
 		
 		//data about row and position
-		final String[][] comb=new String[size][];
+		final String[][] combinations=new String[size][];
 		final Pattern[][] patterns=new Pattern[size][];
 		final byte[][][] hasBytess=new byte[size][][];
+		final boolean[][] mayHaveChanged=new boolean[size][];//is also used to clear old data from oldRes
 
-		//Initialize
-		ArrayList<ArrayList<String>[]> res=new ArrayList<ArrayList<String>[]>();
-
-		//
+		//Initialize data about row an position
 		for(int length=2,index=0;length<=15;length++,index++){
 			//Real, get the combinations for a length
-			comb[index]=MartinsFilterTest.getCharCombinations4(racklength,row,length,fastCrossers,impossible);
-			//Initialize
-			hasBytess[index]=new byte[comb[index].length][];
-			patterns[index]=new Pattern[comb[index].length];
+			//comb[index]=MartinsFilterTest.getCharCombinations4(racklength,row,length,fastCrossers,impossible);
+			if(changed==null){
+				combinations[index]=getCharCombinationsUpdate(racklength,row,length,fastCrossers,impossible,null);//TEST
+			} else {
+				mayHaveChanged[index]=mayHaveChanged(length,changed);
+				combinations[index]=getCharCombinationsUpdate(racklength,row,length,fastCrossers,impossible,mayHaveChanged[index]);//TEST
+			}
+			
+			//Initialize hasBytess and patterns
+			int combLen=combinations[index].length;
+			hasBytess[index]=new byte[combLen][];
+			patterns[index]=new Pattern[combLen];
 			//get properties for each comb
-			for(int i=0;i<comb[index].length;i++){
-				if(comb[index][i]!=null){
+			for(int position=0;position<combinations[index].length;position++){
+				if(combinations[index][position]!=null){
 					//Initialize
-					final String boardLetters=comb[index][i].replaceAll(".","");
+					final String boardLetters=combinations[index][position].replaceAll(".","");
 					final String sourceLetters=rack+boardLetters;
-					//final int[] hasChars=getHasChars(Help.createFreq(sourceLetters));
 					final byte[] freq=Help.createFreq(sourceLetters);
-					//Real
-					//					skipPatterns[index][i]=boardLetters.length()==0;
-					//Real
-					//hasCharss[index][i]=hasChars;
-					//Real
-					hasBytess[index][i]=freq;
-					//Real
-					patterns[index][i]=boardLetters.length()==0?null:Pattern.compile(comb[index][i]);
+					hasBytess[index][position]=freq;
+					patterns[index][position]=boardLetters.length()==0?null:Pattern.compile(combinations[index][position]);
 				}
 			}
-			//Initialize
-			@SuppressWarnings("unchecked")
-			ArrayList<String>[] tmp =new ArrayList[comb[index].length];
-			for(int i=0;i<tmp.length;i++){
-				tmp[i]=new ArrayList<String>();
+		}
+		
+		
+		
+		//initialize the res list
+		if(changed==null) {
+			res=new ArrayList<ArrayList<String>[]>();
+			for(int length=2,index=0;length<=15;length++,index++){
+				@SuppressWarnings("unchecked")
+				ArrayList<String>[] tmp =new ArrayList[combinations[index].length];
+				for(int position=0;position<tmp.length;position++){
+					tmp[position]=new ArrayList<String>();
+				}
+				res.add(tmp);
 			}
-			res.add(tmp);
+			
+			
+		} else {
+			//clean all places that might may have changed
+			for(int length=2,index=0;length<=15;length++,index++){
+				for(int position=0;position<res.get(index).length;position++){
+					if(mayHaveChanged[index][position]){
+						res.get(index)[position]=new ArrayList<String>();
+					}
+				}
+			}
 		}
 		
 
@@ -227,14 +279,14 @@ public class Z_OLD_MartinsFilter {
 			final String word=wordlist[i];
 			final int index=word.length()-2;
 			//			final ArrayList<String>[] res1=res.get(index);
-			final String sarr[]=comb[index];
+			final String sarr[]=combinations[index];
 			//for each starting position on the row for the word
-			for(int j=0;j<sarr.length;j++){
-				if(sarr[j]!=null){
+			for(int position=0;position<sarr.length;position++){
+				if(sarr[position]!=null){
 					//retrieve data about position
 					//final int[] hasChars=hasCharss[index][j];
-					final byte[] hasFreq=hasBytess[index][j];
-					final Pattern p=patterns[index][j];
+					final byte[] hasFreq=hasBytess[index][position];
+					final Pattern p=patterns[index][position];
 					//check, ha enough chars in rack
 					if(Help.hasCharFreq3(checkList[i], charFreq[i], hasFreq, wildcards, unknownWildCards, unknown, unknowns)
 							//hasNeededChars(i,hasChars,wildcards) 
@@ -242,10 +294,10 @@ public class Z_OLD_MartinsFilter {
 							&& (p==null || p.matcher(word).matches())
 							//(p.matcher(wordlist[i]).matches())
 							//&& Help.correctCrossing(wordlist[i],j,fastCrossers,wf)
-							&& Help.correctCrossing(word, j, possible)
+							&& Help.correctCrossing(word, position, possible)
 					){
 						//						res1[j].add(word);
-						res.get(index)[j].add(word);
+						res.get(index)[position].add(word);
 					}
 
 				}
@@ -269,20 +321,21 @@ public class Z_OLD_MartinsFilter {
 	 * @param length
 	 * @param haveAdjacent
 	 * @param fastCrossers
+	 * @param mayHaveChanged use the mayHaveChanged method
 	 * @return
 	 */
-	public static String[] getCharCombinations5(final int rackLength, final String row, final String newRow,final int length,
-			final String[][] fastCrossers, final boolean[] impossible, final int from, final int to, final boolean touching){
-		
+	public static String[] getCharCombinationsUpdate(final int rackLength, final String row, final int length,
+			final String[][] fastCrossers, final boolean[] impossible, final boolean[] mayHaveChanged){
 		final String[] sarr=new String[row.length()-length+1];
-		for(int i=0;i+length-1<row.length();i++){
-			//from and to must be inside the word
-			//ERROR: don't have to be in word if just touching
-			if(touching || from>=i && to<=i+length-1){
+		for(int i=0;i<sarr.length;i++){
+			//mayHaveChanged==null means it is from scratch
+			//a zero or higher change must be inside the word
+			//a type zero change means that there is an adjacent type one change
+			if(mayHaveChanged==null || mayHaveChanged[i]){
 				//it must not be impossible
 				if(!Help.impossibleInRange(i,length,impossible)){
 					String tmp=row.substring(i,i+length);
-					String tmp2=tmp.replaceAll(" ", "");
+					String tmp2=tmp.replaceAll(" ", "");//remove empty places
 					//must have room to place pieces
 					if(tmp.length()!=tmp2.length()){
 						//must have enough letters
@@ -290,10 +343,10 @@ public class Z_OLD_MartinsFilter {
 							//it must be empty before and after the word, or else it's not the given length
 							if( (i==0 || row.charAt(i-1)==' ') && ((i+length)==row.length() || row.charAt(i+length)==' ')){
 								if(tmp2.length()==0){
-									//maybe should check if it's possible to complete each crossing word, and if not call the place forbidden
-									//check if there are letters above or below
 									for(int j=i;j<i+length;j++){
-										//must be letters above or below, if it's empty
+										//must be at least one adjacent letter
+										//if the row is empty
+										//looks an adjacent letter
 										if(fastCrossers[j]!=null){
 											sarr[i]=tmp.replaceAll(" ", ".");
 											break;
@@ -308,11 +361,45 @@ public class Z_OLD_MartinsFilter {
 
 					}
 				}
-			} else {
-				sarr[i]="";
 			}
 		}
 		return sarr;
+	}
+	
+	public static boolean changed(final int start,final int length, final int changed[]){;
+		for(int i=0,index=start;i<length;i++,index++){
+			if(changed[index]>=0){//contains a type zero change or larger
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean[] mayHaveChanged(final int length,final int changed[]){
+		final boolean[] mayHaveChanged=new boolean[15-length+1];
+		for(int i=0;i<mayHaveChanged.length;i++){
+			mayHaveChanged[i]=changed(i,length,changed);
+		}
+		return mayHaveChanged;
+	}
+	/**
+	 * untested, should give the same result as changed.
+	 * @param length
+	 * @param pos
+	 * @param changed
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public boolean changed2(final int length,final int pos, final int changed[],final int from,final int to){
+		int start=Math.max(pos, from);
+		final int limit=Math.min(length, start-to+1);
+		for(int i=0;i<limit;i++,start++){
+			if(changed[start]>=0){//contains a type zero change or larger
+				return true;
+			}
+		}
+		return false;
 	}
 	
 //	/**
