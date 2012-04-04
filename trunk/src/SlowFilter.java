@@ -153,14 +153,32 @@ public class SlowFilter {
 		return newRes;
 	}
 	
-	
-	public int points(String word, int pos,String row,int[] crossPoints,int[] bonus,final WordFinder wf,GameInfo gi,int rackSize,boolean[] isWildcard){
+	/**
+	 * Untested! TODO: test
+	 * @param word
+	 * @param isBlankInRack 
+	 * @param pos
+	 * @param row
+	 * @param fastCrossPoints have pre-calculated the points given from all the letters from the row-crossing
+	 * words, so that the only thing that needs calculating is bonuses and the tile to be added. There should be a negative
+	 * number at all positions that don't have crossing words.
+	 * @param bonus
+	 * @param wf
+	 * @param gi
+	 * @param rackSize
+	 * @param isBlankOnBoard wildcard and blank are synonyms in this case. true means that it's a blank tile at that position.
+	 * @return
+	 */
+	public int points(String word,boolean[] isBlankInRack, int pos,String row,int[] fastCrossPoints,
+			int[] bonus,final WordFinder wf,GameInfo gi,int rackSize,boolean[] isBlankOnBoard){
 		int factor=1;
 		int wordPoints=0;
-		int totalPoints=0;
+		int crossPoints=0;
 		int usedLetters=0;
 		for(int i=0;i<word.length();i++,pos++){
-			char letter=word.charAt(i);
+			char letter=isBlankInRack[i]?'.':word.charAt(i);
+			//letter points are zero if it's a blank tile on the board at this position
+			int letterPoints=isBlankOnBoard[pos]?0:wf.valueOf(letter);
 			int wordBonus=1;
 			int letterBonus=1;
 			
@@ -168,27 +186,27 @@ public class SlowFilter {
 				usedLetters++;
 				//get bonus
 				switch(bonus[pos]){
+				//TODO: double check if these are the correct bonuses
 				case 0: break;//none
 				case 1: letterBonus=2; break;//dl
 				case 2: letterBonus=3; break;//tl
 				case 3: wordBonus=2; break;//dw
 				case 4: wordBonus=3; break;//tw
 				}
-				//only get points if there are a crossing word
-				if(crossPoints[pos]>0){
-					totalPoints+=(crossPoints[pos]+wf.valueOf(letter)*letterBonus)*wordBonus;
+				//only get crossPoints if there are a crossing word
+				if(fastCrossPoints[pos]>=0){
+					crossPoints+=(fastCrossPoints[pos]+letterPoints*letterBonus)*wordBonus;
 				}
 			}
-			//takes into account that it can be a blank tile at the position, and if so the added points should be zero
-			if(!isWildcard[i]){
-				wordPoints+=wf.valueOf(letter)*letterBonus;
-			}
+			//takes into account that it can be a blank tile at the position, only gives points if it's not a blank tile
+			wordPoints+=letterPoints*letterBonus;
 			factor*=wordBonus;
 		}
 		//the rules may be that you must use 7 letters to get the bonus, not that you have to use all in the rack
+		//TODO: check the real rules
 		int usedAllLettersBonus=usedLetters==rackSize?40:0;
 		//returns the total points
-		return totalPoints+wordPoints*factor+usedAllLettersBonus;
+		return crossPoints+wordPoints*factor+usedAllLettersBonus;
 	}
 	
 	/**
