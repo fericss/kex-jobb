@@ -66,7 +66,7 @@ public class MartinsFilterTest {
 		//get variables, first three, 3 ms
 		final String rack=gi.getRack();
 		final String row=gi.getRow(rowIndex, false);
-		final String[][] fastCrossers=Help.fastCrossers(gi.getRowCrossers(rowIndex, vertical));
+		final String[][] fastCrossers=gi.getFastCrossers(rowIndex, vertical);
 		final boolean[] impossible =Help.impossible(fastCrossers, find); //7 ms
 		//get for all lengths
 //		for(int length=2;length<=15;length++){

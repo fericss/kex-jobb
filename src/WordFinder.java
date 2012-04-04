@@ -26,12 +26,12 @@ public class WordFinder {
 	}
 
 	/**
-	 * det kan vara säkrare att använda valueOf2
-	 * @param ch
+	 * returns the value of the tile or 0 if it's a blank tile.
+	 * @param tile
 	 * @return
 	 */
-	public int valueOf(char ch){//TEST
-		return ch=='.' ? 0 : fastPoints[ch-'a'];
+	public int valueOf(final char tile){//TEST
+		return tile=='.' ? 0 : fastPoints[tile-'a'];
 	}
 
 //	/**

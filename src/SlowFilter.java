@@ -153,6 +153,44 @@ public class SlowFilter {
 		return newRes;
 	}
 	
+	
+	public int points(String word, int pos,String row,int[] crossPoints,int[] bonus,final WordFinder wf,GameInfo gi,int rackSize,boolean[] isWildcard){
+		int factor=1;
+		int wordPoints=0;
+		int totalPoints=0;
+		int usedLetters=0;
+		for(int i=0;i<word.length();i++,pos++){
+			char letter=word.charAt(i);
+			int wordBonus=1;
+			int letterBonus=1;
+			
+			if(row.charAt(pos)==' '){
+				usedLetters++;
+				//get bonus
+				switch(bonus[pos]){
+				case 0: break;//none
+				case 1: letterBonus=2; break;//dl
+				case 2: letterBonus=3; break;//tl
+				case 3: wordBonus=2; break;//dw
+				case 4: wordBonus=3; break;//tw
+				}
+				//only get points if there are a crossing word
+				if(crossPoints[pos]>0){
+					totalPoints+=(crossPoints[pos]+wf.valueOf(letter)*letterBonus)*wordBonus;
+				}
+			}
+			//takes into account that it can be a blank tile at the position, and if so the added points should be zero
+			if(!isWildcard[i]){
+				wordPoints+=wf.valueOf(letter)*letterBonus;
+			}
+			factor*=wordBonus;
+		}
+		//the rules may be that you must use 7 letters to get the bonus, not that you have to use all in the rack
+		int usedAllLettersBonus=usedLetters==rackSize?40:0;
+		//returns the total points
+		return totalPoints+wordPoints*factor+usedAllLettersBonus;
+	}
+	
 	/**
 	 * if res==null it means that it has to calculate everything from scratch.
 	 * 
@@ -169,11 +207,11 @@ public class SlowFilter {
 		
 		//pre-calculate stuff...
 		String rack=gi.getRack();
-		String row=gi.getRow(rowIndex, vertical);
-		final String[][] fastCrossers=gi.getFastRowCrossers2Update(rowIndex, vertical);
-		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);//want update version, maybe add it to gameinfo
-		final boolean[] impossible=Help.impossible(possible);//want update version, maybe add it to gameinfo
-		final int[] changed=gi.changed(rowIndex, vertical);
+		String row=gi.getRow(rowIndex, vertical);//TODO: make update version...
+		final String[][] fastCrossers=gi.getFastCrossers(rowIndex, vertical);
+		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);//TODO: want update version, maybe add it to gameinfo
+		final boolean[] impossible=Help.impossible(possible);
+		final int[] changed=gi.getChanged(rowIndex, vertical);
 		
 		//clone old res so that old data isn't destroyed
 		if(changed!=null){
