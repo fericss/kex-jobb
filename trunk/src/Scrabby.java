@@ -119,11 +119,12 @@ public class Scrabby {
 //		return res;
 //	}
 	
-	public char[][] gameToBoard(final String[][] game){
+	public static char[][] gameToBoard(final String[][] game){
 		return gameToBoard(game," ");
 	}
 	
-	private char[][] gameToBoard(final String[][] game,final String emptyLetter){
+	private static char[][] gameToBoard(final String[][] game,final String emptyLetter){
+		final char emptyChar=' ';
 		char[][] board=new char[game.length][game[0].length];
 		for(int x=0;x<game.length;x++){
 			for(int y=0;y<game[0].length;y++){
