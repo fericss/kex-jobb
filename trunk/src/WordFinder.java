@@ -14,7 +14,7 @@ public class WordFinder {
 	private String[] wordList;
 	private String[][] m_words;
 	private FastFilter ff;
-
+	public final static String alphabet="abcdefghijklmnopqrstuvwxyz";
 	public final static int[] fastPoints={1,4,4,2,1,4,3,4,1,10,5,1,3,1,1,4,10,1,1,1,2,4,4,8,4,10};//TEST
 
 	public FastFilter getFastFilter(){
@@ -24,14 +24,20 @@ public class WordFinder {
 		wordList = LoadWords();
 		ff=new FastFilter(wordList);
 	}
+	
+	public static void printLetterPoints(){
+		for(int i=0;i<fastPoints.length;i++){
+			System.out.println(alphabet.charAt(i)+" "+fastPoints[i]);
+		}
+	}
 
 	/**
 	 * returns the value of the tile or 0 if it's a blank tile.
 	 * @param tile
 	 * @return
 	 */
-	public int valueOf(final char tile){//TEST
-		return tile=='.' ? 0 : fastPoints[tile-'a'];
+	public static int valueOf(final char tile){//TEST
+		return tile=='.' || tile==' ' ? 0 : fastPoints[tile-'a'];
 	}
 
 //	/**

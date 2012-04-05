@@ -9,19 +9,27 @@ public class GameInfo {
 	private String game[][];
 	private boolean wildCards[][];
 	private String rack;
-	final int length=15;
+	final static int length=15;
+	
+	
 	
 	
 	
 	//TEST
-	char board[][]=null;
+	private char board[][]=null;
 	GameInfo oldGameInfo=null;
 	int[][] changedPositionsHorizontal=null;
 	int[][] changedPositionsVertical=null;
 	String[] horizontalRows=null;
 	String[] verticalRows=null;
-	String[][][] horizontalFastCrossers=null;
+	String[][][] FastCrossers=null;
 	String[][][] verticalFastCrossers=null;
+	String[][][] horizontalFastCrossers=null;
+	int[][] horizontalPoints=null;
+	int[][] verticalPoints=null;
+	int[][] horizontalCrossPoints=null;
+	int[][] verticalCrossPoints=null;
+	
 	
 	public GameInfo(String _game[][], int _bonus[][],boolean _wildCards[][],String _rack){
 //		System.out.println("contructing gameinfo...");
@@ -29,7 +37,6 @@ public class GameInfo {
 		setBonus(_bonus);
 		setRack(_rack);
 		setWildCards(_wildCards);
-		board=Scrabby.gameToBoard(_game);//TEST
 //		System.out.println("The board in GameInfo:");
 //		for(int i=0;i<board.length;i++){
 //			System.out.println(Arrays.toString(board[i]));
@@ -37,6 +44,16 @@ public class GameInfo {
 //		System.out.println("contructed gameinfo.");
 	}
 	
+	public char[][] getBoard(){
+		if(board==null){
+			board=Scrabby.gameToBoard(this.getGame());
+		}
+		return board;
+	}
+	
+	public void updateBoard(){
+		board=Scrabby.gameToBoard(this.getGame());
+	}
 	
 	
 	/**
@@ -135,6 +152,7 @@ public class GameInfo {
 	protected String getRowHelp(final int row,boolean vertical){
 		vertical=!vertical;
 		final StringBuilder sb=new StringBuilder(length);
+		char[][] board=getBoard();
 		if(vertical){
 			for(int i=0;i<length;i++){
 				sb.append(board[row][i]);
@@ -149,27 +167,23 @@ public class GameInfo {
 	
 	
 	protected String[] getHorizontalRowsHelp(){
-		if(horizontalRows!=null){//load if
-			return horizontalRows;
+		if(horizontalRows==null){//load if
+			horizontalRows=new String[length];
+			for(int i=0;i<length;i++){
+				horizontalRows[i]=getRowHelp(i,false);
+			}
 		}
-		String[] rows=new String[length];
-		for(int i=0;i<length;i++){
-			rows[i]=getRowHelp(i,false);
-		}
-		horizontalRows=rows;
-		return rows;
+		return horizontalRows;
 	}
 	
 	protected String[] getVerticalRowsHelp(){
-		if(verticalRows!=null){//load if
-			return verticalRows;
+		if(verticalRows==null){//load if
+			verticalRows=new String[length];
+			for(int i=0;i<length;i++){
+				verticalRows[i]=getRowHelp(i,true);
+			}
 		}
-		String[] rows=new String[length];
-		for(int i=0;i<length;i++){
-			rows[i]=getRowHelp(i,true);
-		}
-		verticalRows=rows;
-		return rows;
+		return verticalRows;
 	}
 	
 	/**
@@ -237,27 +251,39 @@ public class GameInfo {
 	 */
 	protected int[][] getHasChangedVerticalHelp(){
 		if(this.oldGameInfo==null){return null;}
-		if(changedPositionsVertical!=null){
-			return changedPositionsVertical;
-		}
-		int[][] tmp=getHasChangedHorizontalHelp();
-		int[][] res=new int[length][length];
-		for(int i=0;i<length;i++){
-			for(int j=0;j<length;j++){
-				res[i][j]=tmp[j][i];
+		if(changedPositionsVertical==null){
+			int[][] tmp=getHasChangedHorizontalHelp();
+			int[][] changedPositionsVertical=new int[length][length];
+			//transpose
+			for(int i=0;i<length;i++){
+				for(int j=0;j<length;j++){
+					changedPositionsVertical[i][j]=tmp[j][i];
+				}
 			}
 		}
-		changedPositionsVertical=res;
-		return res;
+		return changedPositionsVertical;
 	}
 	
 	protected int[][] getHasChangedHorizontalHelp(){
 		if(this.oldGameInfo==null){return null;}
-		if(changedPositionsHorizontal!=null){//load value if
-			return changedPositionsHorizontal;
+		if(changedPositionsHorizontal==null){//load value if
+			changedPositionsHorizontal=getHasChangedHorizontalHelp(this.oldGameInfo.getBoard(),this.getBoard());
 		}
-		changedPositionsHorizontal=getHasChangedHorizontalHelp(this.oldGameInfo.board,this.board);
 		return changedPositionsHorizontal;
+	}
+	
+	/**
+	 * 0=no change, 1=affected by change, 2=on top of change
+	 * @param rowIndex
+	 * @param vertical
+	 * @return
+	 */
+	public int[] getChanged(final int rowIndex, final boolean vertical){
+		if(vertical){
+			return getHasChangedVerticalHelp()[rowIndex];
+		} else {
+			return getHasChangedHorizontalHelp()[rowIndex];
+		}
 	}
 	
 	
@@ -300,8 +326,8 @@ public class GameInfo {
 	 */
 	public GameInfo newGameInfo(final String newRack,final Move m){
 		//print stuff
-		System.out.println("Contructing GameInfo from old GameInfo and a move...");
-		System.out.println("Move: "+m);
+//		System.out.println("Contructing GameInfo from old GameInfo and a move...");
+//		System.out.println("Move: "+m);
 		
 		//do stuff
 		GameInfo gi=clone();
@@ -323,59 +349,129 @@ public class GameInfo {
 		}
 		gi.setRack(newRack);
 		
-		gi.board=Scrabby.gameToBoard(gi.getGame());
-		char[][] board2=gi.board;
+		gi.updateBoard();
+		char[][] board=this.getBoard();
+		char[][] board2=gi.getBoard();
 		int[][] hasChanged=gi.getHasChangedHorizontalHelp();
 		this.changedPositionsHorizontal=hasChanged;
 		
 		//Print stuff
-		System.out.println("The new board in GameInfo:");
-		for(int i=0;i<board2.length;i++){
-			System.out.println(Arrays.toString(board2[i]));
-		}
-//		System.out.println("changed1:");
-//		for(int i=0;i<hasChanged.length;i++){
-//			System.out.println(Arrays.toString(hasChanged[i]));
+		
+		
+//		System.out.println("Words that cross the move: "+Arrays.toString(getCrossingWordsList(m)));
+////		WordFinder.printLetterPoints();
+//		System.out.println("The old board in GameInfo:");
+//		for(int i=0;i<board.length;i++){
+//			System.out.println(Arrays.toString(board[i]));
 //		}
-		System.out.println("changed2:");
-		for(int i=0;i<length;i++){
-			System.out.println(Arrays.toString(gi.getChanged(i, false)));
-		}
-//		System.out.println("changed3 (in vertical direction):");
+//		
+//		System.out.println("Move: "+m);
+//		System.out.println("The new board in GameInfo:");
+//		for(int i=0;i<board2.length;i++){
+//			System.out.println(Arrays.toString(board2[i]));
+//		}
+//		System.out.println("Move: "+m);
+//		
+//		
+////		System.out.println("changed1:");
+////		for(int i=0;i<hasChanged.length;i++){
+////			System.out.println(Arrays.toString(hasChanged[i]));
+////		}
+//		System.out.println("changed2:");
 //		for(int i=0;i<length;i++){
-//			System.out.println(Arrays.toString(gi.changed(i, true)));
+//			System.out.println(Arrays.toString(gi.getChanged(i, false)));
 //		}
-		System.out.println("get fastCrossers");
-		for(int i=0;i<length;i++){
-			String[][] tmp=gi.getFastCrossers(i, false);
-			for(int j=0;j<length;j++){
-				System.out.print(Arrays.toString(tmp[j])+" ");
+//		System.out.println("bonus:");
+//		for(int i=0;i<length;i++){
+//			System.out.println(Arrays.toString(this.getBonus()[i]));
+//		}
+		System.out.println("move: "+m);
+		
+		
+		int points=testPoints(m);
+		System.out.println("test points:"+points);
+		if(points!=m.points){
+			System.out.println("**********************************************************");
+			System.out.println("The old board in GameInfo:");
+			for(int i=0;i<board.length;i++){
+				System.out.println(Arrays.toString(board[i]));
 			}
-			System.out.println();
+			System.out.println("The new board in GameInfo:");
+			for(int i=0;i<board2.length;i++){
+				System.out.println(Arrays.toString(board2[i]));
+			}
+			System.out.println("bonus:");
+			for(int i=0;i<length;i++){
+				System.out.println(Arrays.toString(this.getBonus(i, false)));
+			}
+			System.out.println("move: "+m);
+			System.out.println("test points:"+points);
+//			int[] g=new int[-1];
 		}
-		System.out.println("get rows");
-		for(int i=0;i<length;i++){
-			System.out.println(gi.getRow(i, false));
-		}
-		System.out.println("Contructed new GameInfo.");
+		
+//		System.out.println("get fastCrossers");
+//		for(int i=0;i<length;i++){
+//			String[][] tmp=gi.getFastCrossers(i, true);
+//			for(int j=0;j<length;j++){
+//				System.out.print(Arrays.toString(tmp[j])+" ");
+//			}
+//			System.out.println();
+//		}
+		
+////		System.out.println("changed3 (in vertical direction):");
+////		for(int i=0;i<length;i++){
+////			System.out.println(Arrays.toString(gi.changed(i, true)));
+////		}
+//		System.out.println("get fastCrossers");
+//		for(int i=0;i<length;i++){
+//			String[][] tmp=gi.getFastCrossers(i, false);
+//			for(int j=0;j<length;j++){
+//				System.out.print(Arrays.toString(tmp[j])+" ");
+//			}
+//			System.out.println();
+//		}
+//		System.out.println("get rows");
+//		for(int i=0;i<length;i++){
+//			System.out.println(gi.getRow(i, false));
+//		}
+//		System.out.println("Contructed new GameInfo.");
+//		
+//		int[][] pointsHorizontal=gi.getPointsHorizontal();
+//		System.out.println("points horisontal:");
+//		for(int i=0;i<length;i++){
+//			System.out.println(Arrays.toString(pointsHorizontal[i]));
+//		}
+//		
+//		int[][] pointsVertical=gi.getPointsVertical();
+////		System.out.println("points vertical:");
+////		for(int i=0;i<length;i++){
+////			System.out.println(Arrays.toString(pointsVertical[i]));
+////		}
+//		
+//		
+//		String[] verticalRows=gi.getVerticalRowsHelp();
+//		int[][] crossPoints=new int[length][];
+////		int[][] crossPoints=gi.crossPointsHelp(pointsVertical, verticalRows);
+////		System.out.println("crossPointsHorizontal:");
+////		for(int i=0;i<length;i++){
+////			System.out.println(Arrays.toString(crossPoints[i]));
+////		}
+//		
+//		System.out.println("crossPointsHorizontal2:");
+//		for(int i=0;i<length;i++){
+//			crossPoints[i]=this.getCrossPoints(i, false);
+//		}
+//		for(int i=0;i<length;i++){
+//			System.out.println(Arrays.toString(crossPoints[i]));
+//		}
+		
+		
 		
 		//return stuff
 		return gi;
 	}
 	
-	/**
-	 * 0=no change, 1=affected by change, 2=on top of change
-	 * @param rowIndex
-	 * @param vertical
-	 * @return
-	 */
-	public int[] getChanged(final int rowIndex, final boolean vertical){
-		if(vertical){
-			return getHasChangedVerticalHelp()[rowIndex];
-		} else {
-			return getHasChangedHorizontalHelp()[rowIndex];
-		}
-	}
+	
 	
 
 	
@@ -388,11 +484,11 @@ public class GameInfo {
 	 * @return
 	 */
 	protected static String[][] getFastCrossersHelp(final String row){
-		final int length=15;
 		String[][] res=new String[length][];
 		StringBuilder sb=new StringBuilder();
 		boolean added=true;
-		for(int i=0, beforeWord=-1;i<length;i++){
+		int beforeWord=-1;
+		for(int i=0;i<length;i++){
 			if(row.charAt(i)==' '){
 				//if has not added word, add it
 				if(!added){
@@ -430,6 +526,19 @@ public class GameInfo {
 				added=false;
 			}
 		}
+		if(row.charAt(row.length()-1)!=' '){
+			//construct array it's not already there
+			if(beforeWord>=0 && res[beforeWord]==null){
+				res[beforeWord]=new String[2];
+				//fill in default values
+				res[beforeWord][0]="";
+				res[beforeWord][1]="";
+			}
+			//replace default value if there was a space before the word
+			if(beforeWord>=0){
+				res[beforeWord][1]=sb.toString();
+			}
+		}
 		return res;
 	}
 	
@@ -440,8 +549,7 @@ public class GameInfo {
 	 * @param rows
 	 * @return
 	 */
-	protected String[][][] getFastCrossersHelp(final String[] rows){
-		final int length=15;
+	protected static String[][][] getFastCrossersHelp(final String[] rows){
 		String[][][] res=new String[length][][];
 		for(int i=0;i<length;i++){
 			res[i]=getFastCrossersHelp(rows[i]);
@@ -476,5 +584,310 @@ public class GameInfo {
 			return getHorizontalFastCrossersHelp()[rowIndex];
 		}
 	}
+	
+	/**
+	 * these crossing words must be included when making a name
+	 * @param m
+	 * @return
+	 */
+	public String[] getCrossingWordsList(Move m){
+		boolean vertical=m.vertical;
+		final int rowIndex;
+		final int start;
+		if(vertical){
+			rowIndex=m.x;
+			start=m.y;
+		} else {
+			rowIndex=m.y;
+			start=m.x;
+		}
+//		System.out.println("rowIndex: "+rowIndex+" start: "+start);
+//		System.out.println("row: "+getRow(rowIndex, vertical));
+		String[][] fastCrossersOnRow=getFastCrossers(rowIndex,vertical);
+		
+		//print
+//		String[][] tmp=fastCrossersOnRow;
+//		for(int j=0;j<length;j++){
+//			System.out.print(Arrays.toString(tmp[j])+" ");
+//		}
+//		System.out.println();
+		
+		String word=m.word;
+		int size=0;
+		for(int i=0,pos=start;i<word.length();i++,pos++){
+			if(fastCrossersOnRow[pos]!=null){
+				size++;
+			}
+		}
+		String[] res=new String[size];
+		for(int i=0,pos=start,index=0;i<word.length();i++,pos++){
+			if(fastCrossersOnRow[pos]!=null){
+				res[index]=fastCrossersOnRow[pos][0]+word.charAt(i)+fastCrossersOnRow[pos][1];
+				index++;
+			}
+		}
+		return res;
+	}
+	
+	public int[][] getPointsHorizontal(){
+		if(horizontalPoints==null){
+			horizontalPoints=new int[length][length];
+			char[][] board=this.getBoard();
+			boolean[][] blanks=this.getWildCards();
+			for(int i=0;i<length;i++){
+				for(int j=0;j<length;j++){
+					char tile=board[i][j];
+					if(tile!=' ' && !blanks[i][j]){
+						horizontalPoints[i][j]=WordFinder.valueOf(tile);
+					} //else {
+					//	points[i][j]=0;
+					//}
+				}
+			}
+		}
+		return horizontalPoints;
+	}
+	
+	protected int[][] getPointsVertical(){
+		if(verticalPoints==null){
+			int[][] pointsHorizontal=getPointsHorizontal();
+			//transpose
+			verticalPoints=new int[length][length];
+			for(int i=0;i<length;i++){
+				for(int j=0;j<length;j++){
+					verticalPoints[i][j]=pointsHorizontal[j][i];
+				}
+			}
+		}
+		return verticalPoints;
+	}
+	
+	protected int[][] crossPointsHorizontalHelp(){
+		if(horizontalCrossPoints==null){
+			horizontalCrossPoints=crossPointsHelp(getPointsVertical(),getVerticalRowsHelp());
+		}
+		return horizontalCrossPoints;
+	}
+	
+	protected int[][] crossPointsVerticalHelp(){
+		if(verticalCrossPoints==null){
+			verticalCrossPoints=crossPointsHelp(getPointsHorizontal(),getHorizontalRowsHelp());
+		}
+		return verticalCrossPoints;
+	}
+	
+	public int[] getCrossPoints(final int rowIndex,boolean vertical){
+		if(vertical){
+			return crossPointsVerticalHelp()[rowIndex];
+		} else {
+			return crossPointsHorizontalHelp()[rowIndex];
+		}
+	}
+	
+	/**
+	 * example: if it's horizontal rows then it returns crosspoints for all vertical rows.
+	 * or vice versa.
+	 * or vice versa.
+	 * @param points
+	 * @param rows
+	 * @return
+	 */
+	protected static int[][] crossPointsHelp(int[][] points,String[] rows){
+		int[][] res=new int[length][length];
+		for(int i=0;i<length;i++){
+			res[i]=crossPointsHelp(points[i],rows[i]);
+		}
+		int[][] res2=new int[length][length];
+		for(int i=0;i<length;i++){
+			for(int j=0;j<length;j++){
+				res2[i][j]=res[j][i];
+			}
+		}
+		return res2;
+	}
+	
+	/**
+	 * works in a similar way to protected static String[][] getFastCrossersHelp(final String row).
+	 * Gives cross points in the wrong direction, so the results has to be transposed.
+	 * @param rowPoints
+	 * @param row
+	 * @return
+	 */
+	protected static int[] crossPointsHelp(final int[] rowPoints,final String row){
+		int[] res=new int[length];
+		int points=0;
+		boolean added=true;
+		int before=-1;
+		for(int i=0;i<length;i++){
+			if(row.charAt(i)==' '){
+				if(!added){//add points if not added
+					if(before>=0){
+						res[before]+=points;
+					}
+					res[i]+=points;
+					//added points
+					added=true;
+					points=0;
+				}
+				//update before
+				before=i;
+			} else{
+				//start counting points
+				points+=rowPoints[i];
+				added=false;
+			}
+		}
+		if(row.charAt(length-1)!=' '){
+			if(before>=0){
+				res[before]+=points;
+			}
+		}
+		return res;
+	}
+	
+	/**
+	 * does not save result
+	 * @param rowIndex
+	 * @param vertical
+	 * @return
+	 */
+	public int[] getBonus(final int rowIndex, boolean vertical){
+		vertical=!vertical;//kanske är fel...
+		if(vertical){
+			int[][] tmp=new int[length][length];
+			for(int i=0;i<length;i++){
+				for(int j=0;j<length;j++){
+					tmp[i][j]=getBonus()[j][i];
+				}
+			}
+			return tmp[rowIndex];
+		} else {
+			return this.getBonus()[rowIndex];
+		}
+	}
+	
+	/**
+	 * does not save result
+	 * @param rowIndex
+	 * @param vertical
+	 * @return
+	 */
+	public boolean[] getWildCards(final int rowIndex, boolean vertical){
+		vertical=!vertical;//kanske är fel...
+		if(vertical){
+			boolean[][] tmp=new boolean[length][length];
+			for(int i=0;i<length;i++){
+				for(int j=0;j<length;j++){
+					tmp[i][j]=this.getWildCards()[j][i];
+				}
+			}
+			return tmp[rowIndex];
+		} else {
+			return this.getWildCards()[rowIndex];
+		}
+	}
+	
+	public int points(String word,int x, int y,boolean vertical, boolean[] blanksInWord){
+		int pos;
+		int rowIndex;
+		if(vertical){
+			pos=y;
+			rowIndex=x;
+		} else {
+			pos=x;
+			rowIndex=y;
+		}
+		return points(word,blanksInWord,pos,rowIndex,vertical);
+	}
+	
+	/**
+	 * just for testing, doesen't take into account the blank tiles used from the rack.
+	 * @param m
+	 * @return
+	 */
+	public int testPoints(Move m){
+//		int pos;
+//		int rowIndex;
+//		if(m.vertical){
+//			pos=m.y;
+//			rowIndex=m.x;
+//		} else {
+//			pos=m.x;
+//			rowIndex=m.y;
+//		}
+//		return points(m.word,new boolean[m.word.length()],pos,rowIndex,m.vertical);
+		return points(m.word,m.x,m.y,m.vertical,new boolean[m.word.length()]);
+		
+	}
+	
+	public int points(String word, boolean[] isBlankInWord,int pos,int rowIndex,boolean vertical){
+		return points(word, isBlankInWord, pos, this.getRow(rowIndex, vertical), getCrossPoints(rowIndex, vertical), 
+				getBonus(rowIndex, vertical), this, rack.length(), getWildCards(rowIndex, vertical),getFastCrossers(rowIndex, vertical));
+	}
+	
+	/**
+	 * Almost always the same as the standard points calculation. 
+	 * Is more correct when there blank tiles on the board.'
+	 * Has not tested with blank tiles in the rack.
+	 * @param word
+	 * @param isBlankInWord 
+	 * @param pos
+	 * @param row
+	 * @param fastCrossPoints have pre-calculated the points given from all the letters from the row-crossing
+	 * words, so that the only thing that needs calculating is bonuses and the tile to be added. There should be a negative
+	 * number at all positions that don't have crossing words.
+	 * @param bonus
+	 * @param wf
+	 * @param gi
+	 * @param rackSize
+	 * @param isBlankOnBoard wildcard and blank are synonyms in this case. true means that it's a blank tile at that position.
+	 * @return
+	 */
+	protected static int points(String word,boolean[] isBlankInWord, int pos,String row,int[] fastCrossPoints,
+			int[] bonus,GameInfo gi,int rackSize,boolean[] isBlankOnBoard,String[][] fastCrossers){
+		int wordFactor=1;
+		int wordPoints=0;
+		int crossPoints=0;
+		int usedLetters=0;
+		System.out.println();//DEBUG
+		System.out.println("letter: letterPoints * letterBonus ... * wordBonus");//DEBUG
+		for(int i=0;i<word.length();i++,pos++){
+			char letter=isBlankInWord[i]?'.':word.charAt(i);
+			//letter points are zero if it's a blank tile on the board at this position
+			int letterPoints=isBlankOnBoard[pos]?0:WordFinder.valueOf(letter);
+			int wordBonus=1;
+			int letterBonus=1;
+			
+			if(row.charAt(pos)==' '){
+				usedLetters++;
+				//get bonus
+				switch(bonus[pos]){
+				case 0: break;//none
+				case 1: letterBonus=2; break;//dl
+				case 2: letterBonus=3; break;//tl
+				case 3: wordBonus=2; break;//dw
+				case 4: wordBonus=3; break;//tw
+				}
+				//only get crossPoints if there are a crossing word
+				if(fastCrossers[pos]!=null){
+					crossPoints+=(fastCrossPoints[pos]+letterPoints*letterBonus)*wordBonus;
+				}
+			}
+			//takes into account that it can be a blank tile at the position, only gives points if it's not a blank tile
+			wordPoints+=letterPoints*letterBonus;
+			wordFactor*=wordBonus;
+			System.out.println(letter+": "+letterPoints+" * "+letterBonus+" = "+(letterPoints*letterBonus)+" ... * "+wordBonus);//DEBUG
+		}
+		//the rules may be that you must use 7 letters to get the bonus, not that you have to use all in the rack
+		//TODO: check the real rules
+		int usedAllLettersBonus=usedLetters==rackSize?40:0;
+		//returns the total points
+		System.out.println("wordPoints="+wordPoints+ ", wordFactor="+wordFactor+", crossPoints="+crossPoints+", allBonus="+usedAllLettersBonus);//DEBUG
+		System.out.println("result=(wordPoints*wordFactor+crossPoints+allBonus)="+(crossPoints+wordPoints*wordFactor+usedAllLettersBonus));//DEBUG
+		//print fast crossers
+		return wordPoints*wordFactor+crossPoints+usedAllLettersBonus;
+	}
+	
+	
 	
 }

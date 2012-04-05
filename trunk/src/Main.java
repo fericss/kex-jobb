@@ -51,7 +51,7 @@ public class Main extends JFrame{
 		game = new String[15][15];
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
-		String _gameInfo = getGame(gamesIDList.get(0));
+		String _gameInfo = getGame(gamesIDList.get(2));
 		int[][] bonus = getGameBoard(_gameInfo);
 		parseTiles(_gameInfo);
 		
@@ -68,9 +68,19 @@ public class Main extends JFrame{
 		GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
 		
 		long time = System.currentTimeMillis();
-		new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
+		greedyMoveFinder gmf=new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
 		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
-
+		
+//		//Test of the new points method
+//		for(Move m:gmf.buildAbleWords){
+//			int points=gi.testPoints(m);
+//			if(points!=m.points){
+//				System.out.println("aaaaaiiiiiii!!!!!");
+//				System.out.println("Move: "+m);
+//				System.out.println("points method: "+points);
+//				System.out.println("******************************Error above***********************************");
+//			}
+//		}
 
 	}
 	public void printBoard(char[][] board){
