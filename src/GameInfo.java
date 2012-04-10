@@ -22,7 +22,7 @@ public class GameInfo {
 	int[][] changedPositionsVertical=null;
 	String[] horizontalRows=null;
 	String[] verticalRows=null;
-	String[][][] FastCrossers=null;
+//	String[][][] FastCrossers=null;
 	String[][][] verticalFastCrossers=null;
 	String[][][] horizontalFastCrossers=null;
 	int[][] horizontalPoints=null;
@@ -42,6 +42,19 @@ public class GameInfo {
 //			System.out.println(Arrays.toString(board[i]));
 //		}
 //		System.out.println("contructed gameinfo.");
+	}
+	
+	public void printBoard(){
+		printBoard(this.getBoard());
+	}
+	
+	public static void printBoard(char[][] board){
+		int x=0;
+		System.out.println(" 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14");
+		for(char[] b:board){
+			System.out.println(Arrays.toString(b)+" "+(x));
+			x++;
+		}
 	}
 	
 	public char[][] getBoard(){
@@ -149,8 +162,8 @@ public class GameInfo {
 //		return sb.toString().toLowerCase();
 //	}
 	
-	protected String getRowHelp(final int row,boolean vertical){
-		vertical=!vertical;
+	protected String getRowHelp(final int row,final boolean vertical1){
+		final boolean vertical=!vertical1;
 		final StringBuilder sb=new StringBuilder(length);
 		char[][] board=getBoard();
 		if(vertical){
@@ -279,11 +292,13 @@ public class GameInfo {
 	 * @return
 	 */
 	public int[] getChanged(final int rowIndex, final boolean vertical){
+		int[][] tmp;
 		if(vertical){
-			return getHasChangedVerticalHelp()[rowIndex];
+			tmp=getHasChangedVerticalHelp();
 		} else {
-			return getHasChangedHorizontalHelp()[rowIndex];
+			tmp=getHasChangedHorizontalHelp();
 		}
+		return tmp==null?null:tmp[rowIndex];
 	}
 	
 	
@@ -332,24 +347,27 @@ public class GameInfo {
 		//do stuff
 		GameInfo gi=clone();
 		gi.oldGameInfo=this;
-		boolean vertical=!m.vertical;
-		String word=m.word;
-		int x=m.y;//Hax, swaps x and y
-		int y=m.x;
-		if(vertical){
-			for(int i=0;i<word.length();i++,y++){
-				gi.getGame()[x][y]=String.valueOf(word.charAt(i));
-				gi.getWildCards()[x][y]=m.isWildCard(i);
+		if(m!=null){
+			boolean vertical=!m.vertical;
+			String word=m.word;
+			int x=m.y;//Hax, swaps x and y
+			int y=m.x;
+			if(vertical){
+				for(int i=0;i<word.length();i++,y++){
+					gi.getGame()[x][y]=String.valueOf(word.charAt(i));
+					gi.getWildCards()[x][y]=m.isWildCard(i);
+				}
+			}else{
+				for(int i=0;i<word.length();i++,x++){
+					gi.getGame()[x][y]=String.valueOf(word.charAt(i));
+					gi.getWildCards()[x][y]=m.isWildCard(i);
+				}
 			}
-		}else{
-			for(int i=0;i<word.length();i++,x++){
-				gi.getGame()[x][y]=String.valueOf(word.charAt(i));
-				gi.getWildCards()[x][y]=m.isWildCard(i);
-			}
+			gi.updateBoard();
 		}
+		
 		gi.setRack(newRack);
 		
-		gi.updateBoard();
 		char[][] board=this.getBoard();
 		char[][] board2=gi.getBoard();
 		int[][] hasChanged=gi.getHasChangedHorizontalHelp();
@@ -365,8 +383,9 @@ public class GameInfo {
 //			System.out.println(Arrays.toString(board[i]));
 //		}
 //		
-//		System.out.println("Move: "+m);
-//		System.out.println("The new board in GameInfo:");
+		System.out.println("Move: "+m);
+		System.out.println("The new board in GameInfo:");
+		printBoard(board2);
 //		for(int i=0;i<board2.length;i++){
 //			System.out.println(Arrays.toString(board2[i]));
 //		}
@@ -385,29 +404,29 @@ public class GameInfo {
 //		for(int i=0;i<length;i++){
 //			System.out.println(Arrays.toString(this.getBonus()[i]));
 //		}
-		System.out.println("move: "+m);
-		
-		
-		int points=testPoints(m);
-		System.out.println("test points:"+points);
-		if(points!=m.points){
-			System.out.println("**********************************************************");
-			System.out.println("The old board in GameInfo:");
-			for(int i=0;i<board.length;i++){
-				System.out.println(Arrays.toString(board[i]));
-			}
-			System.out.println("The new board in GameInfo:");
-			for(int i=0;i<board2.length;i++){
-				System.out.println(Arrays.toString(board2[i]));
-			}
-			System.out.println("bonus:");
-			for(int i=0;i<length;i++){
-				System.out.println(Arrays.toString(this.getBonus(i, false)));
-			}
-			System.out.println("move: "+m);
-			System.out.println("test points:"+points);
-//			int[] g=new int[-1];
-		}
+//		System.out.println("move: "+m);
+//		
+//		
+//		int points=testPoints(m);
+//		System.out.println("test points:"+points);
+//		if(points!=m.points){
+//			System.out.println("**********************************************************");
+//			System.out.println("The old board in GameInfo:");
+//			for(int i=0;i<board.length;i++){
+//				System.out.println(Arrays.toString(board[i]));
+//			}
+//			System.out.println("The new board in GameInfo:");
+//			for(int i=0;i<board2.length;i++){
+//				System.out.println(Arrays.toString(board2[i]));
+//			}
+//			System.out.println("bonus:");
+//			for(int i=0;i<length;i++){
+//				System.out.println(Arrays.toString(this.getBonus(i, false)));
+//			}
+//			System.out.println("move: "+m);
+//			System.out.println("test points:"+points);
+////			int[] g=new int[-1];
+//		}
 		
 //		System.out.println("get fastCrossers");
 //		for(int i=0;i<length;i++){
@@ -484,6 +503,7 @@ public class GameInfo {
 	 * @return
 	 */
 	protected static String[][] getFastCrossersHelp(final String row){
+		final String empty="";
 		String[][] res=new String[length][];
 		StringBuilder sb=new StringBuilder();
 		boolean added=true;
@@ -498,15 +518,15 @@ public class GameInfo {
 					if(beforeWord>=0 && res[beforeWord]==null){
 						res[beforeWord]=new String[2];
 						//fill in default values
-						res[beforeWord][0]="";
-						res[beforeWord][1]="";
+						res[beforeWord][0]=empty;
+						res[beforeWord][1]=empty;
 					}
 					//construct array if it's not already there
 					if(res[i]==null){
 						res[i]=new String[2];
 						//fill in default values
-						res[i][0]="";
-						res[i][1]="";
+						res[i][0]=empty;
+						res[i][1]=empty;
 					}
 					//replace default value if there was a space before the word
 					if(beforeWord>=0){
@@ -531,8 +551,8 @@ public class GameInfo {
 			if(beforeWord>=0 && res[beforeWord]==null){
 				res[beforeWord]=new String[2];
 				//fill in default values
-				res[beforeWord][0]="";
-				res[beforeWord][1]="";
+				res[beforeWord][0]=empty;
+				res[beforeWord][1]=empty;
 			}
 			//replace default value if there was a space before the word
 			if(beforeWord>=0){
@@ -746,6 +766,43 @@ public class GameInfo {
 	}
 	
 	/**
+	 * untested
+	 * @param rowPoints
+	 * @param row
+	 * @return
+	 */
+	protected static int[] crossPointsHelp2(final String row){
+		final int[] rowPoints=new int[length];
+		final boolean[] isEmpty=new boolean[row.length()];
+		for(int i=0;i<length;i++){
+			char tmp=row.charAt(i);
+			rowPoints[i]=WordFinder.valueOf(tmp);
+			isEmpty[i]= tmp==' ';
+		}
+		
+		int[] res=new int[length];
+		int points=0;
+		for(int i=0;i<length;i++){
+			if(isEmpty[i]){
+				res[i]+=points;
+				points=0;
+			} else {
+				points+=rowPoints[i];
+			}
+		}
+		points=0;
+		for(int i=length-1;i>=0;i--){
+			if(isEmpty[i]){
+				res[i]+=points;
+				points=0;
+			} else {
+				points+=rowPoints[i];
+			}
+		}
+		return res;
+	}
+	
+	/**
 	 * does not save result
 	 * @param rowIndex
 	 * @param vertical
@@ -827,8 +884,8 @@ public class GameInfo {
 	
 	/**
 	 * Almost always the same as the standard points calculation. 
-	 * Is more correct when there blank tiles on the board.'
-	 * Has not tested with blank tiles in the rack.
+	 * Is more correct when there are blank tiles on the board.'
+	 * Has not been tested with blank tiles in the rack.
 	 * @param word
 	 * @param isBlankInWord 
 	 * @param pos
@@ -849,8 +906,8 @@ public class GameInfo {
 		int wordPoints=0;
 		int crossPoints=0;
 		int usedLetters=0;
-		System.out.println();//DEBUG
-		System.out.println("letter: letterPoints * letterBonus ... * wordBonus");//DEBUG
+//		System.out.println();//DEBUG
+//		System.out.println("letter: letterPoints * letterBonus ... * wordBonus");//DEBUG
 		for(int i=0;i<word.length();i++,pos++){
 			char letter=isBlankInWord[i]?'.':word.charAt(i);
 			//letter points are zero if it's a blank tile on the board at this position
@@ -876,18 +933,27 @@ public class GameInfo {
 			//takes into account that it can be a blank tile at the position, only gives points if it's not a blank tile
 			wordPoints+=letterPoints*letterBonus;
 			wordFactor*=wordBonus;
-			System.out.println(letter+": "+letterPoints+" * "+letterBonus+" = "+(letterPoints*letterBonus)+" ... * "+wordBonus);//DEBUG
+//			System.out.println(letter+": "+letterPoints+" * "+letterBonus+" = "+(letterPoints*letterBonus)+" ... * "+wordBonus);//DEBUG
 		}
 		//the rules may be that you must use 7 letters to get the bonus, not that you have to use all in the rack
 		//TODO: check the real rules
 		int usedAllLettersBonus=usedLetters==rackSize?40:0;
 		//returns the total points
-		System.out.println("wordPoints="+wordPoints+ ", wordFactor="+wordFactor+", crossPoints="+crossPoints+", allBonus="+usedAllLettersBonus);//DEBUG
-		System.out.println("result=(wordPoints*wordFactor+crossPoints+allBonus)="+(crossPoints+wordPoints*wordFactor+usedAllLettersBonus));//DEBUG
+//		System.out.println("wordPoints="+wordPoints+ ", wordFactor="+wordFactor+", crossPoints="+crossPoints+", allBonus="+usedAllLettersBonus);//DEBUG
+//		System.out.println("result=(wordPoints*wordFactor+crossPoints+allBonus)="+(crossPoints+wordPoints*wordFactor+usedAllLettersBonus));//DEBUG
 		//print fast crossers
 		return wordPoints*wordFactor+crossPoints+usedAllLettersBonus;
 	}
 	
+	public static String fastCrossersToString(String[][] fastCrossers){
+		String[] sarr=new String[fastCrossers.length];
+		for(int i=0;i<fastCrossers.length;i++){
+			if(fastCrossers[i]!=null){
+				sarr[i]=fastCrossers[i][0]+" "+fastCrossers[i][1];
+			}
+		}
+		return Arrays.toString(sarr);
+	}
 	
 	
 }

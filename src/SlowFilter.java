@@ -8,7 +8,17 @@ import java.util.regex.Pattern;
 /**
  * Uses stuff from FastFilter and greedy bot to make a complete filtering with only valid words for each position.
  * 
- * Might be used in advanced bot because it can replace just those places that need to be recalculated.
+ * Might be used in advanced bot because it can replace just those places that need to be recalculated (this has not been tested yet
+ * and it has not been fully implemented).
+ * 
+ * It has almost the same speed as greedy bot when there are no wildcards, but is almost two times faster when there are wildcards.
+ * It still might have bugs...
+ * 
+ * i.e. it has a higher overhead but then it's faster, but that isn't noticed until there are many possible combinations.
+ * 
+ * Instructions:
+ * use slowFilterUpdate
+ * the result now is in moves
  * 
  * 
  * @author mbernt.mbernt
@@ -19,6 +29,14 @@ public class SlowFilter {
 	final int[] neededChars; //the ints functions as bit array, with a one for each letter type in the word
 	final byte[][] charFreq;//list of the frequency of each letter in each word
 	final byte[][] checkList;//only need to check chars in the word
+	final int[] wordLengths;
+	
+	//these are set when called reset
+	public int p1;
+	public int p2;
+	public int p3;
+	public int p4;
+	public ArrayList<Move> moves;
 	
 	public SlowFilter(String[] _wordlist){
 		//initialize
@@ -26,6 +44,7 @@ public class SlowFilter {
 		neededChars=new int[wordlist.length];
 		charFreq=new byte[wordlist.length][];
 		checkList=new byte[wordlist.length][];
+		wordLengths=new int[wordlist.length];
 		
 		//calculate properties for each word
 		for(int i=0;i<wordlist.length;i++){
@@ -34,15 +53,26 @@ public class SlowFilter {
 				neededChars[i]=Help.getHasChars(wordlist[i]);
 				charFreq[i]=Help.createFreq(wordlist[i]);
 				checkList[i]=Help.getCheckList(charFreq[i]);
+				wordLengths[i]=wordlist[i].length();
 			} else {
 				System.out.println("StrangeWord: "+wordlist[i]);
 				neededChars[i]=0;
 				charFreq[i]=null;
 				checkList[i]=null;
+				wordLengths[i]=0;
 				System.out.println(neededChars[i]);
 			}
 				
 		}
+		reset();
+	}
+	
+	public void reset(){
+		p1=0;
+		p2=0;
+		p3=0;
+		p4=0;
+		moves=new ArrayList<Move>();
 	}
 	
 	public ArrayList<ArrayList<String>[]> slowFilter3(String rack, String row,
@@ -165,27 +195,29 @@ public class SlowFilter {
 	 * @param res
 	 * @return
 	 */
-	public ArrayList<ArrayList<String>[]> slowFilterUpdate(final int rowIndex, boolean vertical, final WordFinder wf,final GameInfo gi,
+	public ArrayList<ArrayList<String>[]> slowFilterUpdate(final int rowIndex, boolean vertical, 
+			final WordFinder wf,final GameInfo gi,
 			ArrayList<ArrayList<String>[]> res){
 		//maybe change so that res is saved in gameinfo?
 		
 		//pre-calculate stuff...
-		String rack=gi.getRack();
-		String row=gi.getRow(rowIndex, vertical);
+		String rack=gi.getRack().toLowerCase();
+		final String row=gi.getRow(rowIndex, vertical).toLowerCase();
 		final String[][] fastCrossers=gi.getFastCrossers(rowIndex, vertical);
 		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);//TODO: want update version, maybe add it to gameinfo
 		final boolean[] impossible=Help.impossible(possible);
 		final int[] changed=gi.getChanged(rowIndex, vertical);
 		
+		
 		//clone old res so that old data isn't destroyed
+		//after this don't add or remove to the lowest level lists without
+		//replacing them first
 		if(changed!=null){
 			res=cloneResList(res);
 		}
 		
-		int racklength=rack.length();
-
-		rack=rack.toLowerCase();
-		row=row.toLowerCase();
+		
+		final int racklength=rack.length();
 
 		//count wildcards
 		int wildcards=rack.length();
@@ -204,44 +236,61 @@ public class SlowFilter {
 
 		int size=15-1;
 		
+		//
+//		final byte[] rowFreq=Help.createFreq(rack+row.replaceAll(" ", ""));
 		
 		//data about row and position
 		final String[][] combinations=new String[size][];
-		final Pattern[][] patterns=new Pattern[size][];
+		final int[][] checkList2=new int[size][];
 		final byte[][][] hasBytess=new byte[size][][];
 		final boolean[][] mayHaveChanged=new boolean[size][];//is also used to clear old data from oldRes
-
+		int[][] letterTypess=new int[size][];
+		
 		//Initialize data about row an position
 		for(int length=2,index=0;length<=15;length++,index++){
 			//Real, get the combinations for a length
-			//comb[index]=MartinsFilterTest.getCharCombinations4(racklength,row,length,fastCrossers,impossible);
 			if(changed==null){
 				combinations[index]=getCharCombinationsUpdate(racklength,row,length,fastCrossers,impossible,null);//TEST
 			} else {
 				mayHaveChanged[index]=mayHaveChanged(length,changed);
 				combinations[index]=getCharCombinationsUpdate(racklength,row,length,fastCrossers,impossible,mayHaveChanged[index]);//TEST
 			}
+			int checkSize=0;
+			for(int position=0;position<combinations[index].length;position++){
+				if(combinations[index][position]!=null){
+					checkSize++;
+				}
+			}
+			checkList2[index]=new int[checkSize];
+			int cindex=0;
 			
 			//Initialize hasBytess and patterns
 			int combLen=combinations[index].length;
 			hasBytess[index]=new byte[combLen][];
-			patterns[index]=new Pattern[combLen];
+			letterTypess[index]=new int[combLen];
+			//patterns[index]=new Pattern[combLen];
 			//get properties for each comb
 			for(int position=0;position<combinations[index].length;position++){
 				if(combinations[index][position]!=null){
 					//Initialize
-					final String boardLetters=combinations[index][position].replaceAll(".","");
+					final String boardLetters=combinations[index][position].replaceAll("\\.","");
 					final String sourceLetters=rack+boardLetters;
+					
 					final byte[] freq=Help.createFreq(sourceLetters);
 					hasBytess[index][position]=freq;
-					patterns[index][position]=boardLetters.length()==0?null:Pattern.compile(combinations[index][position]);
+					
+					final int letterTypes=Help.getHasChars(sourceLetters);
+					letterTypess[index][position]=letterTypes;
+					
+					checkList2[index][cindex]=position;
+					cindex++;
 				}
 			}
 		}
 		
 		
 		
-		//initialize the res list
+		//initialize the res list 0 ms
 		if(changed==null) {
 			res=new ArrayList<ArrayList<String>[]>();
 			for(int length=2,index=0;length<=15;length++,index++){
@@ -263,38 +312,96 @@ public class SlowFilter {
 			}
 		}
 		
-
+		//check if there are no possible words on row
+		boolean finished=true;
+		for(int i=0;i<checkList2.length;i++){
+			if(checkList2[i].length>0){
+				finished=false;
+				break;
+			}
+		}
+		if(finished){
+//			System.out.println("nothing on row!");
+			return res;
+		}
+		
+		//overhead when doing nothing but looping through word ? ms
 		//do filtering
 		//for each word
 		for(int i=0;i<wordlist.length;i++){
-			final String word=wordlist[i];
-			final int index=word.length()-2;
-			//			final ArrayList<String>[] res1=res.get(index);
-			final String sarr[]=combinations[index];
-			//for each starting position on the row for the word
-			for(int position=0;position<sarr.length;position++){
-				if(sarr[position]!=null){
+			//an int array is more cache friendly in java
+			//this way you don't have to follow a reference to each word and then get the length
+			final int index=wordLengths[i]-2;
+			if(checkList2[index].length>0){
+				final String word=wordlist[i];
+				final String sarr[]=combinations[index];
+				//for each starting position on the row for the word
+				for(int j=0;j<checkList2[index].length;j++){
+					p1++;//from 100 to 125 ms with these
+					final int position=checkList2[index][j];
+					//if(sarr[position]!=null){//this check is already done indirectly by checkList2
 					//retrieve data about position
-					//final int[] hasChars=hasCharss[index][j];
-					final byte[] hasFreq=hasBytess[index][position];
-					final Pattern p=patterns[index][position];
-					//check, ha enough chars in rack
-					if(Help.hasCharFreq3(checkList[i], charFreq[i], hasFreq, wildcards, unknownWildCards, unknown, unknowns)
-							//hasNeededChars(i,hasChars,wildcards) 
-							//hasNeededChars(neededChars[i],hasChars,wildcards) 
-							&& (p==null || p.matcher(word).matches())
-							//(p.matcher(wordlist[i]).matches())
-							//&& Help.correctCrossing(wordlist[i],j,fastCrossers,wf)
-							&& Help.correctCrossing(word, position, possible)
-					){
-						//						res1[j].add(word);
-						res.get(index)[position].add(word);
+					//filter
+					if(wildcards>0 || Help.hasNeededChars(neededChars[i], letterTypess[index][position])){
+						p2++;
+						if(Help.hasCharFreq2(checkList[i], charFreq[i], hasBytess[index][position], wildcards)){
+							if(Help.correctCrossing(word, position, possible)){
+								p3++;
+								if(Help.isFitting(sarr[position],word)){
+									p4++;
+									res.get(index)[position].add(word);
+								}
+							}
+						}
 					}
+				}
+			}
 
+		}
+		if(res!=null){
+			addResToMovesList(rowIndex,vertical,res,gi);
+		}
+		return res;
+	}
+	
+	public void addResToMovesList(final int rowIndex,final boolean vertical,final ArrayList<ArrayList<String>[]> res,final GameInfo gi){
+		for(int index=0;index<res.size();index++){
+			final ArrayList<String>[] list=res.get(index);
+			for(int position=0;position<list.length;position++){
+				final ArrayList<String> words=list[position];
+				for(int i=0;i<words.size();i++){
+					final String word=words.get(i);
+					final int x;
+					final int y;
+					if(vertical){
+						y=position;
+						x=rowIndex;
+					} else {
+						x=position;
+						y=rowIndex;
+					}
+					final Move m=new Move(gi.points(word, x, y, vertical, new boolean[word.length()]), word, x, y, vertical);
+					moves.add(m);
 				}
 			}
 		}
-		return res;
+	}
+	
+	public static String[] getPrintStringFromPossible(boolean[][] possible){
+		StringBuilder sb=new StringBuilder();
+		String[] sarr=new String[possible.length];
+		for(int i=0;i<possible.length;i++){
+			if(possible[i]!=null){
+				for(int j=0;j<possible[i].length;j++){
+					if(possible[i][j]){
+						sb.append((char)(j+'a'));
+					}
+				}
+				sarr[i]=sb.toString();
+				sb.setLength(0);
+			}
+		}
+		return sarr;
 	}
 	
 	/**
@@ -320,8 +427,7 @@ public class SlowFilter {
 		final String[] sarr=new String[row.length()-length+1];
 		for(int i=0;i<sarr.length;i++){
 			//mayHaveChanged==null means it is from scratch
-			//a zero or higher change must be inside the word
-			//a type zero change means that there is an adjacent type one change
+			//a 1 or higher change must be inside the word
 			if(mayHaveChanged==null || mayHaveChanged[i]){
 				//it must not be impossible
 				if(!Help.impossibleInRange(i,length,impossible)){
@@ -357,9 +463,11 @@ public class SlowFilter {
 		return sarr;
 	}
 	
+	
+	
 	public static boolean changed(final int start,final int length, final int changed[]){;
 		for(int i=0,index=start;i<length;i++,index++){
-			if(changed[index]>=0){//contains a type zero change or larger
+			if(changed[index]>0){//contains a type one change or larger
 				return true;
 			}
 		}
@@ -375,6 +483,8 @@ public class SlowFilter {
 	}
 	/**
 	 * untested, should give the same result as changed.
+	 * can have adjusted from and to ranges so that it's 
+	 * slightly faster.
 	 * @param length
 	 * @param pos
 	 * @param changed
@@ -383,318 +493,37 @@ public class SlowFilter {
 	 * @return
 	 */
 	public boolean changed2(final int length,final int pos, final int changed[],final int from,final int to){
-		int start=Math.max(pos, from);
-		final int limit=Math.min(length, start-to+1);
-		for(int i=0;i<limit;i++,start++){
-			if(changed[start]>=0){//contains a type zero change or larger
+		final int start=Math.max(pos, from);
+		final int end=Math.min(pos+length-1, to);//index not length
+		for(int i=start;i<=end;i++){
+			if(changed[i]>0){//contains a type zero change or larger
 				return true;
 			}
 		}
 		return false;
 	}
 	
-//	/**
-//	 * for testing performance
-//	 * or other stuff in this class.
-//	 * @param args
-//	 */
-//	public final  static void main(String[] args){
-//		String[] wordlist=new WordFinder().getWordlist();
-//		Z_OLD_MartinsFilter ff2=new Z_OLD_MartinsFilter(wordlist);
-//		
-////		ff2.print();
-//		System.out.println(ff2.getAvarageLength());
-//		System.out.println(ff2.getAvarageWordLength());
-//		System.out.println(ff2.maxLength());
-//		
-//		String[] wordsOnRow={"hej","d","low"};
-//		String rack="fi.hdf";
-//		timingTest(rack,wordsOnRow,wordlist,1000);
-//	}
-//	
-//	public int maxLength(){
-//		int max=0;
-//		for(int i=0;i<neededChars.length;i++){
-//			if(neededChars[i].length>max){
-//				max=neededChars[i].length;
-//			}
-//		}
-//		return max;
-//	}
-//	
-//	public double getAvarageLength(){
-//		double avg=0;
-//		double length=neededChars.length;
-//		for(int i=0;i<neededChars.length;i++){
-//			double tmp=neededChars[i].length;
-//			avg+=tmp/length;
-//		}
-//		return avg;
-//	}
-//	
-//	public double getAvarageWordLength(){
-//		double avg=0;
-//		double length=wordlist.length;
-//		for(int i=0;i<wordlist.length;i++){
-//			double tmp=wordlist[i].length();
-//			avg+=tmp/length;
-//		}
-//		return avg;
-//	}
-//	
-//	public static void timingTest(String rack,String[] wordsOnRow, String[] wordlist,int filterRepeats){
-//		long t1,t2,t3;
-//		t1=System.currentTimeMillis();
-//		Z_OLD_MartinsFilter ff=new Z_OLD_MartinsFilter(wordlist);
-//		t2=System.currentTimeMillis();
-//		ArrayList<String> st=null;
-//		for(int i=0;i<filterRepeats;i++){
-//			st=ff.filter(rack, wordsOnRow);
-////			String s=st.get(0);
-//		}
-//		t3=System.currentTimeMillis();
-//		for(String s:st){
-//			System.out.println(s);
-//		}
-//		System.out.println(st.size());
-//		System.out.println(
-//				"rack: "+rack
-//				+"  wordsOnRow: "+Arrays.toString(wordsOnRow)
-//				+"  wordListLength: "+wordlist.length
-//				+"  constructionTime(ms): "+(t2-t1)
-//				+"  filterTime per word(ms): "+(((double)(t3-t2))/((double)filterRepeats))
-//				+"  filterRepeats: "+filterRepeats
-//				);
-//	}
-//	
-//	public void print(){
-//		for(int i=0;i<wordlist.length;i++){
-//			System.out.println(wordlist[i]+Arrays.toString(toBinaryStrings(neededChars[i])));
-//		}
-//	}
-//	
-//	private static String[] toBinaryStrings(int[] arr){
-//		String[] res=new String[arr.length];
-//		for(int i=0;i<arr.length;i++){
-//			res[i]=Integer.toBinaryString(arr[i]);
-//		}
-//		return res;
-//	}
-//	
-//	
-//	
-//	
-//	/**
-//	 * constructs a FastFilter.
-//	 * @param _wordlist
-//	 */
-//	public Z_OLD_MartinsFilter(String[] _wordlist){
-//		//initialize
-//		wordlist=_wordlist;
-//		neededChars=new int[wordlist.length][];
-//		
-//		//calculate properties for each word
-//		for(int i=0;i<wordlist.length;i++){
-//			if(wordlist[i].matches("[a-z]+")){
-//				neededChars[i]=getHasChars(wordlist[i],0,0);
-//			} else {
-//				System.out.println("StrangeWord: "+wordlist[i]);
-//				neededChars[i]=null;
-//			}
-//		}
-//	}
-//	private static int[] getHasChars(final String s,final int wildCards,final int unknown){
-//		return getHasChars(createFreq(s), wildCards);
-//	}
-//	
-//	private static int[] getHasChars(final byte[] charFreq, final int wildCards){
-//		int max=0;
-//		for(int i=0;i<charFreq.length;i++){
-//			if(charFreq[i]>max){
-//				max=charFreq[i];
-//			}
-//		}
-//		int[] res=new int[max+wildCards];
-//		for(int j=0;j<wildCards;j++){
-//			res[j]=-1;
-//		}
-//		int tmp;
-//		for(int j=0;j<max;j++){
-//			tmp=0;
-//			for(int i=0;i<charFreq.length;i++){
-//				if(charFreq[i]>j){
-//					tmp=tmp | (1<<i);
-//				}
-//			}
-//			res[j+wildCards]=tmp;
-//		}
-//		return res;
-//	}
-//	
-//	/**
-//	 * Returns a filtered wordlist where some of the words that can't be solutions have been filtered out.
-//	 * @param rack
-//	 * @param wordsOnRow
-//	 * @return
-//	 */
-//	public ArrayList<String> filter(String rack, String[] wordsOnRow){
-//		//to lowe case
-//		rack=rack.toLowerCase();
-//		wordsOnRow=Arrays.copyOf(wordsOnRow, wordsOnRow.length);
-//		for(int i=0;i<wordsOnRow.length;i++){
-//			wordsOnRow[i]=wordsOnRow[i].toLowerCase();
-//		}
-//		//get and remove wildcards
-//		int wildcards=rack.length();
-//		rack=rack.replaceAll("\\.", "");
-//		wildcards=wildcards-rack.length();
-//		//create source letters string
-//		String sourceLetters=rack+concatinate(wordsOnRow);
-//		//create freq array from the source
-//		final byte[] hasFreq=createFreq(sourceLetters);
-//		//create hasChars from freq and wildcards
-//		final int[] hasChars=getHasChars(hasFreq,wildcards);
-//		
-//		ArrayList<String> res=new ArrayList<String>();
-////		res.add("empty");
-//		for(int i=0;i<wordlist.length;i++){
-//			if(hasNeededChars(neededChars[i],hasChars)){
-//				res.add(wordlist[i]);
-//			}
-//		}
-//		return res;
-//	}
-//	
-//	private static boolean hasNeededChars(final int neededChars[],final int hasChars[]){
-//		if(neededChars.length>hasChars.length){ return false; }
-//		for(int i=0;i<neededChars.length;i++){
-//			if((neededChars[i] & hasChars[i]) !=neededChars[i]){
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
-//	
-//	/**
-//	 * Checks that all the "neededChars" is in "hasChars". 
-//	 * @param neededChars
-//	 * @param hasChars
-//	 * @return
-//	 */
-//	private static boolean hasNeededChars(final int neededChars,final int hasChars){
-//		return (neededChars & hasChars) == neededChars;
-//	}
-//	
-////	/**
-////	 * Checks that all the corresponding values in needFreq is less than or equal to hasFreq.
-////	 * @param needFreq
-////	 * @param hasFreq
-////	 * @return
-////	 */
-////	private static boolean hasCharFreq(final byte[] needFreq, final byte[] hasFreq){
-////		for(int i=0;i<needFreq.length;i++){
-////			if(needFreq[i]>hasFreq[i]){
-////				//if there are less letters available than needed...
-////				return false;
-////			}
-////		}
-////		return true;
-////	}
-//	
-//	/**
-//	 * Returns a list of the indexes that contain a number greater than zero.
-//	 * @param charFreq
-//	 * @return
-//	 */
-//	private static byte[] getCheckList(final byte[] charFreq){
-//		byte size=0;
-//		for(byte i=0;i<charFreq.length;i++){
-//			if(charFreq[i]>0){
-//				size++;
-//			}
-//		}
-//		final byte[] res=new byte[size];
-//		byte index=0;
-//		for(byte i=0;i<charFreq.length;i++){
-//			if(charFreq[i]>0){
-//				res[index]=i;
-//				index++;
-//			}
-//		}
-//		return res;
-//	}
-//	
-//	/**
-//	 * Checks that all the corresponding values in needFreq is less than or equal to hasFreq.
-//	 * Only checks the letters that is in the word.
-//	 * @param checkList
-//	 * @param needFreq
-//	 * @param hasFreq
-//	 * @return
-//	 */
-//	private static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildCards){
-//		int i;
-//		for(int j=0;j<checkList.length;j++){
-//			i=checkList[j];
-//			if(needFreq[i]>hasFreq[i]){
-//				//if there are less letters available than needed...
-////				System.out.println(needFreq[i]+" "+hasFreq[i]+" "+wildCards);
-//				wildCards=wildCards-(needFreq[i]-hasFreq[i]);
-////				System.out.println(needFreq[i]+" gg "+hasFreq[i]+" "+wildCards);
-//				if(wildCards<0){
-//					return false;
-//				}
-//			}
-//		}
-//		return true;
-//	}
-//	
-//	
-//	/**
-//	 * Uses an int as a bit array to store which chars are in the word.
-//	 * It's then very fast to check if one string contains all the letter types by
-//	 * using: (a&b)==a.
-//	 * If that returns true then b contains all letter types in a.
-//	 * @param s
-//	 * @return
-//	 */
-//	private static int getHasChars(String s){
-////		if(s==null){ s=""; }
-//		int res=0;
-//		for(int i=0;i<s.length();i++){
-//			res= res | (1<<(s.charAt(i)-'a'));
-//		}
-//		return res;
-//	}
-//	
-//	/**
-//	 * Counts the frequency of each letter and stores the count for each letter in a byte array, where 
-//	 * index 0 contains the count for 'a'.
-//	 * @param s
-//	 * @return
-//	 */
-//	public static byte[] createFreq(String s){
-////		System.out.println("freqOf: "+s);
-////		if(s==null){ s=""; }
-//		byte[] freq=new byte['z'-'a'+1];//size of alphabet
-//		for(int i=0;i<s.length();i++){
-//			freq[s.charAt(i)-'a']++;
-//		}
-//		return freq;
-//	}
-//	
-//	/**
-//	 * help method for concatinating all strings in a string array.
-//	 * Should be moved to a help methods class.
-//	 * @param sarr
-//	 * @return
-//	 */
-//	private String concatinate(final String[] sarr){
-//		final StringBuilder sb=new StringBuilder();
-//		for(int i=0;i<sarr.length;i++){
-//			sb.append(sarr[i]);
-//		}
-//		return sb.toString();
-//	}
+	/**
+	 * returns the index of the first changed place
+	 * if there is no change returns -1
+	 * @param changed
+	 * @return
+	 */
+	private int getFromChnaged(final int changed[]){
+		for(int i=0;i<changed.length;i++){
+			if(changed[i]>0){
+				return i;
+			}
+		}
+		return -1;
+	}
 	
+	private int getToChnaged(final int changed[]){
+		for(int i=changed.length-1;i>=0;i--){
+			if(changed[i]>0){
+				return i;
+			}
+		}
+		return -1;
+	}
 }
