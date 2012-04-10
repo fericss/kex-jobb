@@ -95,33 +95,33 @@ public class Main extends JFrame{
 		
 		
 		
-		//should only be done once per wordlist
-		SlowFilter sf=new SlowFilter(find.getWordlist());
-		
-		//is done on this players every turn
-		System.out.println("test of slowfilter");
-		time = System.currentTimeMillis();
-		sf.reset();
-		for(int rowIndex=0;rowIndex<15;rowIndex++){
-			sf.slowFilterUpdate(rowIndex, false, find, gi, null);
-		}
-		for(int rowIndex=0;rowIndex<15;rowIndex++){
-			sf.slowFilterUpdate(rowIndex, true, find, gi, null);
-		}
-		Collections.sort(sf.moves);
-		System.out.println("slowfilter time: "+(System.currentTimeMillis()-time)+" milisec");
-		
-		System.out.println("slowfilter moves: ");
-//		for(Move m:sf.moves){
-//			System.out.println(m);
+//		//should only be done once per wordlist
+//		SlowFilter sf=new SlowFilter(find.getWordlist());
+//		
+//		//is done on this players every turn
+//		System.out.println("test of slowfilter");
+//		time = System.currentTimeMillis();
+//		sf.reset();
+//		for(int rowIndex=0;rowIndex<15;rowIndex++){
+//			sf.slowFilterUpdate(rowIndex, false, find, gi, null);
 //		}
-		System.out.println(sf.moves.size());
-		
-		System.out.println("How many times at each filter: ");
-		System.out.println("p1:"+sf.p1);
-		System.out.println("p2:"+sf.p2);
-		System.out.println("p3:"+sf.p3);
-		System.out.println("p4:"+sf.p4);
+//		for(int rowIndex=0;rowIndex<15;rowIndex++){
+//			sf.slowFilterUpdate(rowIndex, true, find, gi, null);
+//		}
+//		Collections.sort(sf.moves);
+//		System.out.println("slowfilter time: "+(System.currentTimeMillis()-time)+" milisec");
+//		
+//		System.out.println("slowfilter moves: ");
+////		for(Move m:sf.moves){
+////			System.out.println(m);
+////		}
+//		System.out.println(sf.moves.size());
+//		
+//		System.out.println("How many times at each filter: ");
+//		System.out.println("p1:"+sf.p1);
+//		System.out.println("p2:"+sf.p2);
+//		System.out.println("p3:"+sf.p3);
+//		System.out.println("p4:"+sf.p4);
 	}
 	
 	public static void printBoard(char[][] board){
