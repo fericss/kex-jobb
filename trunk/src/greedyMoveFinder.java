@@ -32,10 +32,18 @@ public class greedyMoveFinder {
 			getWordThatCanBeBuiltOnRow(row);
 		}
 		Collections.sort(buildAbleWords);
-		for(Move p : buildAbleWords){
-			System.out.println(p);
+		if(Main.DEBUG){
+			for(Move p : buildAbleWords){
+				System.out.println(p);
+			}
+			System.out.println(""+buildAbleWords.size());
 		}
-		System.out.println(""+buildAbleWords.size());
+	}
+	public Move getBestMove(){
+		return buildAbleWords.size()>0 ? buildAbleWords.get(0) : null;
+	}
+	public Move getRandomMove(){
+		return buildAbleWords.get((int)(Math.random()*buildAbleWords.size()));
 	}
 	public greedyMoveFinder(String[][] _game, ArrayList<Point> _buildLocations, String _rack, Main _main, int[][] _bonus, WordFinder _find,Scrabby _scrab){
 		scrab=_scrab;
@@ -120,7 +128,7 @@ public class greedyMoveFinder {
 		int mult = 0;
 		for(int i = 0;i<(16-word.length());i++){ 
 			boolean possible = false;
-			
+
 			points = 0;
 			mult = 1;
 			if(i+word.length()!=15){
@@ -134,7 +142,7 @@ public class greedyMoveFinder {
 			for(int c = 0; c<word.length();c++){
 				int type = bonus[x][i+c];
 				int tempMult = 1;
-				
+
 				if(x == 7 && (c+i)==7 && game[i+c][x]==null){
 					possible = true;
 				}
@@ -179,6 +187,7 @@ public class greedyMoveFinder {
 					continue;
 				}
 				boolean cont = false;
+				ArrayList<String> createdWords = new ArrayList<String>();
 				for(int c = 0; c<word.length();c++){
 					if(game[i+c][x]!=null){
 						continue;
@@ -196,6 +205,7 @@ public class greedyMoveFinder {
 					}
 					if(tempWord.length()>1){
 						if(find.isWord(tempWord.toLowerCase())){
+							createdWords.add(tempWord.toLowerCase());
 							if(game[i+c][x]==null){
 								int type = bonus[x][i+c];
 								if(type==0){
@@ -236,6 +246,7 @@ public class greedyMoveFinder {
 				}
 				if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
 					Move mov = new Move(points, word, x,i, true);
+					mov.setWords(createdWords.toArray(new String[createdWords.size()]));
 					if(!buildAbleWords.contains(mov)){
 						buildAbleWords.add(mov);
 					}
@@ -243,6 +254,7 @@ public class greedyMoveFinder {
 						ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
 						for(String s:list){
 							mov = new Move(scrab, s, x,i, true);
+							mov.setWords(createdWords.toArray(new String[createdWords.size()]));
 							System.out.println("jag:"+mov);
 							if(!buildAbleWords.contains(mov)){
 								buildAbleWords.add(mov);
@@ -280,7 +292,7 @@ public class greedyMoveFinder {
 				if(x == 7 && (c+i)==7 && game[x][i+c]==null){
 					possible = true;
 				}
-				
+
 				if(x<14)
 					if(game[x+1][i+c]!=null){
 						possible=true;
@@ -323,6 +335,7 @@ public class greedyMoveFinder {
 
 
 				boolean cont = false;
+				ArrayList<String> createdWords = new ArrayList<String>();
 				for(int c = 0; c<word.length();c++){
 					if(game[x][i+c]!=null){
 						continue;
@@ -341,6 +354,7 @@ public class greedyMoveFinder {
 					}
 					if(tempWord.length()>1){
 						if(find.isWord(tempWord.toLowerCase())){
+							createdWords.add(tempWord.toLowerCase());
 							if(game[x][i+c]==null){
 								int type = bonus[i+c][x];
 								if(type==0){
@@ -380,6 +394,7 @@ public class greedyMoveFinder {
 				}
 				if(find.WordCanBeBuiltFromSourceLetters(usedLetters.toLowerCase(),rack.toLowerCase())){
 					Move mov = new Move(points, word, i,x, false);
+					mov.setWords(createdWords.toArray(new String[createdWords.size()]));
 					if(!buildAbleWords.contains(mov)){
 						buildAbleWords.add(mov);
 					}
@@ -387,6 +402,7 @@ public class greedyMoveFinder {
 						ArrayList<String> list=MartinTest.testCombinations(usedLetters, rack);
 						for(String s:list){
 							mov = new Move(scrab, s, i,x, true);
+							mov.setWords(createdWords.toArray(new String[createdWords.size()]));
 							System.out.println("jag:"+mov);
 							if(!buildAbleWords.contains(mov)){
 								buildAbleWords.add(mov);
