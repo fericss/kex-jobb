@@ -256,6 +256,7 @@ public class greedyMoveFinder {
 			}
 		}
 	}
+	
 	private void tryToMatchVertical(String word, int x) {
 		int points = 0;
 		int mult = 0;
