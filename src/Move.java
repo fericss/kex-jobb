@@ -5,6 +5,7 @@ public class Move implements Comparable<Move>{//TODO: make comparable
 	String word;
 	int points;
 	boolean vertical;
+	String[] words;
 	public Move(Scrabby scrab, String _word,int _x, int _y,boolean _vertical){
 //		wordlist=_wordlist;
 		
@@ -33,7 +34,12 @@ public class Move implements Comparable<Move>{//TODO: make comparable
 	public boolean isWildCard(final int pos){//TEST
 		return false;
 	}
-	
+	public void setWords(String[] s){
+		words = s;
+	}
+	public String[] getWords(){
+		return words;
+	}
 	public String toString(){
 		return "{"+this.points+","+word+","+this.x+","+this.y+","+this.vertical+"}";
 	}

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
+
 public class WordFinder {
 	private String[] wordList;
 	private String[][] m_words;
@@ -36,8 +37,13 @@ public class WordFinder {
 	 * @param tile
 	 * @return
 	 */
+//<<<<<<< .mine
 	public static int valueOf(final char tile){//TEST
-		return tile=='.' || tile==' ' ? 0 : fastPoints[tile-'a'];
+		return tile=='.' ? 0 : fastPoints[tile-'a'];
+//=======
+//	public static int valueOf(final char tile){//TEST
+//		return tile=='.' || tile==' ' ? 0 : fastPoints[tile-'a'];
+//>>>>>>> .r137
 	}
 
 //	/**
@@ -175,7 +181,7 @@ public class WordFinder {
 		}
 		return builtWord.equals(targetWord);
 	}
-	private static String Remove(int pos, String sourceLetters) {
+	public static String Remove(int pos, String sourceLetters) {
 		char[] wat = sourceLetters.toCharArray();
 		for(int i = pos+1;i<wat.length;i++){
 			wat[i-1] = wat[i];
@@ -193,6 +199,7 @@ public class WordFinder {
 		  System.out.println(wordList.getFastFilter().filter("xfsoukd", s));
 		//WordFinder wordList = new WordFinder();
 		//System.out.println(wordList.Matches("fhosedextrnaa"));
+
 
 	}
 	public boolean isWord(String s) {
