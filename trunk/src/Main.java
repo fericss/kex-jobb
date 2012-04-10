@@ -51,7 +51,7 @@ public class Main extends JFrame{
 		game = new String[15][15];
 		cookie = getCookie();
 		List<String> gamesIDList = getGames();
-		String _gameInfo = getGame(gamesIDList.get(2));
+		String _gameInfo = getGame(gamesIDList.get(0));
 		int[][] bonus = getGameBoard(_gameInfo);
 		parseTiles(_gameInfo);
 		
@@ -65,11 +65,14 @@ public class Main extends JFrame{
 		System.out.println("Rack: "+rack);
 		printBoard(gameToBoard(game));
 //		rack = "whehe.";
+		rack=".......";
 		GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
 		
 		long time = System.currentTimeMillis();
 		greedyMoveFinder gmf=new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
-		System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
+		System.out.println("Greedy time: "+(System.currentTimeMillis()-time)+" milisec");
+		
+
 		
 //		//Test of the new points method
 //		for(Move m:gmf.buildAbleWords){
@@ -81,9 +84,47 @@ public class Main extends JFrame{
 //				System.out.println("******************************Error above***********************************");
 //			}
 //		}
-
+		
+//		//print the board after the move
+//		for(Move m:gmf.buildAbleWords){
+//			System.out.println(rack);
+//			System.out.println(m);
+//			gi.newGameInfo("", m);
+//		}
+		
+		
+		
+		
+		//should only be done once per wordlist
+		SlowFilter sf=new SlowFilter(find.getWordlist());
+		
+		//is done on this players every turn
+		System.out.println("test of slowfilter");
+		time = System.currentTimeMillis();
+		sf.reset();
+		for(int rowIndex=0;rowIndex<15;rowIndex++){
+			sf.slowFilterUpdate(rowIndex, false, find, gi, null);
+		}
+		for(int rowIndex=0;rowIndex<15;rowIndex++){
+			sf.slowFilterUpdate(rowIndex, true, find, gi, null);
+		}
+		Collections.sort(sf.moves);
+		System.out.println("slowfilter time: "+(System.currentTimeMillis()-time)+" milisec");
+		
+		System.out.println("slowfilter moves: ");
+//		for(Move m:sf.moves){
+//			System.out.println(m);
+//		}
+		System.out.println(sf.moves.size());
+		
+		System.out.println("How many times at each filter: ");
+		System.out.println("p1:"+sf.p1);
+		System.out.println("p2:"+sf.p2);
+		System.out.println("p3:"+sf.p3);
+		System.out.println("p4:"+sf.p4);
 	}
-	public void printBoard(char[][] board){
+	
+	public static void printBoard(char[][] board){
 		int x=0;
 		System.out.println(" 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14");
 		for(char[] b:board){

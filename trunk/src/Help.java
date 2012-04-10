@@ -1,4 +1,7 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Random;
 
 
 /**
@@ -100,6 +103,8 @@ public class Help {
 		return possible;
 	}
 	
+	 
+	
 	/**
 	 * untested!
 	 * @param fastCrossers
@@ -143,7 +148,7 @@ public class Help {
 	 * @param possible
 	 * @return
 	 */
-	public static boolean correctCrossing(String word, int index,boolean[][] possible){
+	public static boolean correctCrossing(final String word, int index,final boolean[][] possible){
 		for(int i=0;i<word.length();i++,index++){
 			if(possible[index]!=null && 
 					!possible[index][word.charAt(i)-'a']){
@@ -232,11 +237,12 @@ public class Help {
 	 * @return
 	 */
 	public static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildCards){
-		int i;
-		for(int j=0;j<checkList.length;j++){
-			i=checkList[j];
-			if(needFreq[i]>hasFreq[i]){
-				wildCards=wildCards-(needFreq[i]-hasFreq[i]);
+		int letterIndex;
+		for(int i=0;i<checkList.length;i++){
+			letterIndex=checkList[i];
+			if(needFreq[letterIndex]>hasFreq[letterIndex]){
+				int need=needFreq[letterIndex]-hasFreq[letterIndex];
+				wildCards=wildCards-need;
 				if(wildCards<0){
 					return false;
 				}
@@ -353,5 +359,31 @@ public class Help {
 		}
 		return false;
 	}
-
+	
+	public static boolean isFitting(final String fit,final String word){
+		for(int i=0;i<word.length();i++){
+			if(fit.charAt(i)!='.' && fit.charAt(i)!=word.charAt(i)){
+//				System.out.println(fit+" -not fit- "+word);
+				
+				return false;
+			}
+		}
+//		if(fit.replaceAll("\\.", "").length()>0){
+//			System.out.println(fit+" -  fit  - "+word);
+//		}
+		
+		return true;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
