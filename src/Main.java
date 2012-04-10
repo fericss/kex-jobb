@@ -147,6 +147,54 @@ public class Main extends JFrame{
 			Thread.sleep(500);
 		}
 	}
+	
+	public void testSlowFilterAndStuff(GameInfo gi,SlowFilter sf){
+//		//Test of the new points method
+//		for(Move m:gmf.buildAbleWords){
+//			int points=gi.testPoints(m);
+//			if(points!=m.points){
+//				System.out.println("aaaaaiiiiiii!!!!!");
+//				System.out.println("Move: "+m);
+//				System.out.println("points method: "+points);
+//				System.out.println("******************************Error above***********************************");
+//			}
+//		}
+		
+//		//print the board after the move
+//		for(Move m:gmf.buildAbleWords){
+//			System.out.println(rack);
+//			System.out.println(m);
+//			gi.newGameInfo("", m);
+//		}
+		
+		
+		
+		//is done on this players every turn
+		System.out.println("test of slowfilter");
+		long time = System.currentTimeMillis();
+		sf.reset();
+		for(int rowIndex=0;rowIndex<15;rowIndex++){
+			sf.slowFilterUpdate(rowIndex, false, find, gi, null);
+		}
+		for(int rowIndex=0;rowIndex<15;rowIndex++){
+			sf.slowFilterUpdate(rowIndex, true, find, gi, null);
+		}
+		Collections.sort(sf.moves);
+		System.out.println("slowfilter time: "+(System.currentTimeMillis()-time)+" milisec");
+		
+		System.out.println("slowfilter moves: ");
+//		for(Move m:sf.moves){
+//			System.out.println(m);
+//		}
+		System.out.println(sf.moves.size());
+		
+		System.out.println("How many times at each filter: ");
+		System.out.println("p1:"+sf.p1);
+		System.out.println("p2:"+sf.p2);
+		System.out.println("p3:"+sf.p3);
+		System.out.println("p4:"+sf.p4);
+	}
+	
 	private void write_data() throws Exception {
 		FileWriter fstream = new FileWriter("data_"+username);
 		BufferedWriter out = new BufferedWriter(fstream);
