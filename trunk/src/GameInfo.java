@@ -546,6 +546,7 @@ public class GameInfo {
 				added=false;
 			}
 		}
+		//if there is a letter at the last position then the last crosser may not have been added
 		if(row.charAt(row.length()-1)!=' '){
 			//construct array it's not already there
 			if(beforeWord>=0 && res[beforeWord]==null){
@@ -935,9 +936,7 @@ public class GameInfo {
 			wordFactor*=wordBonus;
 //			System.out.println(letter+": "+letterPoints+" * "+letterBonus+" = "+(letterPoints*letterBonus)+" ... * "+wordBonus);//DEBUG
 		}
-		//the rules may be that you must use 7 letters to get the bonus, not that you have to use all in the rack
-		//TODO: check the real rules
-		int usedAllLettersBonus=usedLetters==rackSize?40:0;
+		int usedAllLettersBonus=usedLetters==7?40:0;
 		//returns the total points
 //		System.out.println("wordPoints="+wordPoints+ ", wordFactor="+wordFactor+", crossPoints="+crossPoints+", allBonus="+usedAllLettersBonus);//DEBUG
 //		System.out.println("result=(wordPoints*wordFactor+crossPoints+allBonus)="+(crossPoints+wordPoints*wordFactor+usedAllLettersBonus));//DEBUG

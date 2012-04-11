@@ -1118,5 +1118,147 @@ public class Main extends JFrame{
 	public String getRack() {
 		return rack;
 	}
+	
+	public class GamesData{
+		HashMap<String, GameData> games=new HashMap<String, GameData>();
+		public void addData(HashMap<String, GameData> map,String gameId,Data d){
+			GameData gd=map.get(gameId);
+			if(gd==null){
+				gd=new GameData();
+				map.put(gameId,gd);
+			}
+			gd.list.add(d);
+		}
+		
+		public List<GameData> getGames(){
+			return new ArrayList<GameData>(games.values());
+		}
+		
+		/**
+		 * res[turn][type]
+		 * type=0 is time
+		 * type=1 is moves
+		 * type=2 is points
+		 * @param games
+		 * @return
+		 */
+		public double[][] getAvarages(List<GameData> games){
+			int maxLength=0;
+			for(int i=0;i<games.size();i++){
+				if(games.get(i).list.size()>maxLength){
+					maxLength=games.get(i).list.size();
+				}
+			}
+
+			double[][] res=new double[maxLength][3];
+
+			for(int turn=0;turn<maxLength;turn++){
+				int nr=0;
+				int total=0;
+				for(int i=0;i<games.size();i++){
+					if(turn<games.get(i).list.size()){
+						nr++;
+						//calculate total
+						res[turn][0]=games.get(i).list.get(turn).time;
+						res[turn][1]=games.get(i).list.get(turn).moves;
+						res[turn][2]=games.get(i).list.get(turn).points;
+					}
+				}
+				//calculate average
+				res[turn][0]/=(double)nr;
+				res[turn][1]/=(double)nr;
+				res[turn][2]/=(double)nr;
+			}
+			return res;
+		}
+	}
+	
+	public class GameData{
+		ArrayList<Data> list=new ArrayList<Data>();
+	}
+	
+	public class Data{
+		final int moveNr;
+		final long time;
+		final int moves;
+		final int points;
+		public Data(int _moveNr,long _time,int _moves,int _points){
+			moveNr=_moveNr;
+			time=_time;
+			moves=_moves;
+			points=_points;
+		}
+	}
+	
+	public void test(int gameId) throws Exception{
+		user = "fredric.ericsson@gmail.com";
+		username = "Lather";
+		password = "icpmwq";
+		load_data();
+		cookie = getCookie();
+		WordFinder wf=new WordFinder();
+		GameInfo gi=getLetestGameInfo(gameId, wf);
+		SlowFilter sf=new SlowFilter(wf.getWordlist());
+		testSlowFilterAndStuff(gi,sf,wf);
+	}
+	
+	public GameInfo getLetestGameInfo(int gameId,WordFinder find) throws Exception{
+		List<String> gamesIDList = getGames();
+		String g=gamesIDList.get(gameId);
+		wildcards = new boolean[15][15];
+		game = new String[15][15];
+		String _gameInfo = getGame(g);
+		parseTiles(_gameInfo);
+		int[][] bonus = getGameBoard(_gameInfo);
+		GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
+		return gi;
+	}
+	
+	public void testSlowFilterAndStuff(GameInfo gi,SlowFilter sf,WordFinder find){
+//		//Test of the new points method
+//		for(Move m:gmf.buildAbleWords){
+//			int points=gi.testPoints(m);
+//			if(points!=m.points){
+//				System.out.println("aaaaaiiiiiii!!!!!");
+//				System.out.println("Move: "+m);
+//				System.out.println("points method: "+points);
+//				System.out.println("******************************Error above***********************************");
+//			}
+//		}
+		
+//		//print the board after the move
+//		for(Move m:gmf.buildAbleWords){
+//			System.out.println(rack);
+//			System.out.println(m);
+//			gi.newGameInfo("", m);
+//		}
+		
+		
+		
+		//is done on this players every turn
+		System.out.println("test of slowfilter");
+		long time = System.currentTimeMillis();
+		sf.reset();
+		for(int rowIndex=0;rowIndex<15;rowIndex++){
+			sf.slowFilterUpdate(rowIndex, false, find, gi, null);
+		}
+		for(int rowIndex=0;rowIndex<15;rowIndex++){
+			sf.slowFilterUpdate(rowIndex, true, find, gi, null);
+		}
+		Collections.sort(sf.moves);
+		System.out.println("slowfilter time: "+(System.currentTimeMillis()-time)+" milisec");
+		
+		System.out.println("slowfilter moves: ");
+//		for(Move m:sf.moves){
+//			System.out.println(m);
+//		}
+		System.out.println(sf.moves.size());
+		
+		System.out.println("How many times at each filter: ");
+		System.out.println("p1:"+sf.p1);
+		System.out.println("p2:"+sf.p2);
+		System.out.println("p3:"+sf.p3);
+		System.out.println("p4:"+sf.p4);
+	}
 
 }

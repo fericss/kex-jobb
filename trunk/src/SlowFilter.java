@@ -303,6 +303,7 @@ public class SlowFilter {
 			}
 		} else {
 			//clean all places that might may have changed
+			//BUG: have to clean those that have become impossible because not all letters are available
 			for(int length=2,index=0;length<=15;length++,index++){
 				for(int position=0;position<res.get(index).length;position++){
 					if(mayHaveChanged[index][position]){
