@@ -1121,11 +1121,12 @@ public class Main extends JFrame{
 	
 	public class GamesData{
 		HashMap<String, GameData> games=new HashMap<String, GameData>();
-		public void addData(HashMap<String, GameData> map,String gameId,Data d){
-			GameData gd=map.get(gameId);
+		
+		public void addData(String gameId,Data d){
+			GameData gd=games.get(gameId);
 			if(gd==null){
 				gd=new GameData();
-				map.put(gameId,gd);
+				games.put(gameId,gd);
 			}
 			gd.list.add(d);
 		}
