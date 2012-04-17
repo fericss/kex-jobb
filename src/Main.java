@@ -49,7 +49,7 @@ public class Main extends JFrame{
 	public static boolean DEBUG = false;
 	private boolean DUMB = true;
 	
-	
+	 
 	
 	private String rack;
 	private boolean end_game;
@@ -59,6 +59,8 @@ public class Main extends JFrame{
 	private HashMap<String,String> smart_score;
 	private HashMap<String,String> dumb_score;
 	//    String line = null;
+	private boolean once = true;
+	greedyMoveFinder best;
 
 	String[][] game;
 	WordFinder find;
@@ -122,7 +124,9 @@ public class Main extends JFrame{
 					GameInfo gi=new GameInfo(game,bonus ,wildcards,rack);
 
 					long time = System.currentTimeMillis();
-					greedyMoveFinder best = new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
+					best = new greedyMoveFinder(game,buildLocations,rack,this, bonus, find); 
+					System.out.println(g+" "+(System.currentTimeMillis()-time)+" "+best.buildAbleWords.size());
+					
 					if(DEBUG){
 						System.out.println("Time: "+(System.currentTimeMillis()-time)+" milisec");
 					}
@@ -132,14 +136,22 @@ public class Main extends JFrame{
 					else{
 						if(DUMB){
 							this.playMove(best.getRandomMove(), Integer.parseInt(g));
+//							this.playMove(best.getBestMove(), Integer.parseInt(g));
+
 						}
 						else{
 							this.playMove(best.getBestMove(), Integer.parseInt(g));
+							if(best.getBestMove().word.length()>9){
+								System.exit(0);
+							}
 						}
 					}
 				}
 				if(!DUMB && !active_game){
-					new_game("lather2");
+//					if(once){
+//						once = false;
+						new_game("lather2");
+//					}
 				}
 
 			}
@@ -744,16 +756,27 @@ public class Main extends JFrame{
 		if(DEBUG){
 			System.out.println(connection);
 		}
+		
 		connection.connect();
 
 
 		rd  = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String line;//rd.readLine();
-		if(DEBUG){
-			while ((line = rd.readLine()) != null)
+//		if(DEBUG){
+			while ((line = rd.readLine()) != null){
+				if(DEBUG){
+					System.out.println(line);
+					
+				}
+				if(line.contains("illegal_word")){
+					best.buildAbleWords.remove(0);  
+					System.out.println("Illegal word: "+str);
+					this.playMove(best.getBestMove(), id);
+				}
+			}
 				//		        {
-				System.out.println(line);
-		}
+//				System.out.println(line);
+//		}
 
 		//		        for(String bla : connection.getHeaderFields().keySet()){
 		//		            for(String s : bla){

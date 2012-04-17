@@ -47979,7 +47979,6 @@ emeu
 emeus
 emeute
 emeutes
-emf
 emfs
 emic
 emigrant
@@ -65686,7 +65685,6 @@ haffet
 haffets
 haffit
 haffits
-hafis
 hafiz
 hafnium
 hafniums
