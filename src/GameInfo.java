@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -16,6 +17,13 @@ public class GameInfo {
 	
 	
 	//TEST
+	//contains total counts of each tile type
+	final static int[] bag={10,2,2,5,12,2,3,3,9,1,1,4,2,6,7,2,1,6,5,7,4,2,2,1,2,1,2};
+	final static char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','.'};
+	int[] leftInBag=null;
+	
+	Move move=null;
+	
 	private char board[][]=null;
 	GameInfo oldGameInfo=null;
 	int[][] changedPositionsHorizontal=null;
@@ -43,6 +51,92 @@ public class GameInfo {
 //		}
 //		System.out.println("contructed gameinfo.");
 	}
+	
+	/**
+	 * the two input strings have to be lowercase or .
+	 * @param knownInOldRack
+	 * @param knownInThisRack
+	 * @return
+	 */
+	public int[] getLefInBagCopy(String knownInOldRack,String knownInThisRack){
+		if(leftInBag==null){
+			leftInBag=Arrays.copyOf(bag, bag.length);
+			//remove from count in bag all letters that are left in the old rack
+			for(int i=0;i<knownInOldRack.length();i++){
+				leftInBag[letterToIndex(knownInOldRack.charAt(i))]--;
+			}
+			//remove from count in bag those letters that already are in this rack
+			for(int i=0;i<knownInThisRack.length();i++){
+				leftInBag[letterToIndex(knownInThisRack.charAt(i))]--;
+			}
+			//remove from count in bag
+			char[][] board=getBoard();
+			for(int i=0;i<length;i++){
+				for(int j=0;j<length;j++){
+					if(board[i][j]!=' '){
+						if(wildCards[i][j]){
+							leftInBag[letterToIndex('.')]--;
+						} else {
+							leftInBag[letterToIndex(board[i][j])]--;
+						}
+					}
+				}
+			}
+		}
+		return Arrays.copyOf(leftInBag, leftInBag.length);
+	}
+	
+	
+	public void getRandomRack(String alredyInRack,String inOldRack,Random rand){
+		//get a copy of tiles left in bag
+		int[] tiles=getLefInBagCopy(inOldRack,alredyInRack);
+		StringBuilder sb=new StringBuilder(7);
+		sb.append(alredyInRack);
+		int nrTiles=0;
+		for(int i=0;i<tiles.length;i++){
+			nrTiles+=tiles[i];
+		}
+		while(sb.length()<7){
+			int index=getRandomTile(tiles,nrTiles,rand);
+			sb.append(indexToLetter(index));
+			tiles[index]--;
+			nrTiles--;
+		}
+	}
+	
+	/**
+	 * only returns index of random tile
+	 * doesen't take the tile
+	 * blank tile should be at the last index
+	 * throws index out of bounds exception if nrTiles is to high
+	 * @param source
+	 * @param nrTiles The total number of tiles in bag
+	 * @param rand
+	 * @return
+	 */
+	public int getRandomTile(final int[] source,final int nrTiles,final Random rand){
+		if(nrTiles<=0){ return -1; }
+		int tmp=1+rand.nextInt(nrTiles);
+		int index=0;
+		while(true){
+			tmp-=source[index];
+			if(tmp<=0){
+				return index;
+			}
+			index++;
+		}
+	}
+	
+	public int letterToIndex(final char letter){
+		return letter=='.'?bag.length-1:letter-'a';
+	}
+	
+	public char indexToLetter(final int index){
+		return alphabet[index];
+	}
+	
+	
+	
 	
 	public void printBoard(){
 		printBoard(this.getBoard());
@@ -349,6 +443,7 @@ public class GameInfo {
 		gi.oldGameInfo=this;
 		if(m!=null){
 			boolean vertical=!m.vertical;
+			gi.move=m;
 			String word=m.word;
 			int x=m.y;//Hax, swaps x and y
 			int y=m.x;

@@ -252,6 +252,29 @@ public class Help {
 	}
 	
 	/**
+	 * uses a compact needFreq that is the same length as checkList.
+	 * This may make FastFilter or SlowFilter faster.
+	 * @param checkList
+	 * @param needFreq
+	 * @param hasFreq
+	 * @param blanks the same as wildcards
+	 * @return
+	 */
+	public static boolean hasCharFreqCompact(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int blanks){
+		for(int i=0;i<needFreq.length;i++){
+			if(needFreq[i]>hasFreq[checkList[i]]){
+				//if don't have enough letters of that type try blanks
+				//wildCards=wildCards-need
+				blanks=blanks-(needFreq[i]-hasFreq[checkList[i]]);
+				//if there isn't enough blanks return false
+				if(blanks<0){return false;}
+			}
+		}
+		//there were enough letters so return true
+		return true;
+	}
+	
+	/**
 	 * untested can be used in advanced bot
 	 * @param checkList
 	 * @param needFreq
@@ -360,9 +383,9 @@ public class Help {
 		return false;
 	}
 	
-	public static boolean isFitting(final String fit,final String word){
+	public static boolean isFitting(final String fit,final String word, final char blank){
 		for(int i=0;i<word.length();i++){
-			if(fit.charAt(i)!='.' && fit.charAt(i)!=word.charAt(i)){
+			if(fit.charAt(i)!=blank && fit.charAt(i)!=word.charAt(i)){
 //				System.out.println(fit+" -not fit- "+word);
 				
 				return false;
