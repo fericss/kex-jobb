@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Random;
 
 
 
@@ -114,4 +116,8 @@ public class MartinTest {
 			neededLetters.setCharAt(i, ch);
 		}
 	}
+	
+	
+	
+	
 }
