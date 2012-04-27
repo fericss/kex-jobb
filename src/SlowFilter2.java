@@ -558,6 +558,7 @@ public class SlowFilter2 {
 					//it must be empty before and after the word, or else it's not the given length
 					if( (i==0 || row[i-1]==' ') && ((i+length)==row.length || row[i+length]==' ')){
 						if(spaces==length){
+							//must be crossing words if there are no encountered letters
 							if(crossers>0){
 								maybePossible=true;
 							}
