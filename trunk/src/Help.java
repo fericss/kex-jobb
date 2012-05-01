@@ -428,9 +428,9 @@ public class Help {
 		return false;
 	}
 	
-	public static boolean isFitting(final String fit,final String word, final char blank){
+	public static boolean isFitting(final String fit,final String word, final char emptyChar){
 		for(int i=0;i<word.length();i++){
-			if(fit.charAt(i)!=blank && fit.charAt(i)!=word.charAt(i)){
+			if(fit.charAt(i)!=emptyChar && fit.charAt(i)!=word.charAt(i)){
 //				System.out.println(fit+" -not fit- "+word);
 				
 				return false;
@@ -444,16 +444,20 @@ public class Help {
 	}
 	
 	/**
-	 * 
+	 * Checks if the word fits in the position. Returns false if it finds
+	 * one letter in the word that isn't equal to the letter on the row
+	 * (if there is a letter at that position). Returns true if all the letters in
+	 * the word fits on the row. 
+	 * Does not check if crossing words are correct.
 	 * @param word
 	 * @param row
 	 * @param position
-	 * @param blank
+	 * @param emptyChar
 	 * @return
 	 */
-	public static boolean isFitting(final String word, final char[] row,int position, final char blank){
+	public static boolean isFitting(final String word, final char[] row,int position, final char emptyChar){
 		for(int i=0;i<word.length();i++,position++){
-			if(row[position]!=blank && row[position]!=word.charAt(i)){
+			if(row[position]!=emptyChar && row[position]!=word.charAt(i)){
 				return false;
 			}
 		}

@@ -221,17 +221,18 @@ public class SlowFilter2 {
 	}
 	
 	/**
-	 * if using Mionte Carlo then it's unimportant what the old rack was. 
-	 * The only thing that is important is to make a fast greedy algorithm
+	 * if using Monte Carlo then it's unimportant what the old rack was. 
+	 * The only thing that is important is to make a fast greedy algorithm.
 	 * 
-	 * Adds the resulting moves to res2
+	 * Adds/appends the resulting moves to res2.
 	 * @param rowIndex
 	 * @param vertical
 	 * @param wf
 	 * @param gi
-	 * @return
+	 * @return returns the reference to the movesList
 	 */
-	public void slowFilterOptimized2(final int rowIndex, final WordFinder wf,final GameInfo2 gi, ArrayList<Move> res){
+	public ArrayList<Move> slowFilterOptimized2(final int rowIndex, 
+			final WordFinder wf,final GameInfo2 gi, ArrayList<Move> movesList){
 		//pre-calculate stuff...
 		final String[][] fastCrossers=gi.getFastCrossers(rowIndex);
 		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
@@ -243,15 +244,14 @@ public class SlowFilter2 {
 		final char[] row2=String.valueOf(gi.getRow(rowIndex)).toLowerCase().toCharArray();
 		
 		//get rack
-		String rack=gi.getRack().toLowerCase();
-		final int racklength=rack.length();
+		final String rack1=gi.getRack().toLowerCase();
+		final int racklength=rack1.length();
+		final String rack=rack1.replaceAll("\\.", "");
 		
 		//count wildcards
-		int blanks=rack.length();
-		rack=rack.replaceAll("\\.", "");
-		blanks=blanks-rack.length();
-		
-		//
+		final int blanks=rack1.length()-rack.length();
+
+		//the number of lengths
 		final int size=15-1;
 		
 		//data about row and position
@@ -284,7 +284,7 @@ public class SlowFilter2 {
 			}
 		}
 
-		//check if there are no possible words on row, and in that case return
+		//check if there are no possible words on row, and in that case return/abort
 		boolean finished=true;
 		for(int i=0;i<checkList2.length;i++){
 			if(checkList2[i].length>0){
@@ -292,9 +292,7 @@ public class SlowFilter2 {
 				break;
 			}
 		}
-		if(finished){
-			return;
-		}
+		if(finished){return movesList;}//return without adding anything
 		
 		//data about what letters and letter types are available for a position and length
 		final byte[][][] hasBytess=new byte[size][][];
@@ -352,7 +350,8 @@ public class SlowFilter2 {
 					//get position
 					final int position=checkList2[lengthIndex][j];
 					//the filter
-					if(blanks>0 || Help.hasNeededChars(neededChars[i], letterTypess[lengthIndex][position])){
+					if(blanks>0 || 
+							Help.hasNeededChars(neededChars[i], letterTypess[lengthIndex][position])){
 						p2++;//Count the number of times this point is reached
 						//TODO: use hasFreqDual instead of hasCharFreq2
 //						if(Help.hasCharFreq2(checkList[i], charFreq[i], hasBytess[lengthIndex][position], blanks)){
@@ -377,8 +376,9 @@ public class SlowFilter2 {
 
 		}
 //		if(res!=null){
-			addResToMovesList(rowIndex,gi.isTransposed,res1,gi);
+			addResToMovesList(rowIndex,gi.isTransposed,res1,gi,movesList);
 //		}
+		return movesList;
 	}
 	
 	/**
@@ -387,10 +387,10 @@ public class SlowFilter2 {
 	 * @param vertical
 	 * @param res
 	 * @param gi
-	 * @param res2
+	 * @param movesList
 	 */
 	public static void addResToMovesList(final int rowIndex,final boolean vertical,
-			final ArrayList<ArrayList<String>[]> res,final GameInfo2 gi,ArrayList<Move> res2){
+			final ArrayList<ArrayList<String>[]> res,final GameInfo2 gi,ArrayList<Move> movesList){
 		for(int index=0;index<res.size();index++){
 			final ArrayList<String>[] list=res.get(index);
 			for(int position=0;position<list.length;position++){
@@ -407,7 +407,7 @@ public class SlowFilter2 {
 						y=rowIndex;
 					}
 					final Move m=new Move(gi.points(word, x, y, vertical, new boolean[word.length()]), word, x, y, vertical);
-					res2.add(m);
+					movesList.add(m);
 				}
 			}
 		}
@@ -420,7 +420,8 @@ public class SlowFilter2 {
 	 * @param res
 	 * @param gi
 	 */
-	public void addResToMovesList(final int rowIndex,final boolean vertical,final ArrayList<ArrayList<String>[]> res,final GameInfo2 gi){
+	public void addResToMovesList(final int rowIndex,final boolean vertical,
+			final ArrayList<ArrayList<String>[]> res,final GameInfo2 gi){
 		addResToMovesList(rowIndex,vertical,res,gi,moves);
 //		for(int index=0;index<res.size();index++){
 //			final ArrayList<String>[] list=res.get(index);
