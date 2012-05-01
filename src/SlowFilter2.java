@@ -21,6 +21,8 @@ public class SlowFilter2 {
 	final byte[][] checkList;//only need to check chars in the word
 	final int[] wordLengths;
 	
+	final byte[][] charFreqDual;//TEST
+	
 	//these are set when called reset
 	public int p0;
 	public int p1;
@@ -37,6 +39,8 @@ public class SlowFilter2 {
 		checkList=new byte[wordlist.length][];
 		wordLengths=new int[wordlist.length];
 		
+		charFreqDual=new byte[wordlist.length][];//TEST
+		
 		//calculate properties for each word
 		for(int i=0;i<wordlist.length;i++){
 			if(wordlist[i].matches("[a-z]+")){
@@ -44,12 +48,15 @@ public class SlowFilter2 {
 				charFreq[i]=Help.createFreq(wordlist[i]);
 				checkList[i]=Help.getCheckList(charFreq[i]);
 				wordLengths[i]=wordlist[i].length();
+				
+				charFreqDual[i]=Help.createFreqDual(wordlist[i]);//TEST
 			} else {
 				System.out.println("StrangeWord: "+wordlist[i]);
 				neededChars[i]=0;
 				charFreq[i]=null;
 				checkList[i]=null;
 				wordLengths[i]=0;
+				charFreqDual[i]=null;//TEST
 				System.out.println(neededChars[i]);
 			}
 				
@@ -230,41 +237,47 @@ public class SlowFilter2 {
 		final boolean[][] possible=Help.possibleLetters(fastCrossers, wf);
 		final boolean[] impossible=Help.impossible(possible);
 		
-		final String row=String.valueOf(gi.getRow(rowIndex)).toLowerCase();
-		final char[] row2=row.toCharArray();
+//		final String row=String.valueOf(gi.getRow(rowIndex)).toLowerCase();
+//		final char[] row2=row.toCharArray();
+		
+		final char[] row2=String.valueOf(gi.getRow(rowIndex)).toLowerCase().toCharArray();
 		
 		//get rack
 		String rack=gi.getRack().toLowerCase();
 		final int racklength=rack.length();
 		
 		//count wildcards
-		int wildcards=rack.length();
+		int blanks=rack.length();
 		rack=rack.replaceAll("\\.", "");
-		wildcards=wildcards-rack.length();
+		blanks=blanks-rack.length();
 		
 		//
 		final int size=15-1;
 		
 		//data about row and position
-		final String[][] combinations=new String[size][];
+//		final String[][] combinations=new String[size][];
+		final int[][] combinations=new int[size][];
 //		final char[][][] combinations=new char[size][][];
 		final int[][] checkList2=new int[size][];
 
 		//calculate values for combinations and checklist2
 		for(int length=2,index=0;length<=15;length++,index++){
-			//TODO: use getCharCombinationsFaster
+			//TODO: use getCharCombinationsFaster2
 //			combinations[index]=getCharCombinationsUpdate(racklength,row,length,fastCrossers,impossible,null);
-			combinations[index]=getCharCombinationsFaster(racklength, row2, length,fastCrossers, impossible);
+//			combinations[index]=getCharCombinationsFaster(racklength, row2, length,fastCrossers, impossible);
+			combinations[index]=getCharCombinationsFaster2(racklength, row2, length,fastCrossers, impossible);
 			int checkSize=0;
 			for(int position=0;position<combinations[index].length;position++){
-				if(combinations[index][position]!=null){
+//				if(combinations[index][position]!=null){
+				if(combinations[index][position]>0){
 					checkSize++;
 				}
 			}
 			checkList2[index]=new int[checkSize];
 			int cindex=0;
 			for(int position=0;position<combinations[index].length;position++){
-				if(combinations[index][position]!=null){
+//				if(combinations[index][position]!=null){
+				if(combinations[index][position]>0){
 					checkList2[index][cindex]=position;
 					cindex++;
 				}
@@ -297,7 +310,8 @@ public class SlowFilter2 {
 			
 			for(int j=0;j<checkList2[lengthIndex].length;j++){
 				int position=checkList[lengthIndex][j];
-				final String boardLetters=combinations[lengthIndex][position].replaceAll(" ","");
+//				final String boardLetters=combinations[lengthIndex][position].replaceAll(" ","");
+				final String boardLetters=Help.getLetters(row2,position,length);
 				final String sourceLetters=rack+boardLetters;
 				
 				hasBytess[lengthIndex][position]=Help.createFreq(sourceLetters);
@@ -338,12 +352,19 @@ public class SlowFilter2 {
 					//get position
 					final int position=checkList2[lengthIndex][j];
 					//the filter
-					if(wildcards>0 || Help.hasNeededChars(neededChars[i], letterTypess[lengthIndex][position])){
+					if(blanks>0 || Help.hasNeededChars(neededChars[i], letterTypess[lengthIndex][position])){
 						p2++;//Count the number of times this point is reached
-						if(Help.hasCharFreq2(checkList[i], charFreq[i], hasBytess[lengthIndex][position], wildcards)){
-							if(Help.correctCrossing(wordlist[i], position, possible)){
+						//TODO: use hasFreqDual instead of hasCharFreq2
+//						if(Help.hasCharFreq2(checkList[i], charFreq[i], hasBytess[lengthIndex][position], blanks)){
+						if(Help.hasFreqDual(charFreqDual[i], hasBytess[lengthIndex][position], blanks)){ //TEST
+							//TODO: skip if position and length has no crossers (combination==2)
+							if(combinations[lengthIndex][position]==2 || 
+									Help.correctCrossing(wordlist[i], position, possible)){
 								p3++;//Count the number of times this point is reached
-								if(Help.isFitting(combinations[lengthIndex][position],wordlist[i],' ')){
+								//TODO: skip if position and length has no letters (combination==1)
+//								if(Help.isFitting(combinations[lengthIndex][position],wordlist[i],' ')){
+								if(combinations[lengthIndex][position]==1 || 
+										Help.isFitting(wordlist[i], row2, position, ' ')){
 									p4++;//Count the number of times this point is reached
 									//add if passed all filters
 									res1.get(lengthIndex)[position].add(wordlist[i]);
@@ -574,6 +595,98 @@ public class SlowFilter2 {
 			
 			if(maybePossible){
 				sarr[i]=String.valueOf(row, i, length);
+			}
+
+			//uncount old
+			if(row[i]==' '){
+				spaces--;
+			}
+			if(impossible[i]){
+				impossibles--;
+			}
+			if(fastCrossers[i]!=null){
+				crossers--;
+				System.out.println(i);
+			}
+
+		}
+		return sarr;
+	}
+	
+	/**
+	 * untested, should be faster.
+	 * 
+	 * 0=impossible to place word at position.
+	 * 1=possible, and can skip fit test.
+	 * 2=possible, and can skip crosstest.
+	 * 3=possible, can't skip.
+	 * 
+	 * @param rackLength
+	 * @param row
+	 * @param length
+	 * @param fastCrossers
+	 * @param impossible
+	 * @return
+	 */
+	public static int[] getCharCombinationsFaster2(final int rackLength, final char[] row, final int length,
+			final String[][] fastCrossers, final boolean[] impossible){
+//		String[] sarr=new char[row.length-length+1][];
+		int[] sarr=new int[row.length-length+1];
+		
+		//Initialize values
+		int spaces=0;
+		int impossibles=0;
+		int crossers=0;
+		//count all the number of spaces and impossibles, except the next
+		for(int i=0;i<length-1;i++){
+			if(row[i]==' '){
+				spaces++;
+			}
+			if(impossible[i]){
+				impossibles++;
+			}
+			if(fastCrossers[i]!=null){
+				crossers++;
+				System.out.println(i);
+			}
+		}
+
+
+
+		for(int i=0,end=i+length-1;i<sarr.length;i++,end++){
+			//count next
+			if(row[end]==' '){
+				spaces++;
+			}
+			if(impossible[end]){
+				impossibles++;
+			}
+			if(fastCrossers[end]!=null){
+				crossers++;
+				System.out.println(end);
+			}
+//			System.out.println("cross: "+crossers);
+			
+			//it must not be impossible
+			if(impossibles==0){
+				//must have room to place pieces, must have enough letters in rack
+				if((spaces>0 && spaces<=rackLength)){
+					//it must be empty before and after the word, or else it's not the given length
+					if( (i==0 || row[i-1]==' ') && ((i+length)==row.length || row[i+length]==' ')){
+						if(spaces==length){
+							//must be crossing words if there are no encountered letters
+							if(crossers>0){
+								sarr[i]=1;//crossers>0, spaces==length, can skip fit
+							}
+						} else {
+							if(crossers==0){
+								sarr[i]=2;//crossers==0, spaces<length, can skip crossers
+							} else {
+								sarr[i]=3;//crossers>0, spaces<length, can't skip
+							}
+						}
+					}
+				}
 			}
 
 			//uncount old
