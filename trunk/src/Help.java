@@ -208,6 +208,7 @@ public class Help {
 		}
 		return freq;
 	}
+	
 
 	/**
 	 * Uses an int as a bit array to store which chars are in the word.
@@ -236,14 +237,14 @@ public class Help {
 	 * @param hasFreq
 	 * @return
 	 */
-	public static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildCards){
+	public static boolean hasCharFreq2(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq, int blanks){
 		int letterIndex;
 		for(int i=0;i<checkList.length;i++){
 			letterIndex=checkList[i];
 			if(needFreq[letterIndex]>hasFreq[letterIndex]){
 				int need=needFreq[letterIndex]-hasFreq[letterIndex];
-				wildCards=wildCards-need;
-				if(wildCards<0){
+				blanks=blanks-need;
+				if(blanks<0){
 					return false;
 				}
 			}
@@ -251,21 +252,46 @@ public class Help {
 		return true;
 	}
 	
+//	/**
+//	 * uses a compact needFreq that is the same length as checkList.
+//	 * This may make FastFilter or SlowFilter faster.
+//	 * @param checkList
+//	 * @param needFreq
+//	 * @param hasFreq
+//	 * @param blanks the same as wildcards
+//	 * @return
+//	 */
+//	public static boolean hasCharFreqCompact(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int blanks){
+//		for(int i=0;i<needFreq.length;i++){
+//			if(needFreq[i]>hasFreq[checkList[i]]){
+//				//if don't have enough letters of that type try blanks
+//				//wildCards=wildCards-need
+//				blanks=blanks-(needFreq[i]-hasFreq[checkList[i]]);
+//				//if there isn't enough blanks return false
+//				if(blanks<0){return false;}
+//			}
+//		}
+//		//there were enough letters so return true
+//		return true;
+//	}
+	
 	/**
-	 * uses a compact needFreq that is the same length as checkList.
+	 * uses a needFreq that is compact and contains
+	 * letterindex at odd indexes and the amount at even indexes.
+	 * 
 	 * This may make FastFilter or SlowFilter faster.
 	 * @param checkList
-	 * @param needFreq
+	 * @param needFreqDual
 	 * @param hasFreq
 	 * @param blanks the same as wildcards
 	 * @return
 	 */
-	public static boolean hasCharFreqCompact(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int blanks){
-		for(int i=0;i<needFreq.length;i++){
-			if(needFreq[i]>hasFreq[checkList[i]]){
+	public static boolean hasFreqDual(final byte[] needFreqDual, final byte[] hasFreq,int blanks){
+		for(int i=1;i<needFreqDual.length;i+=2){
+			if(needFreqDual[i]>hasFreq[needFreqDual[i-1]]){
 				//if don't have enough letters of that type try blanks
 				//wildCards=wildCards-need
-				blanks=blanks-(needFreq[i]-hasFreq[checkList[i]]);
+				blanks=blanks-(needFreqDual[i]-hasFreq[needFreqDual[i-1]]);
 				//if there isn't enough blanks return false
 				if(blanks<0){return false;}
 			}
@@ -275,43 +301,62 @@ public class Help {
 	}
 	
 	/**
-	 * untested can be used in advanced bot
-	 * @param checkList
-	 * @param needFreq
-	 * @param hasFreq
-	 * @param wildcards
-	 * @param unknownWildCards
-	 * @param unknown
-	 * @param unknowns
+	 * creates a charFreq with "tuples" of letterIndex and count.
+	 * Use hasCharFreqDual instead of hasCharFreq2. It is a
+	 * freq and checkList in one byte array.
+	 * @param s
 	 * @return
 	 */
-	public static boolean hasCharFreq3(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildcards,
-			int unknownWildCards,byte[] unknown,int unknowns){
-		//it dosen't matter what type of wildcard it is
-		int wildCards=wildcards+unknownWildCards;
-		int i;
-		for(int j=0;j<checkList.length;j++){
-			i=checkList[j];
-			//check if need to use unknowns or wildcards
-			if(needFreq[i]>hasFreq[i]){
-				int need=needFreq[i]-hasFreq[i];
-				
-				//available=Math.min(unknowns, unknown[i]);
-				//used unknowns
-				int used=Math.min(need, Math.min(unknowns, unknown[i]));
-				unknowns-=used;
-				//check if need to use wildcards
-				if(used!=need){
-					need=need-used;
-					wildcards-=need;
-					if(wildCards<0){
-						return false;
-					}
-				}
-			} 
+	public static byte[] createFreqDual(final String s){
+		final byte[] charFreq=Help.createFreq(s);
+		final byte[] checkList=Help.getCheckList(charFreq);
+		byte[] res=new byte[checkList.length*2];
+		int index=0;
+		for(int i=0;i<checkList.length;i++){
+			res[index++]=checkList[i];
+			res[index++]=charFreq[checkList[i]];
 		}
-		return true;
+		return res;
 	}
+	
+//	/**
+//	 * untested can be used in advanced bot
+//	 * @param checkList
+//	 * @param needFreq
+//	 * @param hasFreq
+//	 * @param wildcards
+//	 * @param unknownWildCards
+//	 * @param unknown
+//	 * @param unknowns
+//	 * @return
+//	 */
+//	public static boolean hasCharFreq3(final byte[] checkList,final byte[] needFreq, final byte[] hasFreq,int wildcards,
+//			int unknownWildCards,byte[] unknown,int unknowns){
+//		//it dosen't matter what type of wildcard it is
+//		int wildCards=wildcards+unknownWildCards;
+//		int i;
+//		for(int j=0;j<checkList.length;j++){
+//			i=checkList[j];
+//			//check if need to use unknowns or wildcards
+//			if(needFreq[i]>hasFreq[i]){
+//				int need=needFreq[i]-hasFreq[i];
+//				
+//				//available=Math.min(unknowns, unknown[i]);
+//				//used unknowns
+//				int used=Math.min(need, Math.min(unknowns, unknown[i]));
+//				unknowns-=used;
+//				//check if need to use wildcards
+//				if(used!=need){
+//					need=need-used;
+//					wildcards-=need;
+//					if(wildCards<0){
+//						return false;
+//					}
+//				}
+//			} 
+//		}
+//		return true;
+//	}
 	
 	
 //	public static int min(final int a, final int b){
@@ -396,6 +441,33 @@ public class Help {
 //		}
 		
 		return true;
+	}
+	
+	/**
+	 * 
+	 * @param word
+	 * @param row
+	 * @param position
+	 * @param blank
+	 * @return
+	 */
+	public static boolean isFitting(final String word, final char[] row,int position, final char blank){
+		for(int i=0;i<word.length();i++,position++){
+			if(row[position]!=blank && row[position]!=word.charAt(i)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static String getLetters(char[] row, int position,final int length){
+		StringBuilder sb=new StringBuilder();
+		for(int i=0;i<length;i++,position++){
+			if(row[position]!=' '){
+				sb.append(row[position]);
+			}
+		}
+		return sb.toString();
 	}
 	
 	
